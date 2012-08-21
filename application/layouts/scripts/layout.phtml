@@ -1,0 +1,47 @@
+<?php echo $this->doctype() ?> <!-- définit par le bootstrap -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <?php
+    $this->JQuery()->addStyleSheet($this->baseUrl() . '/js/jquery/themes/smoothness/jquery-ui-1.8.23.custom.css');
+    //indique le fichier de script javascript à utliser avec jQuery UI
+    $this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
+    echo $this->jQuery();
+  ?>
+  <title>Zend User Manager</title>
+  <?php echo $this->headLink()->appendStylesheet($this->baseUrl() . '/css/style.css') ?>
+</head>
+ 
+<body>
+    <div id="top">
+        Zend User Manager
+    </div>
+    <div>
+        <div id="left">
+            Menu<br />
+            <?php //attention à la balise "<?=" pour l'url ?>
+   <a href="<?php echo $this->url(array('controller' => 'users', 'action' => 'create'), 'default', true) ?>">Creation</a>
+        </div>
+        <div>
+            <div id="content" class="right_content">
+                <!-- affiche le contenu dynamique de la page -->
+                <?php echo $this->layout()->content ?>
+            </div>
+        </div>
+    </div>
+    
+    <div id="bottom">
+            aurevec.be
+    </div>
+		<div id="right">
+			<h1>Authentication</h1> <br/>
+			<?php
+				$date = new Zend_Date();
+				echo $date->toString('dd MMMM yyyy') . '<br/>';
+ 
+				echo $this->LoggedUser();
+			?>
+ 
+		</div>		
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Règles de réécriture pour Zend Framework
+#RewriteEngine on
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteRule .* index.php
+
+# Sécurité : Ne pas autoriser le parcours de répertoires
+#Options -Indexes
+
+# Configuration PHP
+#php_flag magic_quotes_gpc off
+#php_flag register_globals off
+#php_flag short_open_tag on
+
+# définition de aurevec
+SetEnv APPLICATION_ENV development
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [NC,L]
+RewriteRule ^.*$ index.php [NC,L]

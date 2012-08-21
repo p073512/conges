@@ -1,4 +1,30 @@
 <!--il faut simplement créer une vue pour chaque action:-->
 <!--- fichier /views/scripts/login/login.phtml qui est vide-->
 <!--- fichier /views/scripts/login/logout.phtml qui est vide-->
-<!--- fichier /views/scripts/login/index.phtml qui va simplement contenir une valriable permettant d’afficher le formulaire créé dans l’action-->
+<!--- fichier /views/scripts/login/index.phtml qui va simplement contenir une variable permettant d’afficher le formulaire créé dans l’action-->
+
+<?php //echo $this->render('header.phtml'); ?>
+
+<h1><?php //echo $this->escape($this->title); ?></h1>
+
+<?php if(!empty($this->message)) :?>
+<div id="message"><?php echo $this->escape($this->message);?></div>
+<?php endif; ?>
+
+<form action="<?php echo $this->baseUrl ?>/login/login" method="post">
+	<div>
+		<label for="user">Username</label> <input type="text"
+			name="user" value=""
+		/>
+	</div>
+	<div>
+		<label for="password">Password</label> <input type="password"
+			name="password" value="" 
+		/>
+	</div>
+	<div id="formbutton">
+		<input type="submit" name="login" value="Login" />
+	</div>
+</form>
+
+<?php // echo $this->render('footer.phtml'); ?>

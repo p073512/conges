@@ -13,7 +13,7 @@ class Default_Form_Login extends Zend_Form
 		$login->addFilter('StringTrim');
 		$this->addElement($login);
 
-		$password = new Zend_Form_Element_Password('pass');
+		$password = new Zend_Form_Element_Password('password');
 		$password->setLabel('Password');
 		$password->setRequired(true);
 		$password->addFilter('StripTags');

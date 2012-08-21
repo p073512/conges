@@ -5,8 +5,8 @@ class Default_Controller_Plugin_Acl extends Zend_Controller_Plugin_Abstract
 	//si l'utilisateur n'est pas authentifié
 	private $_noauth = array(
 		'module' => 'default',
-		'controller' => 'auth',
-		'action' => 'login'
+		'controller' => 'login',
+		'action' => 'index'
 	);
  
 	//tableau associatif reprenant les infos utilisées pour le lien
@@ -46,7 +46,7 @@ class Default_Controller_Plugin_Acl extends Zend_Controller_Plugin_Abstract
 		{
 			//récupération du role (via la database)
 			// PTRI - notre login fait office de role (equipe, admin ou csm)
-			$role = $auth->getIdentity()->login;
+			$role = $auth->getIdentity()->role;
 		}
 		else
 		{

@@ -33,15 +33,14 @@
     <div id="bottom">
             aurevec.be
     </div>
-		<div id="right">
-			<h1>Authentication</h1> <br/>
-			<?php
-				$date = new Zend_Date();
-				echo $date->toString('dd MMMM yyyy') . '<br/>';
+	<div id="right">
+		<h1>Authentication</h1> <br/>
+		<?php
+			$date = new Zend_Date();
+			echo $date->toString('dd MMMM yyyy') . '<br/>';
+			echo $this->LoggedUser();
+		?>
  
-				echo $this->LoggedUser();
-			?>
- 
-		</div>		
+	</div>		
 </body>
 </html>

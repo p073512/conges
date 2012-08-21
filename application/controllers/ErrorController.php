@@ -5,7 +5,8 @@ class ErrorController extends Zend_Controller_Action
 
 	public function errorAction()
 	{
-		$errors = $this->_getParam('error_handler');
+		/*
+		 * $errors = $this->_getParam('error_handler');
 
 		if (!$errors) {
 			$this->view->message = 'You have reached the error page';
@@ -40,7 +41,11 @@ class ErrorController extends Zend_Controller_Action
 			$this->view->exception = $errors->exception;
 		}
 
-		$this->view->request   = $errors->request;
+		$this->view->request = $errors->request;
+		*/
+		
+		// Tester les ACL's
+		$this->view->message = "Error !";
 	}
 
 	public function getLog()

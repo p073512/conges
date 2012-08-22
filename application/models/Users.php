@@ -7,7 +7,9 @@ class Default_Model_Users
 	protected $_firstname;
 	protected $_lastname;
 	protected $_mail;
+	protected $_login;
 	protected $_password;
+	protected $_role;
 
 	//le mapper va nous fournir les méthodes pour interagir avec notre table (objet de type Default_Model_UsersMapper)
 	protected $_mapper;
@@ -101,6 +103,16 @@ class Default_Model_Users
 		return $this->_mail;
 	}
 
+	public function setLogin($login)
+	{
+		$this->_login = (string)$login;
+		return $this;
+	}
+	public function getLogin()
+	{
+		return $this->_login;
+	}
+
 	public function setPassword($password)
 	{
 		$this->_password = (string)$password;
@@ -109,6 +121,16 @@ class Default_Model_Users
 	public function getPassword()
 	{
 		return $this->_password;
+	}
+
+	public function setRole($role)
+	{
+		$this->_role = (string)$role;
+		return $this;
+	}
+	public function getRole()
+	{
+		return $this->_role;
 	}
 
 	public function setMapper($mapper)

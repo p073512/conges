@@ -49,6 +49,13 @@ class Default_Form_Users extends Zend_Form
 		$mail->addValidator('NotEmpty');
 		//ce validateur vérifie que la valeur de l'élément correspond a une adresse mail
 		$mail->addValidator('EmailAddress');
+		
+		$login = new Zend_Form_Element_Text('login');
+		$login->setLabel('Login: ');
+		$login->setRequired(true);
+		$login->addFilter('StripTags');
+		$login->addFilter('StringTrim');
+		$login->addValidator('NotEmpty');
 
 		//création d'un élément input de type password
 		$password = new Zend_Form_Element_Password('password');
@@ -57,6 +64,14 @@ class Default_Form_Users extends Zend_Form
 		$password->addFilter('StripTags');
 		$password->addFilter('StringTrim');
 		$password->addValidator('NotEmpty');
+		
+		$role = new Zend_Form_Element_Select('role');
+		$role->setMultiOptions(array('equipe' => 'Equipe','csm' => 'CSM','admin' => 'Admin'));
+		$role->setLabel('Role: ');
+		$role->setRequired(true);
+		$role->addFilter('StripTags');
+		$role->addFilter('StringTrim');
+		$role->addValidator('NotEmpty');
 
 		//création d'un élément submit pour envoyer le formulaire
 		$submit = new Zend_Form_Element_Submit('submit');
@@ -64,6 +79,6 @@ class Default_Form_Users extends Zend_Form
 		$submit->setAttrib('id', 'submitBt');
 
 		//ajout des éléments au formulaire
-		$this->addElements(array($id, $firstname, $lastname, $mail, $password, $submit));
+		$this->addElements(array($id, $firstname, $lastname, $mail, $login, $password, $role, $submit));
 	}
 }

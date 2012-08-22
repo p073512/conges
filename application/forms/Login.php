@@ -22,7 +22,7 @@ class Default_Form_Login extends Zend_Form
 
 		$submit = new Zend_Form_Element_Submit('submit');
 		$submit->setLabel('Connect');
-		$submit->style = array('float: right');
+		//$submit->style = array('float: left');
 		$this->addElement($submit);
 	}
 }

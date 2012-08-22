@@ -14,7 +14,7 @@ class LoginController extends Zend_Controller_Action
 		//création et affichage dans la vue du formulaire
 		$loginForm = new Default_Form_Login();
 		$loginForm->setAction($this->view->url(array('controller' => 'login', 'action' => 'login'), 'default', true));
-		$this->view->loginForm = $loginForm;
+		$this->view->form = $loginForm;
 	}
 
 	public function loginAction()
@@ -83,7 +83,8 @@ class LoginController extends Zend_Controller_Action
 		else
 		{
 			//redirection si la page n'a pas été appelée à partir d'un formulaire
-			$this->_redirect($this->view->url(array('controller' => 'login'), 'default', true));
+			//$this->_redirect($this->view->url(array('controller' => 'login'), 'default', true));
+			$this->_helper->redirector('index', 'login');
 		}
 	}
 

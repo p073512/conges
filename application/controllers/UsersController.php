@@ -53,7 +53,9 @@ class UsersController extends Zend_Controller_Action
 				$users->setFirstname($form->getValue('firstname'));
 				$users->setLastname($form->getValue('lastname'));
 				$users->setMail($form->getValue('mail'));
+				$users->setLogin($form->getValue('login'));
 				$users->setPassword($form->getValue('password'));
+				$users->setRole($form->getValue('role'));
 
 				$users->save();
 
@@ -96,7 +98,9 @@ class UsersController extends Zend_Controller_Action
 				$users->setFirstname($form->getValue('firstname'));
 				$users->setLastname($form->getValue('lastname'));
 				$users->setMail($form->getValue('mail'));
+				$users->setLogin($form->getValue('login'));
 				$users->setPassword($form->getValue('password'));
+				$users->setRole($form->getValue('role'));
 
 				$users->save();
 
@@ -129,7 +133,9 @@ class UsersController extends Zend_Controller_Action
 				$data['firstname'] = $user->getFirstname();
 				$data['lastname'] = $user->getLastname();
 				$data['mail'] = $user->getMail();
+				$data['login'] = $user->getLogin();
 				$data['password'] = $user->getPassword();
+				$data['role'] = $user->getRole();
 				$form->populate($data);
 			}
 		}

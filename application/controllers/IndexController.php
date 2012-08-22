@@ -4,13 +4,13 @@
 //il doit respecter la nomenclature [ControllerName]Controller
 class IndexController extends Zend_Controller_Action
 {
-
+	
 	function preDispatch()
 	{
 		$auth = Zend_Auth::getInstance();
 
 		if (!$auth->hasIdentity()) {
-			$this->_redirect('auth/login');
+			$this->_redirect('login/index');
 		}
 	}
 
@@ -21,7 +21,7 @@ class IndexController extends Zend_Controller_Action
 		$this->view->baseUrl = $this->_request->getBaseUrl();
 		$this->view->role = Zend_Auth::getInstance()->getIdentity();
 	}
-
+	
 	//une action doit respecter la nomenclature [actionName]Action
 	public function indexAction()
 	{

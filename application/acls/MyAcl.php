@@ -23,6 +23,7 @@ class Default_Acl_MyAcl extends Zend_Acl
 		//la méthode addRessource() permet d'ajouter les ressources à l'ACL
 		$this->addResource(new Zend_Acl_Resource('index'));
 		$this->addResource(new Zend_Acl_Resource('error'));
+		$this->addResource(new Zend_Acl_Resource('connexion'));
 		$this->addResource(new Zend_Acl_Resource('login'));
 		$this->addResource(new Zend_Acl_Resource('users'));
 		$this->addResource(new Zend_Acl_Resource('test'));
@@ -60,9 +61,14 @@ class Default_Acl_MyAcl extends Zend_Acl
 		//le second argument permet d'indiquer les contrôleurs
 		//le troisième indique les actions du contrôleur
 		//à noter qu'il aussi possible de refuser un accès grâce à la fonction deny()
-		$this->allow('guest', array('index','error','login','test'));
+		$this->allow('guest', array('index','error','connexion','login','test'));
+		/*
 		$this->allow('equipe', 'users', 'index');
 		$this->allow('csm');
 		$this->allow('admin', 'users');
+		*/
+		$this->allow('equipe');
+		$this->allow('csm');
+		$this->allow('admin');
 	}
 }

@@ -17,7 +17,7 @@ class UsersController extends Zend_Controller_Action
 		//récupérant toutes les entrées dans notre base de données
 		$paginator = Zend_Paginator::factory($users->fetchAll());
 		//indique le nombre déléments à afficher par page
-		$paginator->setItemCountPerPage(2);
+		$paginator->setItemCountPerPage(10);
 		//récupère le numéro de la page à afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 
@@ -53,9 +53,7 @@ class UsersController extends Zend_Controller_Action
 				$users->setFirstname($form->getValue('firstname'));
 				$users->setLastname($form->getValue('lastname'));
 				$users->setMail($form->getValue('mail'));
-				$users->setLogin($form->getValue('login'));
 				$users->setPassword($form->getValue('password'));
-				$users->setRole($form->getValue('role'));
 
 				$users->save();
 
@@ -77,7 +75,7 @@ class UsersController extends Zend_Controller_Action
 		$form = new Default_Form_Users();
 		//indique l'action qui va traiter le formulaire
 		$form->setAction($this->view->url(array('controller' => 'users', 'action' => 'edit'), 'default', true));
-		$form->submit->setLabel('Update');
+		$form->submit->setLabel('Modifier');
 
 		//assigne le formulaire à la vue
 		$this->view->form = $form;
@@ -98,9 +96,7 @@ class UsersController extends Zend_Controller_Action
 				$users->setFirstname($form->getValue('firstname'));
 				$users->setLastname($form->getValue('lastname'));
 				$users->setMail($form->getValue('mail'));
-				$users->setLogin($form->getValue('login'));
 				$users->setPassword($form->getValue('password'));
-				$users->setRole($form->getValue('role'));
 
 				$users->save();
 
@@ -133,9 +129,7 @@ class UsersController extends Zend_Controller_Action
 				$data['firstname'] = $user->getFirstname();
 				$data['lastname'] = $user->getLastname();
 				$data['mail'] = $user->getMail();
-				$data['login'] = $user->getLogin();
 				$data['password'] = $user->getPassword();
-				$data['role'] = $user->getRole();
 				$form->populate($data);
 			}
 		}

@@ -1,0 +1,30 @@
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		  <?php
+			    $this->JQuery()->addStyleSheet($this->baseUrl() . '/js/jquery/themes/smoothness/jquery-ui-1.8.23.custom.css');
+			    //indique le fichier de script javascript à utliser avec jQuery UI
+			    $this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
+			    echo $this->jQuery();
+		  ?>
+		  <?php 
+			  	echo $this->headLink()->appendStylesheet($this->baseUrl() . '/css/page.css'); 
+			  	echo $this->headTitle();
+			  	
+		  ?>
+	</head>
+	</html>
+
+<script>
+if (confirm('solde de cette ressource est epuise. Si vous voulez le modifier appuyer sur annuler'))
+{
+	location.href= "<?php echo $this->url(array('solde'=> 1,'id'=>$this->id, 'controller' => 'proposition', 'action' => 'accepter'), 'default', true) ?>";
+}
+else 
+{
+	location.href= "<?php echo $this->url(array('solde'=> 0,'id'=>$this->id,'controller' => 'proposition', 'action' => 'accepter'), 'default', true) ?>";
+}
+</script>
+

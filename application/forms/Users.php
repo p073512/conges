@@ -50,13 +50,6 @@ class Default_Form_Users extends Zend_Form
 		//ce validateur vérifie que la valeur de l'élément correspond a une adresse mail
 		$mail->addValidator('EmailAddress');
 
-		$login = new Zend_Form_Element_Text('login');
-		$login->setLabel('Login: ');
-		$login->setRequired(true);
-		$login->addFilter('StripTags');
-		$login->addFilter('StringTrim');
-		$login->addValidator('NotEmpty');
-
 		//création d'un élément input de type password
 		$password = new Zend_Form_Element_Password('password');
 		$password->setLabel('Password: ');
@@ -65,37 +58,12 @@ class Default_Form_Users extends Zend_Form
 		$password->addFilter('StringTrim');
 		$password->addValidator('NotEmpty');
 
-		// Selon le profil de notre utilisateur, le champ role sera différent
-		$auth = Zend_Auth::getInstance();
-		$profil = $auth->getIdentity()->login;
-
-		$role = new Zend_Form_Element_Select('role');
-		$role->setMultiOptions(array('equipe' => 'Equipe','csm' => 'CSM','admin' => 'Admin'));
-		$role->setLabel('Role: ');
-		$role->setRequired(true);
-		$role->addFilter('StripTags');
-		$role->addFilter('StringTrim');
-		$role->addValidator('NotEmpty');
-
-		if (!strcmp($profil,'equipe')) {
-			$role->setAttribs(array('disabled' => 'disabled'));
-			$role->setValue('equipe');
-		}
-
-		/*$role = new Zend_Form_Element_Select('role');
-		$role->setMultiOptions(array('equipe' => 'Equipe','csm' => 'CSM','admin' => 'Admin'));
-		$role->setLabel('Role: ');
-		$role->setRequired(true);
-		$role->addFilter('StripTags');
-		$role->addFilter('StringTrim');
-		$role->addValidator('NotEmpty');*/
-
 		//création d'un élément submit pour envoyer le formulaire
 		$submit = new Zend_Form_Element_Submit('submit');
 		//définit l'attribut "id" de l'élément submit
 		$submit->setAttrib('id', 'submitBt');
 
 		//ajout des éléments au formulaire
-		$this->addElements(array($id, $firstname, $lastname, $mail, $login, $password, $role, $submit));
+		$this->addElements(array($id, $firstname, $lastname, $mail, $password, $submit));
 	}
 }

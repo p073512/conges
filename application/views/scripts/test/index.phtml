@@ -1,3 +1,164 @@
-<div>
-    <?php echo $this->form; ?>
-</div>
+<?php 
+
+$joursem = array('dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam');
+$mois2=array('','Janvier','Fevrier','Mars','Avril','Mai','Juin','Juillet','Aout','Septembre','Octobre','Novembre','Decembre');
+$numjour1= array(0, 1, 2, 3, 4,5,6); // 0 pour un dimanche et 6 pour un samedi
+
+var_dump($this->calendrierArray);
+
+?>
+<table border="1">
+<?php
+$m=1;
+$i=0;
+$t=0;
+$x =31;
+$tab = array();
+$tab_jour = array();
+for ($i==0;$i<38;$i++)
+{
+?>	
+<tr >
+	<?php
+	$j=0;
+	for ($j==0;$j<=12;$j++)
+	{
+		?>
+		<td id ="salut">
+		
+		<?php 
+		
+		if ($i==0 && $j==0)
+		{
+			echo "mois/jour";
+		}
+		elseif (($i==0)&& ($j!=0)) echo $mois2[$j];
+		elseif (($i!=0)&& ($j==0)) 
+		{
+			echo $joursem[$t];
+			
+		}
+		elseif (($i!=0)&& ($j!=0)) 
+		{
+			$timestamp = mktime (0, 0, 0, $j, 01, $_SESSION['salut']['annee']/*$year*/);
+			$numjour= $numjour1[date("w",$timestamp)]; 
+			
+			if (((($numjour==$t)&& $i==$numjour)||(($numjour==0)&& $i==7)||(($numjour==6)&& $i==7))&& !in_array($j , $tab))
+			{
+				
+				$tab[$j] = $j;
+				$tab_jour[$j]= $i;
+				
+					?>
+						<table>
+						<tr >
+						<td   > 
+						<?php
+						if (in_array(1, $this->calendrierArray[$j]['A'])){echo '<div class="CP"></div>'; }
+						else '<div class="vide"></div>';
+						?>
+						</td>
+						<td > 
+						<?php
+						if (in_array(1, $this->calendrierArray[$j]['B'])){echo '<div class="P"></div>'; }
+						else '<div class="vide"></div>';
+						?>
+						</td>
+						<td  > 
+						<?php
+						if (in_array(1, $this->calendrierArray[$j]['C'])){echo '<div class="R"></div>'; }
+						else '<div class="vide"></div>';
+						?>
+						</td>
+						<td class="vide"> 1 </td>
+						<td > 
+							<?php
+							
+							if (in_array(1, array_keys($this->calendrierArray[$j]['feries']))){echo $this->calendrierArray[$j]['feries'][1]; }
+							elseif (in_array(1, array_keys($this->calendrierArray[$j]['conge']))){echo $this->calendrierArray[$j]['type_conge'][$this->calendrierArray[$j]['conge'][1]]; }
+							elseif (in_array(1, array_keys($this->calendrierArray[$j]['conge']))){echo $this->calendrierArray[$j]['type_conge'][$this->calendrierArray[$j]['conge'][1]]; }
+							else '<div class="vide"></div>';
+							?>
+						</td>
+						</tr>
+						</table>
+					<?php 		
+			}
+			elseif (in_array($j , $tab))
+			{
+				$nombreDeJoursDeMois = intval(date("t",$timestamp));
+				if ($i < $nombreDeJoursDeMois +$tab_jour[$j])
+				{
+					$num_jrs =($i -$tab_jour[$j])+1;
+					?>
+						
+						<table>
+						<tr >
+					<td > 
+						<?php
+						if (in_array($num_jrs, $this->calendrierArray[$j]['A'])){echo '<div class="CP"></div>'; }
+						else '<div class="vide"></div>';
+						?>
+						</td>
+						<td   > 
+						<?php
+						if (in_array($num_jrs, $this->calendrierArray[$j]['B'])){echo '<div class="P"></div>'; }
+						else '<div class="vide"></div>';
+						?>
+						</td>
+						<td   > 
+						<?php
+						if (in_array($num_jrs, $this->calendrierArray[$j]['C'])){echo '<div class="R"></div>'; }
+						else '<div class="vide"></div>';
+						?>
+						</td>
+						<td   > <?php echo '<div class="vide">'.$num_jrs.'</div>' ?></td>
+						<td   > 
+						
+							<?php
+							
+							if (in_array($num_jrs, array_keys($this->calendrierArray[$j]['feries']))){echo $this->calendrierArray[$j]['feries'][$num_jrs]; }
+							elseif (in_array($num_jrs, array_keys($this->calendrierArray[$j]['conge']))){echo $this->calendrierArray[$j]['type_conge'][$this->calendrierArray[$j]['conge'][$num_jrs]]; }
+							elseif (in_array($num_jrs, array_keys($this->calendrierArray[$j]['conge']))){echo $this->calendrierArray[$j]['type_conge'][$this->calendrierArray[$j]['conge'][$num_jrs]]; }
+							else '<div class="vide"></div>';
+							?>
+						
+						</td>
+						</tr>
+						</table>
+					<?php
+				}
+				else '<div class="vide"></div>';
+				
+					
+			}
+			
+			
+		}
+		
+		?>
+		</td>
+		
+	<?php
+	}
+	?>
+
+</tr>
+
+<?php
+$j=0;
+if ($t==6){$t=0;}
+else $t++;
+$nombre=0;
+
+	}
+	?>
+</table>
+
+
+
+
+
+ 
+
+

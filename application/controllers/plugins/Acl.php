@@ -6,6 +6,7 @@ class Default_Controller_Plugin_Acl extends Zend_Controller_Plugin_Abstract
 	private $_noauth = array(
 		'module' => 'default',
 		'controller' => 'connexion',
+		//'controller' => 'login',
 		'action' => 'index'
 	);
  

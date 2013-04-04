@@ -23,10 +23,22 @@ class Default_Acl_MyAcl extends Zend_Acl
 		//la méthode addRessource() permet d'ajouter les ressources à l'ACL
 		$this->addResource(new Zend_Acl_Resource('index'));
 		$this->addResource(new Zend_Acl_Resource('error'));
-		$this->addResource(new Zend_Acl_Resource('connexion'));
 		$this->addResource(new Zend_Acl_Resource('login'));
-		$this->addResource(new Zend_Acl_Resource('users'));
-		$this->addResource(new Zend_Acl_Resource('test'));
+		$this->addResource(new Zend_Acl_Resource('profil'));
+		/*
+		 * l'acces sera interdit sur quelque ou la totalite des actions 
+		 * des controleurs suivants
+		 */
+		
+		
+		$this->addResource(new Zend_Acl_Resource('connexion'));
+		$this->addResource(new Zend_Acl_Resource('conge'));
+		$this->addResource(new Zend_Acl_Resource('personne'));
+		$this->addResource(new Zend_Acl_Resource('proposition'));
+		$this->addResource(new Zend_Acl_Resource('demande'));
+		$this->addResource(new Zend_Acl_Resource('calendrier'));
+		
+	
 	}
 
 	protected function _initRoles()
@@ -61,14 +73,17 @@ class Default_Acl_MyAcl extends Zend_Acl
 		//le second argument permet d'indiquer les contrôleurs
 		//le troisième indique les actions du contrôleur
 		//à noter qu'il aussi possible de refuser un accès grâce à la fonction deny()
-		$this->allow('guest', array('index','error','connexion','login','test'));
-		/*
-		$this->allow('equipe', 'users', 'index');
-		$this->allow('csm');
-		$this->allow('admin', 'users');
-		*/
-		$this->allow('equipe');
-		$this->allow('csm');
+//		$this->allow('guest', null,null);
+		$this->allow('guest','connexion');
+		$this->allow('equipe','calendrier');
+		$this->allow('equipe','proposition', 'affichercsm');
+		$this->allow('equipe','conge', 'rederigerversindex');
+//		$this->allow('equipe','calendrier', 'calendriermensuel');
+		$this->allow('csm','personne', array('create','edit','delete'));
+		$this->allow('csm','proposition', array('create','edit','delete','index'));
+//		$this->allow('admin');
+//		$this->allow('equipe');
+//		$this->allow('csm');
 		$this->allow('admin');
 	}
 }

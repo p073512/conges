@@ -1,1 +1,37 @@
-<?php echo $this->form; ?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		  <?php
+			    $this->JQuery()->addStyleSheet($this->baseUrl() . '/js/jquery/themes/smoothness/jquery-ui-1.8.23.custom.css');
+			    //indique le fichier de script javascript à utliser avec jQuery UI
+			    $this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
+			    echo $this->jQuery();
+		  ?>
+		  <?php 
+			  	echo $this->headLink()->appendStylesheet($this->baseUrl() . '/css/page2.css'); 
+			  	
+			  	echo $this->headTitle();
+		  ?>
+		  
+	</head>
+
+<body>
+		<div id="bloc_page">
+		
+		
+            <header>
+                <div id="titre_principal">
+                    
+                    <h1> <Strong> Application de gestion des cong&eacute;s </Strong></h1>
+                    
+				</div>
+
+			</header>
+			
+			<div id="corp">
+			<h5> Login In </h5>
+		  		<?php echo $this->form; ?>
+	
+			</div>
+	</div>
+	</body>

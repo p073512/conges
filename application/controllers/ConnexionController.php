@@ -10,6 +10,8 @@ class ConnexionController extends Zend_Controller_Action
 		// Appel de l'aide comme méthode sur le gestionnaire d'aides:
 		$layout = $this->_helper->layout();
 		$layout->disableLayout();
+		
+   
 	}
 
 	public function indexAction()
@@ -18,6 +20,8 @@ class ConnexionController extends Zend_Controller_Action
 		$connexionForm = new Default_Form_Connexion();
 		$connexionForm->setAction($this->view->url(array('controller' => 'connexion', 'action' => 'connexion'), 'default', true));
 		$this->view->form = $connexionForm;
+	
+		
 	}
 
 	public function connexionAction()
@@ -26,7 +30,7 @@ class ConnexionController extends Zend_Controller_Action
 		$form = new Default_Form_Connexion();
 		//indique l'action qui va traiter le formulaire
 		$form->setAction($this->view->url(array('controller' => 'connexion', 'action' => 'connexion'), 'default', true));
-		$form->submit->setLabel('Connexion');
+		
 
 		//assigne le formulaire à la vue
 		$this->view->form = $form;
@@ -74,26 +78,34 @@ class ConnexionController extends Zend_Controller_Action
 					Zend_Session::regenerateId();
 
 					//redirection
-					$this->_helper->_redirector('index', 'users');
+					$this->_helper->_redirector('calendriermensuel', 'calendrier');
 				}
 				else
 				{
 					//si erreur rencontrée, le formulaire est rechargé
-					$this->_helper->_redirector('index', 'connexion');
+					
+					echo "mot de passe incorrecte";
+					///$this->_helper->_redirector('index', 'connexion');
+				
 				}
 			}
 			else
 			{
 				//si erreur rencontrée, le formulaire est rechargé
-				$form->populate($data);
-				$this->_helper->_redirector('index', 'connexion');
+				
+				echo "mot de passe incorrecte";
+				//$this->_helper->_redirector('index', 'connexion');
+				
 			}
 		}
 		else
 		{
 			//redirection si la page n'a pas été appelée à partir d'un formulaire
 			//$this->_redirect($this->view->url(array('controller' => 'profil'), 'default', true));
-			$this->_helper->redirector('index', 'connexion');
+			
+			echo "mot de passe incorrecte";	
+			//$this->_helper->redirector('index', 'connexion');
+			
 		}
 	}
 

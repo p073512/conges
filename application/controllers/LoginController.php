@@ -40,7 +40,8 @@ class LoginController extends Zend_Controller_Action
 				//le second correspond à la table qui est utilisée pour l'authentification
 				//le troisième indique la colonne utilisée pour représenter l'identité (le login)
 				//le quatrième argument indique la colonne utilisée pour représenter le crédit (le password)
-				$authAdapter = new Zend_Auth_Adapter_DbTable(Zend_Db_Table_Abstract::getDefaultAdapter(), 'users', 'login', 'password');
+				//$authAdapter = new Zend_Auth_Adapter_DbTable(Zend_Db_Table_Abstract::getDefaultAdapter(), 'profil', 'login', 'password','MD5(?)');
+				$authAdapter = new Zend_Auth_Adapter_DbTable(Zend_Db_Table_Abstract::getDefaultAdapter(), 'profil', 'login', 'mot_passe');
 
 				//création de validateurs permettant de vérifier si certaines exigences sont respectées
 				//par le login et le password
@@ -75,7 +76,7 @@ class LoginController extends Zend_Controller_Action
 						Zend_Session::regenerateId();
 
 						//redirection
-						$this->_helper->_redirector('index', 'users');
+						$this->_helper->_redirector('calendriermensuel', 'calendrier');
 					}
 				}
 			}

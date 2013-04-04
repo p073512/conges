@@ -1,0 +1,56 @@
+<div>
+    <table border="1">
+        <tr>
+           
+            <th>Nom</th>
+            <th>Prenom</th>
+            <th>Date Entree</th>
+            <th>Entite</th>
+            <th>Pole</th>
+            <th>Fonction</th>
+            <th>Centre Service</th>
+            <th>Modalite</th>
+            <th>Pourcent</th>
+            <th>Stage</th>
+            <th> Modifier </th>
+            <th> Supprimer </th>
+
+        </tr>
+        <?php
+            //$this->usersArray est une variable qui peut être garnie par le controller
+            //elle doit recevoir un tableau contenant des objets de type Default_Model_Proposition
+            //le tableau est parcouru par foreach pour afficher les propiétés des objets contenus dans le tableau
+            foreach ($this->personneArray as $personne) :
+
+        ?>
+        <tr>
+            
+            <td><?php echo $personne->nom; ?></td>
+            <td><?php echo $personne->prenom; ?></td>
+            <td><?php echo $personne->date_entree; ?></td>
+            <td><?php echo $personne->id_entite; ?></td>
+            <td><?php echo $personne->id_pole; ?></td>
+            <td><?php echo $personne->id_fonction; ?></td>
+            <td><?php echo $personne->centre_service; ?></td>
+            <td><?php echo $personne->id_modalite; ?></td>
+            <td><?php echo $personne->pourcent; ?></td>
+            <td><?php echo $personne->stage; ?></td>
+        <td>
+                <a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'edit', 'id' => $personne->id), 'default', true); ?>">Edit</a>
+            </td>
+           <td>
+                <a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'delete', 'id' => $personne->id), 'default', true); ?>">Delete</a>
+            </td>
+
+        </tr>
+        <?php endforeach; ?>
+    </table>
+    <?php
+    //nous affichons, à la suite du tableau (après la balise </table>), notre template qui permettra de gérer la pagination
+    //la méthode pginationControl() prend, ici, 3 arguments:
+    //  - l'instane paginator
+    //  - le style de défilement
+    //  - le template de pagination
+    echo $this->paginationControl($this->personneArray, 'Sliding', 'common/my_paginator_control.phtml');
+	?>
+</div>

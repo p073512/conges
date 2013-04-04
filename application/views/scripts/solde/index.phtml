@@ -1,0 +1,35 @@
+<div>
+    <table border="1">
+        <tr>
+            <th>Nom Prenom</th>
+            <th>Total cp</th>
+            <th>Total q1</th>
+            <th>Total q2</th>
+            <th>Annee Reference</th>
+        </tr>
+        <?php
+            //$this->usersArray est une variable qui peut être garnie par le controller
+            //elle doit recevoir un tableau contenant des objets de type Default_Model_Users
+            //le tableau est parcouru par foreach pour afficher les propiétés des objets contenus dans le tableau
+            foreach ($this->soldeArray as $solde) :
+              $personne = new Default_Model_Personne();
+			$result_set_personnes = $personne->find($solde->id_personne);
+        ?>
+        <tr>
+            <td><?php echo $result_set_personnes->getNom().'  '.$result_set_personnes->getPrenom(); ?></td>
+            <td><?php echo $solde->total_cp; ?></td>
+            <td><?php echo $solde->total_q1; ?></td>
+            <td><?php echo $solde->total_q2; ?></td>
+            <td><?php echo $solde->annee_reference; ?></td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
+    <?php
+    //nous affichons, à la suite du tableau (après la balise </table>), notre template qui permettra de gérer la pagination
+    //la méthode pginationControl() prend, ici, 3 arguments:
+    //  - l'instane paginator
+    //  - le style de défilement
+    //  - le template de pagination
+    echo $this->paginationControl($this->soldeArray, 'Sliding', 'common/my_paginator_control.phtml');
+	?>
+</div>

@@ -1,0 +1,34 @@
+<div>
+    <table border="1">
+        <tr>
+            <th>id</th>
+            <th>type de la fete</th>
+            <th>date_debut</th>
+            <th>Libelle</th>
+            <th>Annee Reference</th>
+        </tr>
+        <?php
+            //$this->usersArray est une variable qui peut être garnie par le controller
+            //elle doit recevoir un tableau contenant des objets de type Default_Model_Users
+            //le tableau est parcouru par foreach pour afficher les propiétés des objets contenus dans le tableau
+            foreach ($this->ferieArray as $ferie) :
+          
+        ?>
+        <tr>
+            <td><?php echo $ferie->id; ?></td>
+            <td><?php if($ferie->id_type ==2) echo "Religieuse"; else echo "Civile"; ?></td>
+            <td><?php echo $ferie->date_debut; ?></td>
+            <td><?php echo $ferie->libelle; ?></td>
+            <td><?php echo $ferie->annee_reference; ?></td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
+    <?php
+    //nous affichons, à la suite du tableau (après la balise </table>), notre template qui permettra de gérer la pagination
+    //la méthode pginationControl() prend, ici, 3 arguments:
+    //  - l'instane paginator
+    //  - le style de défilement
+    //  - le template de pagination
+    echo $this->paginationControl($this->ferieArray, 'Sliding', 'common/my_paginator_control.phtml');
+	?>
+</div>

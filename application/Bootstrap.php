@@ -66,7 +66,14 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	 
 		//vérifie si une identité existe et applique le rôle
 		$auth = Zend_Auth::getInstance();
-		$role = (!$auth->hasIdentity()) ? 'guest' : $auth->getIdentity()->role;
+		/*
+		 * detruit la session en cas de connexion avec un role invalide
+		 */
+		//Zend_Debug::dump($auth->getIdentity()->role, $label = "Identité", $echo = true);
+		//$auth->clearIdentity();
+		//Zend_Session::destroy();
+		
+		$role = (!$auth->hasIdentity()) ? 'guest' : $auth->getIdentity()->login;
 	}
 
 }

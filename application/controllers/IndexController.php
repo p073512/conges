@@ -10,7 +10,7 @@ class IndexController extends Zend_Controller_Action
 		$auth = Zend_Auth::getInstance();
 
 		if (!$auth->hasIdentity()) {
-			$this->_redirect('login/index');
+			$this->_redirect('connexion/index');
 		}
 	}
 

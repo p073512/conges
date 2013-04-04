@@ -4,18 +4,8 @@
 //l'appel de la méthode bootstrap() de l'interface Zend_Application_Bootstrap_Bootstrapper
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
-	//bootstrap autoloader pour les ressources de l'application, ça permet de
-	//charger les classes automatiquement en fonction des besoins
-	/*
-	 protected function _initAutoload()
-	{
-		$autoloader = new Zend_Application_Module_Autoloader(array(
-			'namespace' => 'Default',
-			'basePath'  => dirname(__FILE__),
-		));
-		return $autoloader;
-	}
-	*/
+
+	
 
 	//bootstrap le doctype des vues
 	protected function _initDoctype()
@@ -38,16 +28,26 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$ressourceLoader->addResourceType('form', 'forms/', 'Form')
 						->addResourceType('acl', 'acls/', 'Acl')
 						->addResourceType('model', 'models/', 'Model')
-						->addResourceType('plugin', 'controllers/plugins/', 'Controller_Plugin');
-
+						->addResourceType('plugin', 'controllers/plugins/', 'Controller_Plugin')
+						->addResourceType('helper', 'controllers/helpers/', 'Controller_Helpers')
+						->addResourceType('session', 'sessions/', 'Session');
 		return $ressourceLoader;
 	}
 
+	protected function _initHelpers()
+	{
+		Zend_Controller_Action_HelperBroker::addHelper(new Default_Controller_Helpers_Validation());
+	}
 	protected function _initJQuery()
 	{
 		$this->bootstrap('view');
 		$view = $this->getResource('view');
 		$view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
+	
+		// d'initailiser le jquery sur toutes les vues
+		$view->jQuery()->enable();
+        $view->jQuery()->uiEnable();
+	
 	}
 
 	protected function _initAcl()
@@ -66,15 +66,59 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	 
 		//vérifie si une identité existe et applique le rôle
 		$auth = Zend_Auth::getInstance();
-		/*
-		 * detruit la session en cas de connexion avec un role invalide
-		 */
-		//Zend_Debug::dump($auth->getIdentity()->role, $label = "Identité", $echo = true);
-		//$auth->clearIdentity();
-		//Zend_Session::destroy();
-		
 		$role = (!$auth->hasIdentity()) ? 'guest' : $auth->getIdentity()->login;
 	}
 
+	/*
+	 * initialisation de la vue layout
+	 */
+ protected function _initView()
+    {
+        // Initialize view
+        $view = new Zend_View();
+        $view->doctype('XHTML1_STRICT');
+        $view->headTitle('Gestion de conge');
+        $view->headMeta()->appendHttpEquiv('Content-Type', 'text/html; charset=UTF-8');
+        // Add it to the ViewRenderer
+        $viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
+        $viewRenderer->setView($view);
+        //initialisation de layout
+        Zend_Layout::startMvc(array('layoutPath'=>'./application/layouts'));
+        // Return it, so that it can be stored by the bootstrap
+        return $view;
+    }
+	
+   protected function _initSidebar()
+    {
+        $this->bootstrap('View');
+        $view = $this->getResource('View');
+ 
+        $view->placeholder('sidebar');
+    }
+	
+    /**
+     * Initialize session
+     *
+     * @return Zend_Session_Namespace
+     */
+    protected function _initSession()
+    {
+    	// On initialise la session
+    	
+    	
+		
+    	Zend_Session::start();
+    	$mois = new Zend_Session_Namespace('salut',false);
+    	$date=date('D/d/m/Y');
+    	list($dcourt,$day, $m, $y) = explode("/", $date);
+		$mois->mois = (int)$m;// IL FAUT PROPGRAMMER UNE FONCTION AU NIVEAU DE BOOSTTRAP POUR INITIALISER LES SESSIONS
+		$mois->annee = $y;
+    	$_SESSION['salut']['mois']= (int)$m;
+    	return $mois;
+    }
+    
+    
+    
+    
 }
 

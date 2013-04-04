@@ -38,9 +38,7 @@ class Default_Model_UsersMapper
                'firstname' => $users->getFirstname(),
                'lastname' => $users->getLastname(),
                'mail' => $users->getMail(),
-               'login' => $users->getLogin(),
-               'password' => $users->getPassword(),
-               'role' => $users->getRole()
+               'password' => $users->getPassword()
 		);
 
 		//on vérifie si un l'objet $users contient un id
@@ -73,9 +71,7 @@ class Default_Model_UsersMapper
 		$users->setFirstname($row->firstname);
 		$users->setLastname($row->lastname);
 		$users->setMail($row->mail);
-		$users->setLogin($row->login);
 		$users->setPassword($row->password);
-		$users->setRole($row->role);
 	}
 
 	//récupére toutes les entrées de la table
@@ -94,9 +90,7 @@ class Default_Model_UsersMapper
 			$entry->setFirstname($row->firstname);
 			$entry->setLastname($row->lastname);
 			$entry->setMail($row->mail);
-			$entry->setLogin($row->login);
 			$entry->setPassword($row->password);
-			$entry->setRole($row->role);
 			$entry->setMapper($this);
 
 			$entries[] = $entry;

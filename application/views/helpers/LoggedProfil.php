@@ -20,7 +20,7 @@ class Zend_View_Helper_LoggedProfil
 			//$username = $this->_view->escape($user->login);
 			$profil = $this->_view->escape($user->login);
 			//chaine qui sera affichée si l'utilisateur est connecté
-			$link = 'Welcome, ' . ' | Vous avez le profil ' . $profil . ' | <a href="' . $logoutUrl . '">Deconnexion</a>';
+			$link = 'Bonjour, ' . '  Vous avez le profil ' . $profil . '  <a href="' . $logoutUrl . '">Deconnexion</a>';
 		}
 		else
 		{

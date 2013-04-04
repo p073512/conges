@@ -5,9 +5,7 @@
             <th>first name</th>
             <th>last name</th>
             <th>mail</th>
-            <th>login</th>
             <th>password</th>
-            <th>role</th>
             <th>edit</th>
             <th>delete</th>
         </tr>
@@ -22,9 +20,7 @@
             <td><?php echo $users->firstname; ?></td>
             <td><?php echo $users->lastname; ?></td>
             <td><?php echo $users->mail; ?></td>
-            <td><?php echo $users->login; ?></td>
             <td><?php echo $users->password; ?></td>
-            <td><?php echo $users->role; ?></td>
             <td>
                 <a href="<?php echo $this->url(array('controller' => 'users', 'action' => 'edit', 'id' => $users->id), 'default', true); ?>">Edit</a>
             </td>

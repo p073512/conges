@@ -287,7 +287,6 @@ BODY
 	position: relative;
 	left: 170px;
 	top: -496px;
-	text-align: center;
 	font-weight: bold;
 	line-height: 1.4;
 	height: 13px;
@@ -320,7 +319,6 @@ BODY
 	position: relative;
 	left: -1px;
 	top: -453px;
-	text-align: center;
 	font-weight: bold;
 	line-height: 1.4;
 	height: 13px;
@@ -337,7 +335,6 @@ BODY
 	position: relative;
 	left: -174px;
 	top: -413px;
-	text-align: center;
 	font-weight: bold;
 	line-height: 1.4;
 	height: 13px;
@@ -435,7 +432,6 @@ BODY
 #pourcent_pr
 {
 	position: relative;
-	text-align: center;
 	font-weight: bold;
 	line-height: 1.4;
 	height: 18px;

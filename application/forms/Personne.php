@@ -108,13 +108,26 @@ class Default_Form_Personne extends Zend_Form
 		$id_cservice_pr= new Zend_Form_Element_Select('centre_service_pr');
 		$id_cservice_pr->addMultiOptions(array(0=>0,1=>1));
 		$id_cservice_pr->setOptions(array('onChange' => 'submit()'));
-		
+		/*
 		// champs pourcent 
 		$tableau_pourcentage = array(0=>100,1=>80);
 		$pourcent_pr =  new Zend_Form_Element_Select('pourcent_pr');
 		$pourcent_pr->addMultiOptions($tableau_pourcentage);
 		
 		$pourcent_pr->addValidator('NotEmpty');
+		$pourcent_pr->removeDecorator('DtDdWrapper');
+		$pourcent_pr->removeDecorator('HtmlTag');
+		$pourcent_pr->removeDecorator('Label');
+		*/
+		
+		$pourcent_pr = new Zend_Form_Element_Text('$pourcent_pr');
+		$pourcent_pr->setValue('100');
+		$pourcent_pr->setRequired(true);
+		$pourcent_pr->addFilter('StripTags');
+		$pourcent_pr->addFilter('StringTrim');
+		$pourcent_pr->addValidator('NotEmpty');
+		$pourcent_pr->addValidator('Between', false, array('min' => 0, 'max' => 100,'messages'=>'Pourcentage : Format incorrect, pas d\'enregistrement (Entre 0 et 100) '));
+		$pourcent_pr->addValidator('digits',false,array('messages'=> 'Pourcentage : Format incorrect, pas d\'enregistrement (Uniquement valeur numeriques autorisees)'));
 		$pourcent_pr->removeDecorator('DtDdWrapper');
 		$pourcent_pr->removeDecorator('HtmlTag');
 		$pourcent_pr->removeDecorator('Label');

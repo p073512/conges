@@ -96,6 +96,27 @@ class PersonneController extends Zend_Controller_Action
 			}
 			else
 			{
+		                
+				        
+						$errorsMessages =$form->getMessages();
+						// Pour afficher le tableau des erreurs => print_r($errorsMessages);
+						 
+						echo"<em><span style='background-color:rgb(255,0,0)'>";
+						// affiche messagge d'erreur si valeur n'est pas entre 0 et 100
+						if(isset($errorsMessages['pourcent_pr']['notBetween']))
+						echo $errorsMessages['pourcent_pr']['notBetween']."<br/>";
+						if(isset($errorsMessages['pourcent_pr']['notDigits']))
+						// affiche messagge d'erreur si valeur n'est pas numérique
+						echo $errorsMessages['pourcent_pr']['notDigits']."<br/>";
+						
+						echo"</span></em>";
+						echo"</span></em></strong>";
+						
+						
+						
+
+
+
 				
 				$form->populate($data);
 			}

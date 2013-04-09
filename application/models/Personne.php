@@ -16,6 +16,7 @@ class Default_Model_Personne
 	protected  $_pourcent;
 	protected  $_centre_service;
 	protected  $_stage;
+	protected  $entite;
 
 	
 	
@@ -30,6 +31,7 @@ class Default_Model_Personne
 		if (is_array($options)) {
 			$this->setOptions($options);
 		}
+		$this->entite = new Default_Model_Entite();
 	}
 
 	//cette méthode permet d'appeler n'importe quel settor en fonction
@@ -143,12 +145,26 @@ class Default_Model_Personne
 	{
 		return $this->_id_entite;
 	}
-
+	/*
+	 * getters et setters de l'objet entité
+	 */
+	#region MBA 
+    public function setEntite($entite)
+	{
+		$this->entite = $entite;
+		return $this;
+	}
+	public function  getEntite()
+	{
+		return $this->entite;
+	}
+    #endregion MBA
 	public function setId_pole($id_pole)
 	{
 		$this->_id_pole = (int)$id_pole;
 		return $this;
 	}
+	
 
 	public function  getId_pole()
 	{

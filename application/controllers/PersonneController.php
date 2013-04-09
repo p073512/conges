@@ -6,6 +6,7 @@ class PersonneController extends Zend_Controller_Action
 	{
 		//création d'un d'une instance Default_Model_Personne
 		$personne = new Default_Model_Personne();
+		
 
 		//$this->view permet d'accéder à la vue qui sera utilisée par l'action
 		//on initialise la valeur usersArray de la vue
@@ -29,6 +30,7 @@ class PersonneController extends Zend_Controller_Action
 
 	public function createAction()
 	{
+		
 		//création du fomulaire
 		$form = new Default_Form_Personne();
 		//indique l'action qui va traiter le formulaire
@@ -56,27 +58,53 @@ class PersonneController extends Zend_Controller_Action
 				$personne->setId_pole($form->getValue('id_pole_pr'));
 				$personne->setDate_debut('0000-00-00');
 				$personne->setDate_fin('0000-00-00');
-				$personne->setId_entite($form->getValue('id_entite_pr'));
+				
+				//$personne->setId_entite($form->getValue('id_entite_pr'));
+				
+				//MBA : récupération de l'entité a partir de l'id entité.
+				$entite = $personne->getEntite()->find((int)$form->getValue('id_entite_pr'));
+				$personne->setEntite($entite);
+				
+			
 				$personne->setId_modalite($form->getValue('id_modalite_pr'));
 				$personne->setId_fonction($form->getValue('id_fonction_pr'));
-				$personne->setCentre_service($form->getValue('centre_service_pr'));
+				
+				//MBA : récupération de la valeur centre de service à partir de l'Entit associé à Personne
+				$personne->setCentre_service($personne->getEntite()->getCs());
 				$personne->setPourcent($form->getValue('pourcent_pr'));
+				
 				$personne->setStage($form->getValue('stage_pr'));
+                /*
+                 * MBA: vérification pour bloquer l'insertion d'un centre de service avec une modalité différente que 'Aucune Modalité'
+                 */
+               
+				#region MBA
+				if(7 != $form->getValue('id_modalite_pr')&&  "1" === $personne->getEntite()->getCs() ) 
+				{
+					echo "la modalité est non compatible avec le centre cservice";
+					
+					$form->populate($data);
+				}
+				
+				/*
 				if($form->getValue('id_modalite_pr')!= 7 && $form->getValue('centre_service_pr') ==1) 
 				{
 					echo "la modalité est no compatible avec le centre cservice";
 					
 					$form->populate($data);
-				}
+				}*/
+				#endregion MBA
 				else
 				{
+					
 					$personne->save();
 					/* initialisation du solde conge de la personne cree*/		
 					$resul = $personne ->find ($personne->maxid());
 					$solde= new Default_Model_Solde();
 					$solde ->setId_personne($resul->getId());
 					$solde ->setTotal_cp($form->getValue('date_entree_pr'));
-					if ($form->getValue('centre_service_pr') == 1)
+					
+					    if ($personne->getEntite()->getCs() == 1) //test avec la valeur de cs de l'Entité de Personne au lieu de $form->getValue('centre_service_pr') == 1)
 					{
 						//$solde ->setTotal_q1(0);
 						$solde ->setTotal_q2(0);// a revoir
@@ -95,8 +123,10 @@ class PersonneController extends Zend_Controller_Action
 				}
 			}
 			else
-			{
-		                
+			{           /*les messages d'erreur retournés , un sytème de redirection de message d'erreur
+				         est à prévoir */ 
+				
+		                #region MBA
 				        
 						$errorsMessages =$form->getMessages();
 						// Pour afficher le tableau des erreurs => print_r($errorsMessages);
@@ -113,7 +143,7 @@ class PersonneController extends Zend_Controller_Action
 						echo"</span></em></strong>";
 						
 						
-						
+						#endregion #MBA
 
 
 

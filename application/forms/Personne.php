@@ -61,6 +61,8 @@ class Default_Form_Personne extends Zend_Form
 		$id_entite_pr->removeDecorator('HtmlTag');
 		$id_entite_pr->removeDecorator('Label');
 		
+		
+		
 
 		// liste muli-selection Poles
 		$pole = new Default_Model_Pole();
@@ -104,21 +106,16 @@ class Default_Form_Personne extends Zend_Form
 		$id_modalite_pr->removeDecorator('HtmlTag');
 		$id_modalite_pr->removeDecorator('Label');
 		
+		#region MBA 
+		//
+		
 		// muli-selection Centre service
 		$id_cservice_pr= new Zend_Form_Element_Select('centre_service_pr');
 		$id_cservice_pr->addMultiOptions(array(0=>0,1=>1));
-		$id_cservice_pr->setOptions(array('onChange' => 'submit()'));
-		/*
-		// champs pourcent 
-		$tableau_pourcentage = array(0=>100,1=>80);
-		$pourcent_pr =  new Zend_Form_Element_Select('pourcent_pr');
-		$pourcent_pr->addMultiOptions($tableau_pourcentage);
+		//list FO/BO désactivée pas moyen de la supprimer sans impacter l'affichage des éléments du formulaire.
+		$id_cservice_pr->setAttrib('disabled', true);
+		//$id_cservice_pr->setOptions(array('onChange' => 'submit()'));
 		
-		$pourcent_pr->addValidator('NotEmpty');
-		$pourcent_pr->removeDecorator('DtDdWrapper');
-		$pourcent_pr->removeDecorator('HtmlTag');
-		$pourcent_pr->removeDecorator('Label');
-		*/
 		
 		$pourcent_pr = new Zend_Form_Element_Text('$pourcent_pr');
 		$pourcent_pr->setValue('100');
@@ -131,6 +128,8 @@ class Default_Form_Personne extends Zend_Form
 		$pourcent_pr->removeDecorator('DtDdWrapper');
 		$pourcent_pr->removeDecorator('HtmlTag');
 		$pourcent_pr->removeDecorator('Label');
+		
+		#endregion MBA
 		
 		// stage 
 		$stage_pr = new Zend_Form_Element_Checkbox('stage_pr');

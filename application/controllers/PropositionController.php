@@ -6,9 +6,6 @@ class PropositionController extends Zend_Controller_Action
 	{
 		// on ajoute le filtre sur la vue des propositions
 		
-		
-		
-		
 		$proposition = new Default_Model_Proposition;
 		//$this->view->propositionArray =$proposition->fetchAll('Etat = "NV"');
 
@@ -47,8 +44,8 @@ class PropositionController extends Zend_Controller_Action
 		//(cf. application/views/scripts/users/index.phtml)
 		$this->view->propositionArray = $paginator;*/
 	}
-
-	public function createAction()
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public function createAction()   /* MTA : Mohamed khalil Takafi */
 	{
 		//création du fomulaire
 		$form = new Default_Form_Proposition();
@@ -60,14 +57,14 @@ class PropositionController extends Zend_Controller_Action
 		$this->view->form = $form;
 		$this->view->title = "Creer Proposition";
 		//si la page est POSTée = formulaire envoyé
-		if($this->_request->isPost())
+		if($this->_request->isPost())   
 		{
 			//récupération des données envoyées par le formulaire
 			
 			$data = $this->_request->getPost();
 
 			//vérifie que les données répondent aux conditions des validateurs
-			if($form->isValid($data))
+			if($form->isValid($data))  
 			{
 				//création et initialisation d'un objet Default_Model_Proposition
 				//qui sera enregistré dans la base de données
@@ -92,28 +89,28 @@ class PropositionController extends Zend_Controller_Action
 					$this->_helper->redirector('index');
 					
 				}
-				else 
+				else   /* MTA : Mohamed khalil Takafi */ 
 				{
 					$form->populate($data);
-					if ($form->getValue('date_debut_pro')>$form->getValue('date_fin_pro'))
-					echo "<strong><em><span style='background-color:rgb(255,0,0)'> date debut doit etre superieur ou egale la date du fin</span></em></strong>";
+					if ($form->getValue('date_debut_pro') > $form->getValue('date_fin_pro'))
+					// MTA : modification du message echo "......."
+					echo "<strong><em><span style='background-color:rgb(255,0,0)'> La date de début doit être inférieure ou égale à la date de fin</span></em></strong>";
 				}
 			}
-			
 			else 
 			{
 				$form->populate($data);
-				echo "<strong><em><span style='background-color:rgb(255,0,0)'> proposition ou conge deja demande</span></em></strong>";
+				echo "<strong><em><span style='background-color:rgb(255,0,0)'> proposition ou conge deja demande </span></em></strong>";
 			}
 		}
-		else
+		else 
 		{
 			//si erreur rencontrée, le formulaire est rempli avec les données
 			//envoyées précédemment
 			$form->populate($data);
 		}
 	}
-	
+//////////////////////////////////////////////////////////////////////////////////////////////////////////	
 
 	public function editAction()
 	{

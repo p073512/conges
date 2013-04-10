@@ -123,8 +123,9 @@ class Default_Form_Personne extends Zend_Form
 		$pourcent_pr->addFilter('StripTags');
 		$pourcent_pr->addFilter('StringTrim');
 		$pourcent_pr->addValidator('NotEmpty');
-		$pourcent_pr->addValidator('Between', false, array('min' => 0, 'max' => 100,'messages'=>'Pourcentage : Format incorrect, pas d\'enregistrement (Entre 0 et 100) '));
-		$pourcent_pr->addValidator('digits',false,array('messages'=> 'Pourcentage : Format incorrect, pas d\'enregistrement (Uniquement valeur numeriques autorisees)'));
+		$pourcent_pr->addValidator('Regex', false,array('/^[1-9]?[0-9]{1}$|^100$/','messages' => "Pourcentage : Seulement valeurs entre 0 et 1 acceptées"));
+		//$pourcent_pr->addValidator('Between', false, array('min' => 0, 'max' => 100,'messages'=>'Pourcentage : Format incorrect, pas d\'enregistrement (Entre 0 et 100) '));
+		//$pourcent_pr->addValidator('digits',false,array('messages'=> 'Pourcentage : Format incorrect, pas d\'enregistrement (Uniquement valeur numeriques autorisees)'));
 		$pourcent_pr->removeDecorator('DtDdWrapper');
 		$pourcent_pr->removeDecorator('HtmlTag');
 		$pourcent_pr->removeDecorator('Label');

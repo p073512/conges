@@ -44,7 +44,7 @@ class PropositionController extends Zend_Controller_Action
 		//(cf. application/views/scripts/users/index.phtml)
 		$this->view->propositionArray = $paginator;*/
 	}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public function createAction()   /* MTA : Mohamed khalil Takafi */
 	{
 		//création du fomulaire
@@ -110,7 +110,6 @@ class PropositionController extends Zend_Controller_Action
 			$form->populate($data);
 		}
 	}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////	
 
 	public function editAction()
 	{

@@ -202,7 +202,8 @@ class Default_Model_Proposition
 	/*
 	 * retourne le nombre de jours ouveres entre la date du debut de conge et la date du fin de conge
 	 * */
-	
+    
+    /* MTA : Mohamed khalil Takafi */		
 	public function calculNombreDuJours()
 	{
 		// tu peut utiliser cette fonction pour afficher les nombre totale ouvere pour un mois donné
@@ -234,23 +235,24 @@ class Default_Model_Proposition
 	}
 
 		
-		if ((($this->getMi_debut_journee() ==True) ||($this->getMi_fin_journee() == True)) && ($this->getDate_debut() ==$this->getDate_fin()) )
+		if ((($this->getMi_debut_journee() == True) ||($this->getMi_fin_journee() == True)) && ($this->getDate_debut() ==$this->getDate_fin()) )
 		{
 			$nb_jours_ouvres = 0;
-			return $nb_jours_ouvres+ 0.5;
+			return $nb_jours_ouvres + 0.5;
 		}
-		elseif ((($this->getMi_debut_journee() ==True) && ($this->getMi_fin_journee() == True))  && ($this->getDate_debut() !=$this->getDate_fin()) )
+		/* MTA : Mohamed khalil Takafi */
+		elseif ((($this->getMi_debut_journee() == True) && ($this->getMi_fin_journee() == True))  && ($this->getDate_debut() != $this->getDate_fin()) )
 		{
-			return $nb_jours_ouvres;
+			return $nb_jours_ouvres - 1;   // MTA : ajout de "-1" à return $nb_jours_ouvres
 		}
 		elseif ((($this->getMi_debut_journee() ==True) ||($this->getMi_fin_journee() == True))  && ($this->getDate_debut() !=$this->getDate_fin()) )
 		{
-			return $nb_jours_ouvres- 0.5;
+			return $nb_jours_ouvres - 0.5;
 		}
 		
 		return $nb_jours_ouvres;
 	}
-	
+
 	public function joursOuvresDuMois($debut_mois,$fin_mois)
 	{
 		// tu peut utiliser cette fonction pour afficher les nombre totale ouvere pour un mois donné
@@ -262,6 +264,7 @@ class Default_Model_Proposition
 	    $tableau_jours_feries = $feris->RecupererLesJoursFeries( $annee);
 		$nb= count($tableau_jours_feries );
 		$tableau = array();
+		
 		for ($i=0;$i<$nb;$i++)
 		{
 			$tableau[$i]=$tableau_jours_feries[$i]['date_debut'];

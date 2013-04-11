@@ -1,4 +1,5 @@
 <?php
+// PTRI - Test commit sur le fichier index
 //définition de la constante 'APPLICATION_PATH'
 defined('APPLICATION_PATH')
 	|| define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../application'));

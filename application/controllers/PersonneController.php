@@ -30,6 +30,8 @@ class PersonneController extends Zend_Controller_Action
 
 	public function createAction()
 	{
+		//initialisation tableau d'erreur
+		//$error = array();
 		
 		//création du fomulaire
 		$form = new Default_Form_Personne();
@@ -79,13 +81,14 @@ class PersonneController extends Zend_Controller_Action
                  */
                
 				#region MBA
-				if(7 != $form->getValue('id_modalite_pr')&&  "1" === $personne->getEntite()->getCs() ) 
+				
+				if(7 != $form->getElement('id_modalite_pr')->getValue() &&  "1" === $personne->getEntite()->getCs() ) 
 				{
 					echo "la modalité est non compatible avec le centre cservice";
 					
 					$form->populate($data);
 				}
-				
+			
 				/*
 				if($form->getValue('id_modalite_pr')!= 7 && $form->getValue('centre_service_pr') ==1) 
 				{
@@ -144,6 +147,7 @@ class PersonneController extends Zend_Controller_Action
 						echo $errorsMessages['pourcent_pr']['regexNotMatch']."<br/>";
 						echo"</span></em>";
 						echo"</span></em></strong>";
+					//	$this->view->error = $data = array("0"=>'this is an error');
 						
 						
 						#endregion #MBA

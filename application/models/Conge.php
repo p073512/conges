@@ -144,7 +144,7 @@ class Default_Model_Conge
 	public function setNombre_jours()
 	{
 		$this->_nombre_jours = (float)$this->calculNombreDuJours();
-		return $this;
+		return $this;  
 	}
 	public function  getNombre_jours()
 	{
@@ -273,19 +273,19 @@ class Default_Model_Conge
 	 * calcule de nombre de jours ouvres dans periode de conge
 	 */
 	
-	public function calculNombreDuJours()
+	public function calculNombreDuJours()  /* MTA : Mohamed khalil Takafi */
 	{
 		// tu peut utiliser cette fonction pour afficher les nombre totale ouvere pour un mois donné
 		$date_depart = $this->getDate_debut();
     	$date_fin1 = $this->getDate_fin();
     	$date_debut = strtotime($date_depart );
     	$date_fin = strtotime($date_fin1 );
-		
+        $tableau = array(); // MTA: Tableau à ignorer pour l'instant  
     	$tableau_jours_feries = array(); // Tableau des jours feriés
     // On boucle dans le cas où l'année de départ serait différente de l'année d'arrivée
     	$difference_annees = date('Y', $date_fin) - date('Y', $date_debut);
- for ($i = 0; $i <= $difference_annees; $i++) 
-    {
+    	for ($i = 0; $i <= $difference_annees; $i++) 
+   		{
 	    $annee = (int)date('Y', $date_debut) + $i;
 	    // Liste des jours feriés
 	    $tableau_jours_feries[] = '1_1_'.$annee; // Jour de l'an
@@ -303,28 +303,32 @@ class Default_Model_Conge
 	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*50)); // Pentecote
     }
     //print_r($tableau_jours_feries);
-    $nb_jours_ouvres = 0;
+    	 $nb_jours_ouvres = 0;
     // Mettre <= si on souhaite prendre en compte le dernier jour dans le décompte
     while ($date_debut <= $date_fin) 
     {
     // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvrés
-	    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) 
+	    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date(date('Y', $date_debut).'-n-j', $date_debut),$tableau)) // MTA 
 	    {
 	    	$nb_jours_ouvres++;
 	    }
 	    	$date_debut = mktime(date('H', $date_debut), date('i', $date_debut), date('s', $date_debut), date('m', $date_debut), date('d', $date_debut) + 1, date('Y', $date_debut));
 	}
-
-		
-		if ((($this->getMi_debut_journee() ==True) ||($this->getMi_fin_journee() == True))  && ($this->getDate_debut() ==$this->getDate_fin()) )
+		if ((($this->getMi_debut_journee() == True) ||($this->getMi_fin_journee() == True)) && ($this->getDate_debut() ==$this->getDate_fin()) )
 		{
 			$nb_jours_ouvres = 0;
-			return $nb_jours_ouvres+ 0.5;
+			return $nb_jours_ouvres + 0.5 ;
+		}
+		
+		elseif ((($this->getMi_debut_journee() == True) && ($this->getMi_fin_journee() == True))  && ($this->getDate_debut() != $this->getDate_fin()) )
+		{
+			return $nb_jours_ouvres - 1;   
 		}
 		elseif ((($this->getMi_debut_journee() ==True) ||($this->getMi_fin_journee() == True))  && ($this->getDate_debut() !=$this->getDate_fin()) )
 		{
-			return $nb_jours_ouvres- 0.5;
+			return $nb_jours_ouvres - 0.5;
 		}
+		
 		return $nb_jours_ouvres;
 	}
 	

@@ -26,6 +26,8 @@ class CalendrierController extends Zend_Controller_Action
 		$this->view->title_filtre = "Filtrer sur ressources";
 		$this->view->title_choix = "Filtre sur une periode";
 		$this->view->title = "Calendrier Mensuel";
+		
+		
 		// recuperation du premier de mois et de la fin du mois actuel
 		if ($this ->_getParam ('mois') )
 		{
@@ -33,6 +35,7 @@ class CalendrierController extends Zend_Controller_Action
 			$mois->annee = $this ->_getParam ('annee');
 			
 		}
+		
 		if(!($this->_request->ispost()))
 		{
 			$fin_mois=date('Y-m-d',mktime(0,0,0,$_SESSION['salut']['mois']+1,0,$_SESSION['salut']['annee']));
@@ -40,7 +43,7 @@ class CalendrierController extends Zend_Controller_Action
 			$personne = new Default_Model_Personne();
 			$reponse = $this->_helper->validation->calendrier($str=array(),$debut_mois,$fin_mois);
 			
-			if (count($reponse)==0)
+			if (count($reponse)== 0)
 			{
 				echo'<strong ><span style="color:red">Tous le monde bosse ce mois </span ></strong>';
 							
@@ -54,6 +57,7 @@ class CalendrierController extends Zend_Controller_Action
 		if ($this->_request->ispost())
 		{
 			$data = $this->_request->getPost();
+			
 			if (!(array_key_exists('num_mois', $data)|| array_key_exists('num_annee', $data))) 
 			{
 				if($form->isValid($data))
@@ -65,7 +69,8 @@ class CalendrierController extends Zend_Controller_Action
 					$id_pole = $form->getValue('id_pole_ca');
 					$id_fonction = $form->getValue('id_fonction_ca');
 					$id_entite =  $form->getValue('id_entite_ca');
-					if ($id_pole!=0 && $id_entite==0 &&$id_fonction==0 ) 
+					
+					if ($id_pole!=0 && $id_entite==0 && $id_fonction==0 ) 
 					{
 						$set_personnes= $personne->fetchAll('id_pole ='.$id_pole );
 					}
@@ -93,13 +98,9 @@ class CalendrierController extends Zend_Controller_Action
 					{
 						$set_personnes= $personne->fetchAll('id_pole ='.$id_pole .'&&'. 'id_fonction ='.$id_fonction .'&&'. 'id_entite ='.$id_entite );
 					}
-					
-				
-				
+
 				}
 
-				
-				
 				$tableau_personnes = array();
 				$reponse= array();
 				foreach($set_personnes as $p)
@@ -118,7 +119,6 @@ class CalendrierController extends Zend_Controller_Action
 				$this->view->mois = $_SESSION['salut']['mois'];
 				$this->view->annee = $_SESSION['salut']['annee'];
 			}
-			
 	 		else 
 	 		{
 		 			if (array_key_exists('num_mois', $data))
@@ -142,9 +142,7 @@ class CalendrierController extends Zend_Controller_Action
 						echo'<strong ><span style="color:red">il n y a personne qui ne bosse pas ce mois </span ></strong>';
 						
 					}
-			
-		
-		
+
 					$this->view->calendrierArray = $reponse;
 					$this->view->mois = $_SESSION['salut']['mois'];
 					$this->view->annee = $_SESSION['salut']['annee'];
@@ -152,7 +150,7 @@ class CalendrierController extends Zend_Controller_Action
 	 		}
 		}
 	}
-	
+
 	public function calendrierannuelAction()
 	{
 	

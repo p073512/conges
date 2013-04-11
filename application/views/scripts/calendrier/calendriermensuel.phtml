@@ -48,7 +48,6 @@
 //list($dcourt,$day, $month, $year) = explode("/", $date);
 $month =$_SESSION['salut']['mois'];
 
-//var_dump($this->calendrierArray);
 
 $joursem = array('dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam');
 $mois2=array('','Janvier','Fevrier','Mars','Avril','Mai','Juin','Juillet','Aout','Septembre','Octobre','Novembre','Decembre');
@@ -69,21 +68,20 @@ $nombreDeJoursDeMois = intval(date("t",$timestamp));
 		$conge = new Default_Model_Conge();
 		$propostion = new Default_Model_Proposition();
 		// chercher les jours feries de ce mois de conge
-		$tableau_jours_feries=$conge->chercher_jours_feriers($debut_mois, $fin_mois);
+		$tableau_jours_feries =$conge->chercher_jours_feriers($debut_mois,$fin_mois);
+		
 		// Recuperer les jour feries marocain sous un tableau 
-				$ferie = new Default_Model_Ferie();
-				$jours_feries_marocain = $ferie->RecupererLesJoursFeries( $_SESSION['salut']['annee']);
-				$nb= count($jours_feries_marocain );
-				$tableau = array();
-				for ($i=0;$i<$nb;$i++)
-				{
-					$tableau[$i]=$jours_feries_marocain[$i]['date_debut'];
-					
-				}
+			$ferie = new Default_Model_Ferie();
+			$jours_feries_marocain = $ferie->RecupererLesJoursFeries( $_SESSION['salut']['annee']);
+			$nb= count($jours_feries_marocain );
+			$tableau = array();
+			for ($i=0;$i<$nb;$i++)
+			{
+					$tableau[$i]=$jours_feries_marocain[$i]['date_debut'];		
+			}
 
 $month_t=intval(date("n")); // on recepure le numumro du mois avec la fonction interval on peut avoir un num entier ( s'assurer)
 // affichage du mois par son nom
-
 
 ?>
 
@@ -99,12 +97,19 @@ $t=0;
 $d=0;
 $f=0;
 $mt =0;
-while ($L<= count($this->calendrierArray)+1 ) //  c'est le nombre des ressources et c'est le meme le nombre de lignes remplace le par le $nombre_ligne
+
+
+
+while ($L <= count($this->calendrierArray)+1 ) //  c'est le nombre des ressources et c'est le meme le nombre de lignes remplace le par le $nombre_ligne
 {
 	// aide pour les calcule des jour ferie et valorisés au niveau du calendrier 
 	$var = strtotime($debut_mois );
+
 ?>
-<tr  >
+
+
+
+<tr>
 	
 	<?php
 	$j = 0;
@@ -114,19 +119,21 @@ while ($L<= count($this->calendrierArray)+1 ) //  c'est le nombre des ressources
 		$s =0;
 	?>
 			<td <?php if ($L!=1 && $j !=0){echo 'class="colonne"'; }?>>
-		
+		      
 				<?php 
 					if ($L==1 && $j ==0){ echo "";}
 					elseif ($L==1 && $j ==($nombreDeJoursDeMois)+1){ echo "NbJ";} 
 					elseif ($L!=1 && $j ==($nombreDeJoursDeMois)+1)
 					{
-						echo $this->calendrierArray[$L-2][0]['nombre_jours'];
-					
+						    // affichage NBR JOURS dans calendrier MTA : 
+						    echo /*-1 */ $this->calendrierArray[$L-2][0]['nombre_jours'];  // MTA : resultat correcte mais négatif * -1 
+						
 					} 
 					elseif ($L!=1 && $j ==0)
 					{ 
 						?>
-						<a href="<?php echo $this->url(array('id'=>$this->calendrierArray[$r][$s]['id'], 'controller' => 'calendrier', 'action' => 'calendrierannuel'), 'default', true) ?>" > <?php echo $this->calendrierArray[$r][$s]['nom'];$r++;?> </a>
+						<a href="<?php echo $this->url(array('id'=>$this->calendrierArray[$r][$s]['id'], 'controller' => 'calendrier', 'action' => 'calendrierannuel'), 'default', true) ?>" > 
+						<?php echo $this->calendrierArray[$r][$s]['nom'];$r++;?> </a>
 						<?php
 					} 
 					elseif ($L==1 && $j !=0){ echo $j;} 
@@ -139,7 +146,7 @@ while ($L<= count($this->calendrierArray)+1 ) //  c'est le nombre des ressources
 					{
 							$flag2 =0;
 						/*
-						 * aprtir de cette ligne jusqu'au la ligne 119 c'est  pour la valorisation des jours ferier francais au niveau du 
+						 * apartir de cette ligne jusqu'au la ligne 119 c'est  pour la valorisation des jours ferier francais au niveau du 
 						 * calendirer mensuel
 						 */ 
 						
@@ -153,7 +160,7 @@ while ($L<= count($this->calendrierArray)+1 ) //  c'est le nombre des ressources
 							}
 							if((in_array(date('j_n_'.date('Y', $var), $var), $tableau_jours_feries))&&($this->calendrierArray[$L-2][$s]['centre_service']==0))
 							{
-								echo  '<div class="FF"> FF</div>';
+								echo  '<div class="FF">FF</div>';
 								$flag2 =1;
 							}
 							if((in_array(date(date('Y', $var).'-m-d', $var), $tableau))&&($this->calendrierArray[$L-2][$s]['centre_service']==1))
@@ -170,6 +177,7 @@ while ($L<= count($this->calendrierArray)+1 ) //  c'est le nombre des ressources
 						 * jusu'au 149 c'est pour valoriser les jours de conges selon le type du conge ainsi les jours de week-end en gris
 						 */
 						
+						/* MTA : Mohamed khalil TAKAFI */
 						for ($i=0;$i<count($this->calendrierArray[$L-2]);$i++)
 						{
 							
@@ -181,14 +189,37 @@ while ($L<= count($this->calendrierArray)+1 ) //  c'est le nombre des ressources
 								
 								$numjour++;
 								$flag =true;
+								
+								// ( date_debut == date_fin )  et   ( debut_midi == fin_midi )
 								if(($this->calendrierArray[$L-2][$i]['date_debut']==$this->calendrierArray[$L-2][$i]['date_fin']) && $mi_fin_journee== $mi_debut_journee)
 								{
 									echo "<div class=".$idConge."_1>".$idConge."</div>"."<div class=".$this->calendrierArray[$L-2][$i]['id_type_conge2']."_22>".$this->calendrierArray[$L-2][$i]['id_type_conge2']."</div>";
+
 								}
-								elseif (($this->calendrierArray[$L-2][$i]['date_debut']!=$this->calendrierArray[$L-2][$i]['date_fin']) && $mi_fin_journee== $mi_debut_journee && $mi_fin_journee!= 0 ){if ($this->calendrierArray[$L-2][$i]['date_debut']->get(Zend_Date::DAY)==$j)echo "<div class=".$idConge."_1>".$idConge."</div>";elseif ($this->calendrierArray[$L-2][$i]['date_fin']->get(Zend_Date::DAY)==$j)echo "<div class=".$idConge."_2>".$idConge."</div>";else echo "<div class=".$idConge.">".$idConge."</div>";}
-								elseif(($mi_debut_journee == 1 || $mi_fin_journee == 1)&& ($this->calendrierArray[$L-2][$i]['date_debut']->get(Zend_Date::DAY)==$j)){if($mi_debut_journee == 1) echo "<div class=".$idConge."_1>".$idConge."</div>"; else  echo "<div class=".$idConge."_2>".$idConge."</div>"; }  
-							 	elseif(1) echo "<div class=".$idConge.">".$idConge."</div>";
-								break ;
+								// ( date_debut != date_fin )  et  (( debut_midi == fin_midi ) et ( fin_midi != 0 ))
+								elseif (($this->calendrierArray[$L-2][$i]['date_debut']!=$this->calendrierArray[$L-2][$i]['date_fin']) && $mi_fin_journee== $mi_debut_journee && $mi_fin_journee!= 0 )
+								{	
+									if ($this->calendrierArray[$L-2][$i]['date_debut']->get(Zend_Date::DAY)==$j)   // MTA : insérer en deuxieme 	
+										echo "<div class=".$idConge."_2>".$idConge."</div>";
+			
+									elseif ($this->calendrierArray[$L-2][$i]['date_fin']->get(Zend_Date::DAY)==$j) // MTA : insérer en premier
+											echo "<div class=".$idConge."_1>".$idConge."</div>";
+								    else 
+											echo "<div class=".$idConge.">".$idConge."</div>";                     // MTA : remplir le tout
+								}
+								// ( debut_midi = 1)  and  ( date_debut = $j )  // MTA : bug corrigé ! 
+								elseif($mi_debut_journee == 1 && ($this->calendrierArray[$L-2][$i]['date_debut']->get(Zend_Date::DAY)==$j))
+								{
+											echo "<div class=".$idConge."_2>".$idConge."</div>"; // MTA : insérer en deuxieme 	
+								}
+							    // ( fin_midi = 1) and   ( date_fin = $j )  // MTA : bug corrigé ! 
+                               elseif( $mi_fin_journee == 1 && ($this->calendrierArray[$L-2][$i]['date_fin']->get(Zend_Date::DAY)==$j))
+                               {
+											echo "<div class=".$idConge."_1>".$idConge."</div>"; // MTA : insérer en premier
+                               }
+							    elseif(1) 
+							 		echo "<div class=".$idConge.">".$idConge."</div>";
+							 		break ;
 							}
 						
 						}
@@ -215,13 +246,14 @@ while ($L<= count($this->calendrierArray)+1 ) //  c'est le nombre des ressources
 			</td>
 			
 			<?php
-			
-			$j++;
+
+		$j++;
 		}
+	
 	?>
 	</tr>
-	
-	<?php
+
+	<?php 
 	$j=0;
 	$numjour =$numjour1[date("w",$timestamp)];
 	$L++;
@@ -229,6 +261,7 @@ while ($L<= count($this->calendrierArray)+1 ) //  c'est le nombre des ressources
 	
 }
 ?>
+
 </table> 
 
 <a href="<?php  if ($_SESSION['salut']['mois'] == 12){$_SESSION['salut']['mois']=0; $_SESSION['salut']['annee']++;}echo $this->url(array('mois'=> $_SESSION['salut']['mois']+1 ,'annee'=> $_SESSION['salut']['annee'],'controller' => 'calendrier', 'action' => 'calendriermensuel'), 'default', true) ?>" id ="mois_suivant">Mois suivant</a>

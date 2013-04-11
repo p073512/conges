@@ -214,9 +214,10 @@ class Default_Model_Proposition
     	$tableau_jours_feries = array(); // Tableau des jours feriés
 	    $annee = (int)date('Y', $date_debut);
 	    $feris = new Default_Model_Ferie();
-	    $tableau_jours_feries = $feris->RecupererLesJoursFeries( $annee);
+	    $tableau_jours_feries = $feris->RecupererLesJoursFeries($annee);
 		$nb= count($tableau_jours_feries );
 		$tableau = array();
+		
 		for ($i=0;$i<$nb;$i++)
 		{
 			$tableau[$i]=$tableau_jours_feries[$i]['date_debut'];
@@ -233,12 +234,10 @@ class Default_Model_Proposition
 	    }
 	    	$date_debut = mktime(date('H', $date_debut), date('i', $date_debut), date('s', $date_debut), date('m', $date_debut), date('d', $date_debut) + 1, date('Y', $date_debut));
 	}
-
-		
 		if ((($this->getMi_debut_journee() == True) ||($this->getMi_fin_journee() == True)) && ($this->getDate_debut() ==$this->getDate_fin()) )
 		{
 			$nb_jours_ouvres = 0;
-			return $nb_jours_ouvres + 0.5;
+			return $nb_jours_ouvres + 0.5 ;
 		}
 		/* MTA : Mohamed khalil Takafi */
 		elseif ((($this->getMi_debut_journee() == True) && ($this->getMi_fin_journee() == True))  && ($this->getDate_debut() != $this->getDate_fin()) )
@@ -261,10 +260,10 @@ class Default_Model_Proposition
     	$tableau_jours_feries = array(); // Tableau des jours feriés
 	    $annee = (int)date('Y', $date_debut);
 	    $feris = new Default_Model_Ferie();
-	    $tableau_jours_feries = $feris->RecupererLesJoursFeries( $annee);
+	    $tableau_jours_feries = $feris->RecupererLesJoursFeries($annee);
 		$nb= count($tableau_jours_feries );
 		$tableau = array();
-		
+	
 		for ($i=0;$i<$nb;$i++)
 		{
 			$tableau[$i]=$tableau_jours_feries[$i]['date_debut'];

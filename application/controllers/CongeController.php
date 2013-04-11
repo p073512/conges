@@ -43,7 +43,9 @@ class CongeController extends Zend_Controller_Action
 		$this->view->title = "Deposer un conge";
 		$this->view->headLink()->appendStylesheet($this->view->baseUrl().'/css/page2.css');
 		$data = array();
-			
+
+
+		
 		if($this->_request->isPost())
 		{
 				//récupération des données envoyées par le formulaire
@@ -89,11 +91,15 @@ class CongeController extends Zend_Controller_Action
 				$form->populate($data);
 				if($form->getValue('annee_reference')==0)
 				echo "<strong><em><span style='background-color:rgb(255,0,0)'> annee de reference doit etre non nulle</span></em></strong>";
-				else echo "<strong><em><span style='background-color:rgb(255,0,0)'>  conge deja demande</span></em></strong>";
+				else 
+				{
+					echo "<strong><em><span style='background-color:rgb(255,0,0)'>  conge deja demande</span></em></strong>";
+				}
 			}
 		}
 		else
 		{
+			
 			$form->populate($data);
 		}
 		

@@ -251,7 +251,7 @@ class PropositionController extends Zend_Controller_Action
 	{
 			$id = $params['id'];
 		
-		if ($params['solde']==2)
+		if ($params['solde']== 2)
 		{
 			
 			

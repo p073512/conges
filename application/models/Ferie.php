@@ -165,6 +165,10 @@ class Default_Model_Ferie
 	 
 	public function RecupererLesJoursFeries( $annee_reference) 
 	{
-		return $this->getMapper()->RecupererLesJoursFeries( $annee_reference);
+		return $this->getMapper()->RecupererLesJoursFeries($annee_reference);
 	}
+
+
+
+
 }

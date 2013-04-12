@@ -1,3 +1,11 @@
+.error
+{
+	border: 1px solid red;
+}
+.errors{
+	color:red;
+	}
+
 #bloc_page
 {
 	width: 980px;
@@ -618,15 +626,17 @@ BODY
 	left: 132px;
 	top: -328px;
 }
+/**
 DD .errors
 {
 	position: static;
-	/*+placement:shift 122px -494px;*/
+	//+placement:shift 122px -494px;
 	position: relative;
 	left: 122px;
 	top: -494px;
 	font-weight: bold;
 }
+**/
 #ferme
 {
 	position: relative;
@@ -2283,6 +2293,7 @@ DD .errors
 	left: 0px;
 	top: -22px;
 }
+/*
 .errors
 {
 	position: fixed;
@@ -2295,11 +2306,11 @@ DD .errors
 	font-style: italic;
 	font-family: Cambria;
 	line-height: 1.5;
-	/*+placement:shift 119px -113px;*/
+	//+placement:shift 119px -113px;
 	position: relative;
 	left: 119px;
 	top: -113px;
-}
+}*/
 #corp
 {
 	position: relative;

@@ -5,6 +5,7 @@ class Default_Model_Entite
 	//variables correspondant à chacun des champs de notre table users
 	protected  $_id;
 	protected  $_libelle;
+	protected  $_cs; // MBA: attribut centre de service
 
 	//le mapper va nous fournir les méthodes pour interagir avec notre table (objet de type Default_Model_EntiteMapper)
 	protected $_mapper;
@@ -78,7 +79,23 @@ class Default_Model_Entite
 	{
 		return $this->_libelle;
 	}
+	/*
+	 * getters et setters du champ cs (centre de service) 
+	 */
+	#region MBA
+	public function setCs($cs)
+	{
+		if("1" === $cs OR "0" === $cs) // MBA : contrôle sur les valeur que peut prendre cs limitées à 0 ou 1
+		$this->_cs = (string) $cs;
+		
+		return $this;
+	}
 
+	public function  getCs()
+	{
+		return $this->_cs;
+	}
+    #endregion MBA
 
 
 	public function setMapper($mapper)

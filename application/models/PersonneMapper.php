@@ -41,7 +41,7 @@ class Default_Model_PersonneMapper
                	'date_entree' => $personne->getDate_entree(),
 				'date_debut' => $personne->getDate_debut(),
 				'date_fin' => $personne->getDate_fin(),
-				'id_entite' => $personne->getId_entite(),
+				'id_entite' => $personne->getEntite()->getId(),
 				'id_pole' => $personne->getId_pole(),
 				'id_modalite' => $personne->getId_modalite(),
 				'id_fonction' => $personne->getId_fonction(),

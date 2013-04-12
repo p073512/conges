@@ -1,6 +1,45 @@
 
 <?php //echo $this->action('calendriermensuel','calendrier','application'); ?>
+ <!-- Script  -->
+	<script type="text/javascript">
 	
+       
+		 $(document).ready( function(){
+
+			 /*
+	          MBA: vérification si le champ CSM est sélectionné pendant le Load 
+	          ou le reload de la page
+	           
+	        */
+				var value = $("#id_entite_pr option:selected").val(); 
+				if (value == "2")
+				 { 
+					 $('#id_modalite_pr').val('7');
+					 $("#id_modalite_pr").attr("disabled","true");
+				 }
+				 
+			 /*
+			    * MBA : fonction anonyme qui se déclenche à l'événement Change() pointant 
+			    sur le <select id="#id_entite_pr">
+			 */
+				$("#id_entite_pr").live("change",function() {
+					
+				value = $("#id_entite_pr option:selected").val(); 
+				
+				if (value == "2")
+				 { 
+					
+					 $("#id_modalite_pr option[value='7']").attr("selected","selected");
+					 $("#id_modalite_pr").attr("disabled","true");
+				 }
+				 else
+				 {
+					 $('#id_modalite_pr').val('1');
+					 $("#id_modalite_pr").removeAttr("disabled");	
+				 }
+													});
+											}); 
+</script>
 
 	<div id ="bloc_choix_personne">
 		<h4><?php echo $this->escape($this->title);?></h4>
@@ -23,7 +62,7 @@
 						</br>
 						<li><strong>Fonction</strong></li>
 						</br>
-						<li><strong>FO/BO</strong></li>
+						<li><strong>FO/BO(disabled)</strong></li>
 						</br>
 						<li><strong>Modalite</strong></li>
 						</br>
@@ -33,8 +72,16 @@
 																									
 					</ol>			
 				</div>
+				
 	
 	<?php echo $this->form; ?>	
+	
 	</div>
-
-
+	 <?php /* if(isset($this->error)) {?>
+<span class="error"> 
+     <?php  foreach ($this->error as $key => $value) 
+                 echo "</br>". $key ." : ". $value;
+	             
+     ?> 
+     </span> 
+<?php }*/ ?>

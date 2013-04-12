@@ -34,7 +34,8 @@ class Default_Model_EntiteMapper
 		//les noms des clés du tableau correspondent aux noms des champs de la table
 		$data = array(
                	'id' => $entite->getId(),
-				'libelle' => $entite->getLibelle()		
+				'libelle' => $entite->getLibelle(),
+				'cs' => $entite->getCs()	//MBA : enregistrement du champ cs
 		);
 
 		//on vérifie si un l'objet $entite contient un id
@@ -64,7 +65,11 @@ class Default_Model_EntiteMapper
 
 		//setting des valeurs dans notre objet $users passé en argument
 		$entite->setId($row->id);
-		$entite->setLiblle($row->libelle);
+		$entite->setLibelle($row->libelle);
+		$entite->setCs($row->cs);  // MBA : récupération du champ cs
+		
+		
+		
 	}
 
 	//récupére toutes les entrées de la table
@@ -81,6 +86,7 @@ class Default_Model_EntiteMapper
 			$entry = new Default_Model_Entite();
 			$entry->setId($row->id);
 			$entry->setLibelle($row->libelle);
+			$entry->setCs($row->cs);    // MBA : récupération du champ cs
 			$entry->setMapper($this);
 			$entries[] = $entry;
 		}

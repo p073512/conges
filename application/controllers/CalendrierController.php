@@ -113,8 +113,9 @@ class CalendrierController extends Zend_Controller_Action
 					echo'<strong ><span style="color:red">Tous le monde bosse ce mois </span ></strong>';
 					
 				}
-				else $reponse = $this->_helper->validation->calendrier($tableau_personnes,$debut_mois,$fin_mois); 
+				else 
 				
+				$reponse = $this->_helper->validation->calendrier($tableau_personnes,$debut_mois,$fin_mois); 
 				$this->view->calendrierArray = $reponse;
 				$this->view->mois = $_SESSION['salut']['mois'];
 				$this->view->annee = $_SESSION['salut']['annee'];
@@ -149,6 +150,7 @@ class CalendrierController extends Zend_Controller_Action
 	 		
 	 		}
 		}
+
 	}
 
 	public function calendrierannuelAction()

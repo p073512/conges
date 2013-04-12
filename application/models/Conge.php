@@ -302,7 +302,7 @@ class Default_Model_Conge
 	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*39)); // Ascension
 	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*50)); // Pentecote
     }
-    //print_r($tableau_jours_feries);
+
     	 $nb_jours_ouvres = 0;
     // Mettre <= si on souhaite prendre en compte le dernier jour dans le décompte
     while ($date_debut <= $date_fin) 
@@ -310,7 +310,7 @@ class Default_Model_Conge
     // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvrés
 	    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date(date('Y', $date_debut).'-n-j', $date_debut),$tableau)) // MTA 
 	    {
-	    	$nb_jours_ouvres++;
+	    	$nb_jours_ouvres ++;
 	    }
 	    	$date_debut = mktime(date('H', $date_debut), date('i', $date_debut), date('s', $date_debut), date('m', $date_debut), date('d', $date_debut) + 1, date('Y', $date_debut));
 	}
@@ -328,10 +328,10 @@ class Default_Model_Conge
 		{
 			return $nb_jours_ouvres - 0.5;
 		}
-		
+
 		return $nb_jours_ouvres;
 	}
-	
+
 	/*
 	 * calcule de nombre de jours ouvres dans un mois  
 	 */
@@ -346,7 +346,7 @@ class Default_Model_Conge
     	$tableau_jours_feries = array(); // Tableau des jours feriés
     // On boucle dans le cas où l'année de départ serait différente de l'année d'arrivée
     	$difference_annees = date('Y', $date_fin) - date('Y', $date_debut);
- for ($i = 0; $i <= $difference_annees; $i++) 
+    for ($i = 0; $i <= $difference_annees; $i++) 
     {
 	    $annee = (int)date('Y', $date_debut) + $i;
 	    // Liste des jours feriés
@@ -377,7 +377,7 @@ class Default_Model_Conge
 	    	$date_debut = mktime(date('H', $date_debut), date('i', $date_debut), date('s', $date_debut), date('m', $date_debut), date('d', $date_debut) + 1, date('Y', $date_debut));
 	}
 
-		return $nb_jours_ouvres;
+		return $nb_jours_ouvres; 
 	}
 	
 	/*
@@ -415,5 +415,5 @@ class Default_Model_Conge
     }
     	return $tableau_jours_feries;
 	}
-
+	
 }

@@ -109,6 +109,7 @@ class PropositionController extends Zend_Controller_Action
 			//envoyées précédemment
 			$form->populate($data);
 		}
+	
 	}
 
 	public function editAction()

@@ -186,7 +186,7 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 		$fin_mois1=date('Y-m-d',mktime(0,0,0,$month+1,0,$_SESSION['salut']['annee']));
 		$debut_mois1=date('Y-m-d',mktime(0,0,0,$month,1,$_SESSION['salut']['annee']));
 		
-		$conge = new Default_Model_Conge();
+		$conge = new Default_Model_Conge();  
 		$propostion = new Default_Model_Proposition();
 		$nb_jr_ouv_mois_fr = $conge->joursOuvresDuMois($debut_mois1,$fin_mois1);
 		$nb_jr_ouv_mois_ma = $propostion->joursOuvresDuMois($debut_mois1,$fin_mois1);
@@ -273,18 +273,18 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 							$date_debut = new Zend_Date($reponse2[$l]['date_debut']);
 							$date_fin = new Zend_Date($reponse2[$l]['date_fin']);
 							$somme[$l] = $this->calculNombreJour(0,$date_debut,$date_fin,$reponse2[$l]['centre_service'],$reponse2[$l]['nombre_jours']);
-							$totaljours = $totaljours +$somme[$l];
+							$totaljours = $totaljours + $somme[$l];
 								
 						}
 						
 					 	
 						if ($reponse2[$i]['centre_service'] ==1) 
 						{
-							$totaljours =  $nb_jr_ouv_mois_ma-$totaljours;
+							$totaljours = $totaljours -  $nb_jr_ouv_mois_ma;
 						}
 						elseif($reponse2[$i]['centre_service'] ==0) 
 						{
-							$totaljours = $nb_jr_ouv_mois_fr-$totaljours;
+							$totaljours = $totaljours - $nb_jr_ouv_mois_fr; 
 						}
 						$calendrier[$j][$i]['nom']=$reponse2[$i]['nom'];
 						$calendrier[$j][$i]['id']=$reponse2[$i]['id'];
@@ -349,47 +349,43 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 		$nb_jr_ouv_mois_fr = $conge->joursOuvresDuMois($debut_mois,$fin_mois);
 		$nb_jr_ouv_mois_ma = $propostion->joursOuvresDuMois($debut_mois,$fin_mois);
 	
-		
+		// (date_fin->mois  > session.mois)  et (date_debut->mois  < session.mois)  
 		if (($date_fin->get(Zend_Date::MONTH)>$_SESSION['salut']['mois']) &&($date_debut->get(Zend_Date::MONTH)<$_SESSION['salut']['mois']))
 		{
-		
 			return 0;		
-		
 		}
-		elseif((($date_fin->get(Zend_Date::MONTH)== $_SESSION['salut']['mois']) &&($date_debut->get(Zend_Date::MONTH)==$_SESSION['salut']['mois'])))	
+		/* Mohamed khalil TAKAFI */
+		// (date_fin->mois  == session.mois)  et (date_debut->mois  == session.mois)  
+		elseif((($date_fin->get(Zend_Date::MONTH)== $_SESSION['salut']['mois']) &&($date_debut->get(Zend_Date::MONTH)== $_SESSION['salut']['mois'])))	
 		{
 			if (($centre_cervice==1)) 
 			{
-				
-				return 	$propostion->joursOuvresDuMois($debut_mois,$date_fin)-$nombre_jours;
+				// bug corrigé : retourne un nombre négatif 
+				return 	$nombre_jours - $propostion->joursOuvresDuMois($debut_mois,$date_fin) ; // MTA : inversion de B - A => A - B
 				
 			}
 			elseif (($centre_cervice==0)) 
 			{
-				
-				return 	 $conge->joursOuvresDuMois($debut_mois,$fin_mois)- $nombre_jours;
-				
+				return 	$conge->joursOuvresDuMois($debut_mois,$fin_mois) - $nombre_jours ; 
 			}
 		
-		}		
+		}
+		// (date_fin->mois  == session.mois)  et (date_debut->mois < session.mois)  		
 		elseif((($date_fin->get(Zend_Date::MONTH)== $_SESSION['salut']['mois']) &&($date_debut->get(Zend_Date::MONTH)< $_SESSION['salut']['mois'])))	
 		{
 			
 			if (($centre_cervice==1)) 
 			{
-				
-				return 	$nb_jr_ouv_mois_ma - $propostion->joursOuvresDuMois($debut_mois,$date_fin);
-				
+				return 	$nb_jr_ouv_mois_ma - $propostion->joursOuvresDuMois($debut_mois,$date_fin);	
 			}
 			elseif (($centre_cervice==0)) 
-			{
-				
-				return 	 $nb_jr_ouv_mois_fr -$conge->joursOuvresDuMois($debut_mois,$date_fin);
+			{	
+				return 	 $nb_jr_ouv_mois_fr - $conge->joursOuvresDuMois($debut_mois,$date_fin); 
 				
 			}
 		
 		}
-		
+		// (date_fin->mois  > session.mois)  et (date_debut->mois < session.mois) 
 		elseif((($date_fin->get(Zend_Date::MONTH)> $_SESSION['salut']['mois']) &&($date_debut->get(Zend_Date::MONTH)== $_SESSION['salut']['mois'])))	
 		{
 			
@@ -402,7 +398,7 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 			elseif (($centre_cervice==0)) 
 			{
 				
-				return 	 $nb_jr_ouv_mois_fr -$conge->joursOuvresDuMois($date_debut,$fin_mois);
+				return 	 $nb_jr_ouv_mois_fr - $conge->joursOuvresDuMois($date_debut,$fin_mois);
 				
 			}
 		

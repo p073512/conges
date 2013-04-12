@@ -77,7 +77,7 @@ $nombreDeJoursDeMois = intval(date("t",$timestamp));
 			$tableau = array();
 			for ($i=0;$i<$nb;$i++)
 			{
-					$tableau[$i]=$jours_feries_marocain[$i]['date_debut'];		
+					$tableau[$i] = $jours_feries_marocain[$i]['date_debut'];		
 			}
 
 $month_t=intval(date("n")); // on recepure le numumro du mois avec la fonction interval on peut avoir un num entier ( s'assurer)
@@ -126,7 +126,7 @@ while ($L <= count($this->calendrierArray)+1 ) //  c'est le nombre des ressource
 					elseif ($L!=1 && $j ==($nombreDeJoursDeMois)+1)
 					{
 						    // affichage NBR JOURS dans calendrier MTA : 
-						    echo /*-1 */ $this->calendrierArray[$L-2][0]['nombre_jours'];  // MTA : resultat correcte mais négatif * -1 
+						    echo $this->calendrierArray[$L-2][0]['nombre_jours'];  // MTA : resultat correcte mais négatif * -1 
 						
 					} 
 					elseif ($L!=1 && $j ==0)
@@ -151,9 +151,13 @@ while ($L <= count($this->calendrierArray)+1 ) //  c'est le nombre des ressource
 						 */ 
 						
 						//echo "la valeur de var est :".date(date('Y', $var).'-m-d', $var);
-						if((((in_array(date('j_n_'.date('Y', $var), $var), $tableau_jours_feries))&&($this->calendrierArray[$L-2][$s]['centre_service']==0))||((in_array(date(date('Y', $var).'-m-d', $var), $tableau))&&($this->calendrierArray[$L-2][$s]['centre_service']==1))) && !(in_array(date('w', $var), array(0, 6))) ) 
-						{
-							if ((in_array(date('j_n_'.date('Y', $var), $var), $tableau_jours_feries))&&(in_array(date(date('Y', $var).'-m-d', $var), $tableau)))
+						
+						// ((date (j_n_y) in jours_feries_France et centre_service = 0 )  ou  (date (y-m-d) in jours_feries_maroc et centre_service = 1 )) et ni (samedi/dimanche)
+						if((((in_array(date('j_n_'.date('Y', $var), $var), $tableau_jours_feries)) && ($this->calendrierArray[$L-2][$s]['centre_service']==0))||((in_array(date(date('Y', $var).'-m-d', $var), $tableau))&&($this->calendrierArray[$L-2][$s]['centre_service']==1))) && !(in_array(date('w', $var), array(0, 6))) ) 
+						{  
+							
+							
+							if ((in_array(date('j_n_'.date('Y', $var), $var), $tableau_jours_feries)) && (in_array(date(date('Y', $var).'-m-d', $var), $tableau)))
 							{
 								echo  '<div class="FC">FC</div>';
 								$flag2 =1;
@@ -164,7 +168,7 @@ while ($L <= count($this->calendrierArray)+1 ) //  c'est le nombre des ressource
 								$flag2 =1;
 							}
 							if((in_array(date(date('Y', $var).'-m-d', $var), $tableau))&&($this->calendrierArray[$L-2][$s]['centre_service']==1))
-							{
+							{   
 								echo  '<div class="FF">FM</div>';
 								$flag2 =1;
 							}
@@ -197,7 +201,7 @@ while ($L <= count($this->calendrierArray)+1 ) //  c'est le nombre des ressource
 
 								}
 								// ( date_debut != date_fin )  et  (( debut_midi == fin_midi ) et ( fin_midi != 0 ))
-								elseif (($this->calendrierArray[$L-2][$i]['date_debut']!=$this->calendrierArray[$L-2][$i]['date_fin']) && $mi_fin_journee== $mi_debut_journee && $mi_fin_journee!= 0 )
+								elseif (($this->calendrierArray[$L-2][$i]['date_debut']!=$this->calendrierArray[$L-2][$i]['date_fin']) && $mi_fin_journee == $mi_debut_journee && $mi_fin_journee!= 0 )
 								{	
 									if ($this->calendrierArray[$L-2][$i]['date_debut']->get(Zend_Date::DAY)==$j)   // MTA : insérer en deuxieme 	
 										echo "<div class=".$idConge."_2>".$idConge."</div>";
@@ -241,6 +245,9 @@ while ($L <= count($this->calendrierArray)+1 ) //  c'est le nombre des ressource
 				}
 					$flag = false;
 					$flag2 =false;
+					
+			
+					
 				?>
 			 
 			</td>
@@ -258,7 +265,8 @@ while ($L <= count($this->calendrierArray)+1 ) //  c'est le nombre des ressource
 	$numjour =$numjour1[date("w",$timestamp)];
 	$L++;
 	$s =0;
-	
+			// MTA var_dump($tableau_jours_feries);
+			// MTA var_dump($this->calendrierArray);
 }
 ?>
 

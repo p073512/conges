@@ -203,8 +203,6 @@ class CongeController extends Zend_Controller_Action
 		//récupére les paramètres de la requête
 		$params = $this->getRequest()->getParams();
 
-	
-
 		//vérifie que le paramètre id existe
 		if(isset($params['id']))
 		{

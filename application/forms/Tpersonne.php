@@ -6,10 +6,10 @@ class Default_Form_TPersonne extends Zend_Form
 {
 	public function init()
 	{
-	 // nom du formulaire 
-	     $this->setName('createPersonne');
+	 	// nom du formulaire 
+		$this->setName('createPersonne');
 	   
-     // La méthode HTTP d'envoi du formulaire
+     	// La méthode HTTP d'envoi du formulaire
    		 $this->setMethod('post');
    		  $decorators = array('label','ViewHelper','Errors','description','htmltag','DtDdWrapper');
    		 foreach ($decorators as $decorator)

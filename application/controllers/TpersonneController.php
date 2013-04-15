@@ -25,9 +25,8 @@ class TpersonneController extends Zend_Controller_Action
 		
         if ($this->getRequest()->isPost()) {
         	
-            if ($form->isValid($request->getPost())) {
-            	
-            	$data = $request->getPost();
+            $data = $request->getPost();
+        	if ($form->isValid($request->getPost())) {
             	
             	$personne = new Default_Model_Personne();
             	$personne->setNom($data['Nom']);
@@ -50,16 +49,28 @@ class TpersonneController extends Zend_Controller_Action
             	$personne->setId_entite($entite->getId());
             	$personne->setCentre_service($entite->getCs());
             	$personne->setId_modalite("7");
-            	var_dump($data);
-            	$personne->save();
             	
-            	
-            	
-                return $this->_helper->redirector('createp');
+            	try {
+            			$personne->save();
+            	}
+                catch (Zend_Db_Exception $e){
+                	    
+         
+				        $this->view->error = "Erreur d'insertion : ".$e->getMessage();
+				     	$form->populate($data); 
+                     
+                }
+                 
+            	 $this->view->success = $data['Nom'];
+            
             }
+            else {
+            	
+            	$form->populate($data); 
+            }  
         }
- 
+      
         $this->view->form = $form;
     }
 }
-#endregion
+#endregion MBA

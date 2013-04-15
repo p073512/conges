@@ -42,15 +42,35 @@ $this->layout()->setLayout('mylayout');
 $this->form->setAction($this->url());
 ?>
 
-	<div class="container">
 
-					
-					<div class="row-fluid">
-					<fieldset>
-					<legend >Ajout Personne (CSM)</legend>
+	   <div class="container">
+	
+					<div class="well row-fluid">
+	<?php if(isset($this->error)){ ?>
+
+						<div class="alert">
+							<button type="button" class="close span6" data-dismiss="alert"></button>
+							<strong>Alerte!</strong><?php echo "error :".$this->error; ?>
+						</div>
+
+	<?php }else if(isset($this->success)){?>
+	                    <div class="alert alert-info">
+							<button type="button" class="close span8" data-dismiss="alert"></button>
+							<strong>Success!</strong>
+	<?php echo "success : '". $this->success ."' a été bien créé <a href='".$this->url(array('controller' => 'personne', 'action' => 'index'), 'default', true)."'>Afficher la table Personnels </a>"; ?>
+						</div>
+	<?php }?>
+			
+			<fieldset>
+				<legend >Ajout Personne (CSM)</legend>
 					<div class="offset3">
-					
- <?php echo $this->form; ?>
- </div> </fieldset></div></div>
+                      <?php echo $this->form; ?>
+                   </div>
+           </fieldset>
+                  </div>
+          </div>
 
+
+
+  
  <?php #endregion MBA

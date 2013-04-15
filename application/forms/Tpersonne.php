@@ -9,14 +9,14 @@ class Default_Form_TPersonne extends Zend_Form
 	 	// nom du formulaire 
 		$this->setName('createPersonne');
 	   
-     	// La méthode HTTP d'envoi du formulaire
+     	// La mï¿½thode HTTP d'envoi du formulaire
    		 $this->setMethod('post');
    		  $decorators = array('label','ViewHelper','Errors','description','htmltag','DtDdWrapper');
    		 foreach ($decorators as $decorator)
    		 { $this->removeDecorator($decorator);}
    		 
    		
-   		 // le chemin du décorateur est défini.
+   		 // le chemin du dï¿½corateur est dï¿½fini.
            $this->addElementPrefixPath('My_Form_Decorators',
                        APPLICATION_PATH.'../../My/Form/Decorators',
 		              'decorator');
@@ -29,12 +29,12 @@ class Default_Form_TPersonne extends Zend_Form
 		 /*
          * Champ input type text nom 
          * Validation : requis,
-         * Filtre : StringTrim (supprime les espaces en début et fin ),
+         * Filtre : StringTrim (supprime les espaces en dÃ©but et fin ),
          *          StringTags (supprime les balises html et php)
          */
    		 $this->addElement('text','Nom',array(
    		 'label' => 'Nom',
-   		 'placeholder' => 'Entrez nom…',
+   		 'placeholder' => 'Entrez nom..',
    		 'required' => true,
    		 'description' => 'required',
    		 'decorators' => array(
@@ -47,13 +47,13 @@ class Default_Form_TPersonne extends Zend_Form
         /*
          * Champ input type text Prenom 
          * Validation : requis,
-         * Filtre : StringTrim (supprime les espaces en début et fin ),
+         * Filtre : StringTrim (supprime les espaces en dï¿½but et fin ),
          *          StringTags (supprime les balises html et php)
          */
         $this->addElement('text', 'Prenom', array(
             'label'      => 'Prenom',
             'required'   => true,
-            'placeholder' => 'Entrez prenom…',
+            'placeholder' => 'Entrez prenom..',
             'filters'    => array('StringTrim','StripTags'),
             'validators' => array(
                
@@ -65,7 +65,7 @@ class Default_Form_TPersonne extends Zend_Form
            
         ));
         /*
-         * Date entrée type jquery_x datepicker
+         * Date entr"e type jquery_x datepicker
          * 
          */
         
@@ -73,6 +73,7 @@ class Default_Form_TPersonne extends Zend_Form
 		$date_entree_pr->setJQueryParam('dateFormat', 'yy-mm-dd');
 		$date_entree_pr->setLabel("Date d'entree");
 		$date_entree_pr->setRequired(true);
+		$date_entree_pr->addValidator('date',true,array('date' => 'yy-MM-dd'));
 		$date_entree_pr->addDecorator('Ftextinput', array('label'));
 		
         
@@ -87,6 +88,7 @@ class Default_Form_TPersonne extends Zend_Form
 		$date_debut->setJQueryParam('dateFormat', 'yy-mm-dd');
 		$date_debut->setLabel("Date debut");
 		$date_debut->setRequired(true);
+		$date_debut->addValidator('date',true,array('date' => 'yy-MM-dd'));
 		$date_debut->addDecorator('Ftextinput', array('label'));
 		
 		
@@ -98,7 +100,7 @@ class Default_Form_TPersonne extends Zend_Form
         
 		
 		/*
-         * Liste déroulante "Pôle" peuplée à partir de la BD via setDbOptions
+         * Liste dÃ©roulante "PÃ´le" peuplÃ©e Ã  partir de la BD via setDbOptions
          */
 		
 		
@@ -110,7 +112,7 @@ class Default_Form_TPersonne extends Zend_Form
 		
 		
 		/*
-         * Liste déroulante "Fonctions" peuplée à partir de la BD via setDbOptions
+         * Liste dÃ©roulante "Fonctions" peuplÃ©e Ã  partir de la BD via setDbOptions
          */
 		 
 		$this->addElement('select', 'fonctions' ,array(
@@ -123,10 +125,10 @@ class Default_Form_TPersonne extends Zend_Form
 		 /*
          * Champ type text 
          * Validation : requis,NotEmpty,Regex (entre 0 et 100)
-         * Filtre : StringTrim (supprime les espaces en début et fin ),
+         * Filtre : StringTrim (supprime les espaces en dï¿½but et fin ),
          *          StringTags (supprime les balises html et php)
          */
-		 
+		
 		 $this->addElement('text','pourcentage',array(
 		 'label' => 'Pourcentage',
 		 'value' => '100',
@@ -137,7 +139,7 @@ class Default_Form_TPersonne extends Zend_Form
 				                        true,
 				                        array('pattern'=> '/^[1-9]?[0-9]{1}$|^100$/',
 				                        'messages' => array(
-                                        'regexNotMatch'=>'Pourcentage : Seulement valeurs entre 0 et 1 acceptées'
+                                        'regexNotMatch'=>'Pourcentage : Seulement valeurs entre 0 et 1 acceptï¿½es'
                                ))),
 		                       ),
 		 'decorators' => array(
@@ -151,6 +153,8 @@ class Default_Form_TPersonne extends Zend_Form
 		  
 		  ));
 		  
+		  
+		  
 		  $this->addElement('submit', 'creer',
 		   array('label' => 'valider'));
       
@@ -158,30 +162,30 @@ class Default_Form_TPersonne extends Zend_Form
 	}
 	
     /*
-     * function return : zend_element_select($elementNam) peuplé | null
+     * function return : zend_element_select($elementNam) peuplÃ© | null
      * function params :
-     * &$objet : la référence du type de l'objet dont on veut récupérer la liste depuis la BD 
+     * &$objet : la rÃ©fÃ©rence du type de l'objet dont on veut rÃ©cupÃ¨rer la liste depuis la BD 
      * 
-     * $id_function : le nom de la fonction qui retourne le Id de l'objet, par défaut getId sinon il faut
-     * renseigné le nom de la fonction. [optionnel]
+     * $id_function : le nom de la fonction qui retourne le Id de l'objet, par dÃ©faut getId sinon il faut
+     * renseignÃ© le nom de la fonction. [optionnel]
      * 
-     * $libelle_function : Par défaut getLibelle() sinon renseignez nom de méthode. [optionnel]
+     * $libelle_function : Par dÃ©faut getLibelle() sinon renseignez nom de mÃ©thode. [optionnel]
      * 
-     * $str[] : tableau dans lequel seront récupérés les objets depuis la base. [optionnel]
+     * $str[] : tableau dans lequel seront rÃ©cupÃ©rÃ©s les objets depuis la base. [optionnel]
      * 
-     * desc : fonction qui sert à peupler un element du formulaire select à partir d'une liste d'objet
-     * récupérée de la base de donnée. la fonction s'applique sur "tout" type d'objet.
+     * desc : fonction qui sert Ã  peupler un element du formulaire select Ã  partir d'une liste d'objet
+     * rÃ©cupÃ¨rÃ©e de la base de donnÃ©e. la fonction s'applique sur "tout" type d'objet.
      */
 	public function setDbOptions($elementName, &$object, $id_function ='getId', $libelle_function = 'getLibelle', $str = array())
 				{
-					// vérifie si le champ en question est un "select"
+					// vï¿½rifie si le champ en question est un "select"
 					if($this->getElement($elementName) instanceof Zend_Form_Element_Select)
 					{
-						// check si l'objet à la méthode getMapper (pour la liaison avec la base)
+						// check si l'objet Ã  la mÃ©thode getMapper (pour la liaison avec la base)
 						if(method_exists($object, "getMapper"))
 						{ 
 						  $mapper = $object->getMapper();
-						// check la méthode fetchAll() existe
+						// check la mÃ©thode fetchAll() existe
 						  if(method_exists($mapper, "fetchAll"))
 							{ 
 							   $str = $object->getMapper()->fetchAll($str);
@@ -194,6 +198,15 @@ class Default_Form_TPersonne extends Zend_Form
 								*/
 								$objArray [$p->$id_function()] = $p->$libelle_function();
 							}
+							/*
+							 * PremiÃ¨re option affiche le libellÃ© choissisez pour forcer le user
+							 * Ã  sÃ©lectionner une ligne , id value Ã  x pour s'assurer qu'il ne sera
+							 * jamais un id de la base de donnÃ©e (id de type int)
+							 */
+							
+							$selectOptionLibelle = array('x' => 'Choisissez :' );
+							$objArray = (array)$selectOptionLibelle + (array)$objArray;
+							
 
 			  	return $this->getElement($elementName)->setOptions(array('MultiOptions' =>  $objArray));
 					}	
@@ -201,36 +214,8 @@ class Default_Form_TPersonne extends Zend_Form
 				return ;			}
 				
 
-		/*
-		 * function return : $valid boolean selon la validité du formulaire.
-		 * @param :
-		 * $data : valeurs entrées dans le formulaire.
-		 * 
-		 * desc: fonction qui sert à detecter les champ de saisie erronés et les entourez en rouge.
-		 * 
-		 */		
-				
-		 public function isValid($data)
-		    {
-		        $valid = parent::isValid($data);
-		  //Boucle sur les éléments du formulaire pointé  (par $this)
-		        foreach ($this->getElements() as $element) {
-                // en cas d'erreur sur une saisie
-		        	if ($element->hasErrors()) {
-		        		/*On récupére l'attribut class de l'element pour le concatener avec 'error' ou lui affecter 'error'
-		        		* pour l'entourer ensuite en utilisant css
-		        		*/
-		                $ancClass = $element->getAttrib('class');
-		                if (!empty($ancClass)) {
-		                    $element->setAttrib('class', $ancClass . ' error');
-		                } else {
-		                    $element->setAttrib('class', 'error');
-		                }
-		            }
-		        }
-		 
-		        return $valid;
-		    }
+		
+		
 	
 }
 #endregion MBA

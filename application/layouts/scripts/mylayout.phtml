@@ -1,0 +1,236 @@
+<?php 
+echo $this->doctype() ?>
+<!doctype html>
+
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+   <meta charset="utf-8" />
+   <!-- Toujours forcer le dernier IE (même en Intra) et le Chrome Frame -->
+   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+   <!-- Mobile viewport optimized: h5bp.com/viewport -->
+   <meta name="viewport" content="width=device-width">
+
+   <title>Application de gestion de Congés</title>
+   <meta name="robots" content="index, nofollow">
+   <meta name="description" content="Application de gestion de congé : Application qui gére les cong�s du csm et france du projet Presstalis." />
+   <meta name="keywords" content="Application gestion congé,congé,calendrier,Presstalis" />
+   <meta name="author" content="MedB"/>
+   
+   <!-- ligne � supprimer en cas d'utilisation de font locals -->
+   <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
+   <!-- Le fav and touch icons -->
+   <link rel="shortcut icon" href="content/ico/favicon.ico">
+   <link rel="apple-touch-icon-precomposed" sizes="144x144" href="content/ico/apple-touch-icon-144-precomposed.png">
+   <link rel="apple-touch-icon-precomposed" sizes="114x114" href="content/ico/apple-touch-icon-114-precomposed.png">
+   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="content/ico/apple-touch-icon-72-precomposed.png">
+   <link rel="apple-touch-icon-precomposed" href="content/ico/apple-touch-icon-57-precomposed.png">
+  
+		  <?php
+		
+		 
+		  /*
+		   * Import des fichies de feuille de styles css propores au bootstrap MertroUI W8
+		   */
+		 
+		  $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/bootstrap.css');
+		   $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/bootstrap-responsive.css');
+		    $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/bootmetro.css');
+		     $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/bootmetro-tiles.css');
+		      $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/bootmetro-charms.css');
+		       $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/metro-ui-light.css');
+		        $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/icomoon.css'); 
+		        echo $this->headLink();
+
+		         
+		       
+		        
+		        
+		        $this->headScript()->appendFile( $this->baseUrl() .'/scriptjs/jquery-1.8.2.min.js');
+		        $this->headScript()->appendFile($this->baseUrl().'/scriptjs/google-code-prettify/prettify.js');
+				$this->headScript()->appendFile($this->baseUrl() .'/scriptjs/jquery.mousewheel.js');
+		    	$this->headScript()->appendFile($this->baseUrl() .'/scriptjs/jquery.scrollTo.js');
+				$this->headScript()->appendFile($this->baseUrl() .'/scriptjs/bootstrap.min.js');
+				$this->headScript()->appendFile($this->baseUrl() .'/scriptjs/bootmetro.js');
+				$this->headScript()->appendFile($this->baseUrl() .'/scriptjs/bootmetro-charms.js');
+				$this->headScript()->appendFile($this->baseUrl().'/scriptjs/demo.js');
+				$this->headScript()->appendFile($this->baseUrl() .'/scriptjs/holder.js');
+		       
+			   
+		  
+		  ?>
+		  <?php 
+			   
+			  	echo $this->headTitle();
+			  	
+		  ?>
+		  <!-- All JavaScript at the bottom, except for Modernizr and Respond.
+          Modernizr enables HTML5 elements & feature detects; Respond is a polyfill for min/max-width CSS3 Media Queries
+          For optimal performance, use a custom Modernizr build: www.modernizr.com/download/ -->
+          <?php 
+            echo $this->jQuery();
+          $this->headScript()->appendFile($this->baseUrl( 'scriptjs/modernizr-2.6.1.min.js'));
+
+          echo $this->headScript();
+          
+      ?>
+		   <script type="text/javascript">
+			   
+			      $(".metro").metro();
+			      //$("dropdown-toggle").dropdown();
+   </script>
+	</head>
+
+<header id="nav-bar" class="container-fluid">
+      <div class="row-fluid">
+         <div class="span9">
+           
+               
+			<div class="navbar ">
+                 <div class="navbar-inner">
+                   <div class="container" >
+                     <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                       <span class="icon-bar"></span>
+                       <span class="icon-bar"></span>
+                       <span class="icon-bar"></span>
+                     </a>
+                     <a class="brand" style="margin-top: 0px;padding-top: 0px;" href="#"><img width="60"  height="70" botom="0" src="/eclipse/conges/public/content/img/cgi.png" /></a>
+                     <div class="nav-collapse collapse navbar-responsive-collapse">
+                       
+                       
+                       <ul class="nav ">
+                       	<li class="dropdown">
+                           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Gestion des demandes<b class="caret"></b></a>
+                           <ul class="dropdown-menu">
+                             <li><a href="<?php echo $this->url(array('controller' => 'demande', 'action' => 'create'), 'default', true) ?>">Créer</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'demande', 'action' => 'rederigerversindex'), 'default', true) ?>">Valider / Refuser</a></li>
+                             
+                           </ul>
+                         </li>
+                         <li class="divider-vertical"></li>
+                       	 <li class="dropdown">
+                           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Proposition<b class="caret"></b></a>
+                           <ul class="dropdown-menu">
+                             <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'create'), 'default', true) ?>">Créer</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'affichercsm'), 'default', true) ?>">Afficher / Modifier</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'afficheradmin'), 'default', true) ?>">Valider / Refuser</a></li>
+                            
+                           </ul>
+                         </li>
+                         <li class="divider-vertical"></li>
+                          <li class="dropdown">
+                           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Congés<b class="caret"></b></a>
+                           <ul class="dropdown-menu">
+                             <li><a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'create'), 'default', true) ?>">Créer</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'rederigerversindex'), 'default', true) ?>">Valider / Refuser</a></li>
+                             
+                           </ul>
+                         </li>
+                         <li class="divider-vertical"></li>
+                         <li class="dropdown">
+                           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Personne<b class="caret"></b></a>
+                           <ul class="dropdown-menu">
+                             <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'index'), 'default', true) ?>">Afficher Personnels</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'create'), 'default', true) ?>">Initialiser les soldes</a></li>
+                             <li class="nav-header">France</li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'create'), 'default', true) ?>">Ajouter Personne</a></li>
+                             <li class="divider"></li>
+                             <li class="nav-header">CSM</li>
+                             <li><a href="#">Ajouter Personne</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'create'), 'default', true) ?>">Declarer jours feries CSM</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'index'), 'default', true) ?>">Afficher jours feries CSM</a></li>
+                           </ul>
+                         </li>
+                         
+                         <li class="divider-vertical"></li>
+                         <li class="dropdown">
+                           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Calendrier<b class="caret"></b></a>
+                           <ul class="dropdown-menu">
+                             <li><a href="<?php echo $this->url(array('controller' => 'calendrier', 'action' => 'calendriermensuel'), 'default', true) ?>">Calendrier mensuel</a></li>
+                             <li><a href="#">Calendrier annuel</a></li>
+                             
+                           </ul>
+                         </li>
+                       </ul>
+                     </div><!-- /.nav-collapse -->
+                   </div>
+                 </div><!-- /navbar-inner -->
+               </div>
+				
+       
+         </div>
+        
+         <div class="span3">
+         <div id="top-info" class="pull-right">
+         <a href="#" class="pull-left">
+            <div class="top-info-block">
+            
+            
+               <h3><?php 
+               $profil = substr_replace($this->LoggedProfil(),"",0,31);
+               $profil = str_replace("Deconnexion","", $profil);
+               $profil  = strip_tags($profil);
+               echo $profil;?></h3>
+               <h4>Déconnexion</h4>
+            </div>
+            <div class="top-info-block">
+               <b class="icon-user"></b>
+            </div>
+         </a>
+         <hr class="separator pull-left"/>
+         <a id="settings" class="pull-left" href="#">
+            <b class="icon-settings"></b>
+         </a>
+      </div>
+   </div>
+   </header>
+<body>
+	
+	   <div id="charms" class="win-ui-light">
+   
+      <div id="theme-charms-section" class="charms-section">
+         <div class="charms-header">
+            <a href="#" class="close-charms win-command">
+               <span class="win-commandimage win-commandring">&#xe05d;</span>
+            </a>
+            <h2>Settings</h2>
+         </div>
+   
+         <div class="row-fluid">
+            <div class="span12">
+   
+               <form class="">
+                  <label for="win-theme-select">Change theme:</label>
+                  <select id="win-theme-select" class="">
+                     <option value="metro-ui-semilight">Semi-Light</option>
+                     <option value="metro-ui-light">Light</option>
+                     <option value="metro-ui-dark">Dark</option>
+                  </select>
+               </form>
+   
+            </div>
+         </div>
+      </div>
+   
+   </div>
+<?php 
+
+?>
+
+  
+	
+	
+		<div id="content">
+		
+
+		  <?php echo  $this->layout()->content; ?>
+		
+		</div>	
+</body>
+
+
+           
+           
+

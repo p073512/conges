@@ -4,12 +4,20 @@ class TpersonneController extends Zend_Controller_Action
 {
     // indexAction() ici ...
  
+	public function preDispatch(){
+		
+    	    $doctypeHelper = new Zend_View_Helper_Doctype();
+            $doctypeHelper->doctype('HTML5');
+    
+    	$this->_helper->layout->setLayout('mylayout');
+	}
     public function createpAction()
     {
+    	
         $request = $this->getRequest();
         $form    = new Default_Form_TPersonne();
         
-        //MBA : Peuplé les listes déroulantes à partir de la Base de donnée
+        //MBA : PeuplÃ© les listes dÃ©roulantes Ã  partir de la Base de donnÃ©e
         $form->setDbOptions('fonctions',new Default_Model_Fonction());
         $form->setDbOptions('pole', new Default_Model_Pole());
        
@@ -18,6 +26,34 @@ class TpersonneController extends Zend_Controller_Action
         if ($this->getRequest()->isPost()) {
         	
             if ($form->isValid($request->getPost())) {
+            	
+            	$data = $request->getPost();
+            	
+            	$personne = new Default_Model_Personne();
+            	$personne->setNom($data['Nom']);
+            	$personne->setPrenom($data['Prenom']);
+            	$personne->setDate_entree($data['date_entree']);
+            	$personne->setId_pole($data['pole']);
+            	$personne->setId_fonction($data['fonctions']);
+            	$personne->setPourcent($data['pourcentage']);
+            	$personne->setStage($data['Stage']);
+            	$personne->setDate_debut($data['date_debut']);
+            	$personne->setDate_fin('00/00/0000');
+            	
+            	/*
+            	 * centre de service,modalitÃ© et entitÃ© figÃ©s pour le csm
+            	 */
+            	
+            	$entite = $personne->getEntite()->find((int) "2");
+            	
+            	
+            	$personne->setId_entite($entite->getId());
+            	$personne->setCentre_service($entite->getCs());
+            	$personne->setId_modalite("7");
+            	var_dump($data);
+            	$personne->save();
+            	
+            	
             	
                 return $this->_helper->redirector('createp');
             }

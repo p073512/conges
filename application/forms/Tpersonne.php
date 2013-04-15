@@ -11,24 +11,38 @@ class Default_Form_TPersonne extends Zend_Form
 	   
      // La méthode HTTP d'envoi du formulaire
    		 $this->setMethod('post');
+   		  $decorators = array('label','ViewHelper','Errors','description','htmltag','DtDdWrapper');
+   		 foreach ($decorators as $decorator)
+   		 { $this->removeDecorator($decorator);}
    		 
-   		 $this->setElementDecorators(array('label','ViewHelper','Errors','description','htmltag','DtDdWrapper'));
+   		
+   		 // le chemin du décorateur est défini.
+           $this->addElementPrefixPath('My_Form_Decorators',
+                       APPLICATION_PATH.'../../My/Form/Decorators',
+		              'decorator');
    		 /*
+   		  * Test decorator ftextinput
+   		  * 
+   		  */
+   		
+   		 
+		 /*
          * Champ input type text nom 
          * Validation : requis,
          * Filtre : StringTrim (supprime les espaces en début et fin ),
          *          StringTags (supprime les balises html et php)
          */
-   		 $this->addElement('text', 'Nom', array(
-            'label'      => 'Nom :',
-            'required'   => true,
-            'filters'    => array('StringTrim','StripTags'),
-            'validators' => array(
-               
-            ),
-           
-		    
-        ));
+   		 $this->addElement('text','Nom',array(
+   		 'label' => 'Nom',
+   		 'placeholder' => 'Entrez nom…',
+   		 'required' => true,
+   		 'description' => 'required',
+   		 'decorators' => array(
+            'Ftextinput', array()),
+   		 
+   		 
+   		 ));
+   		 
         
         /*
          * Champ input type text Prenom 
@@ -37,27 +51,50 @@ class Default_Form_TPersonne extends Zend_Form
          *          StringTags (supprime les balises html et php)
          */
         $this->addElement('text', 'Prenom', array(
-            'label'      => 'Prenom :',
+            'label'      => 'Prenom',
             'required'   => true,
+            'placeholder' => 'Entrez prenom…',
             'filters'    => array('StringTrim','StripTags'),
             'validators' => array(
                
             ),
+            'description' =>'description ici..',
+            'decorators' => array(
+            'Ftextinput', array()),
+            
            
         ));
+        /*
+         * Date entrée type jquery_x datepicker
+         * 
+         */
         
+		$date_entree_pr = new ZendX_JQuery_Form_Element_DatePicker('date_entree');
+		$date_entree_pr->setJQueryParam('dateFormat', 'yy-mm-dd');
+		$date_entree_pr->setLabel("Date d'entree");
+		$date_entree_pr->setRequired(true);
+		$date_entree_pr->addDecorator('Ftextinput', array('label'));
+		
         
+		$this->addElement($date_entree_pr);
 		
-		$this->addElement(new ZendX_JQuery_Form_Element_DatePicker('date_entree'),'datePicker',
-		array(
+		/*
+         * Date debut type jquery_x datepicker
+         * 
+         */
 		
-		'required' => true,
-		'filters' => array('StringTrim','StripTags'),
-		'JQueryParam' => array('dateFormat' => 'yy-mm-dd'),
-		"label" => 'Date entree :',
+		$date_debut = new ZendX_JQuery_Form_Element_DatePicker('date_debut');
+		$date_debut->setJQueryParam('dateFormat', 'yy-mm-dd');
+		$date_debut->setLabel("Date debut");
+		$date_debut->setRequired(true);
+		$date_debut->addDecorator('Ftextinput', array('label'));
 		
+		
+		
+        
+		$this->addElement($date_debut);
 		    
-		));
+		
         
 		
 		/*
@@ -91,7 +128,7 @@ class Default_Form_TPersonne extends Zend_Form
          */
 		 
 		 $this->addElement('text','pourcentage',array(
-		 'label' => 'Pourcentage :',
+		 'label' => 'Pourcentage',
 		 'value' => '100',
 		 'required' => true,
 		 'filters' => array('StringTrim','StripTags'),
@@ -103,9 +140,17 @@ class Default_Form_TPersonne extends Zend_Form
                                         'regexNotMatch'=>'Pourcentage : Seulement valeurs entre 0 et 1 acceptées'
                                ))),
 		                       ),
+		 'decorators' => array(
+            'Ftextinput', array()),
 		 
 		  ));
 		
+		  
+		  $this->addElement('checkbox','Stage',array(
+		  'label' => 'stage ?',
+		  
+		  ));
+		  
 		  $this->addElement('submit', 'creer',
 		   array('label' => 'valider'));
       

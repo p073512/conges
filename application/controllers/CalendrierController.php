@@ -167,7 +167,7 @@ class CalendrierController extends Zend_Controller_Action
 			$propostion = new Default_Model_Proposition();
 			$tableau_jours_feries=$conge->chercher_jours_feriers($debut_mois, $fin_mois);
 			$ferie = new Default_Model_Ferie();
-			$jours_feries_marocain = $ferie->RecupererLesJoursFeries( $_SESSION['salut']['annee']);
+			$jours_feries_marocain = $ferie->RecupererLesJoursFeries($_SESSION['salut']['annee']);
 			$nb= count($jours_feries_marocain );
 			$tableau = array();
 			for ($i=0;$i<$nb;$i++)

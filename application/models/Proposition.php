@@ -206,57 +206,107 @@ class Default_Model_Proposition
     /* MTA : Mohamed khalil Takafi */		
 	public function calculNombreDuJours()
 	{
+	
 		// tu peut utiliser cette fonction pour afficher les nombre totale ouvere pour un mois donné
-		$date_depart = $this->getDate_debut();
+		$date_depart = $this->getDate_debut();    
     	$date_fin1 = $this->getDate_fin();
-    	$date_debut = strtotime($date_depart );
-    	$date_fin = strtotime($date_fin1 );
-    	$tableau_jours_feries = array(); // Tableau des jours feriés
-	    $annee = (int)date('Y', $date_debut);
-	    $feris = new Default_Model_Ferie();
-	    $tableau_jours_feries = $feris->RecupererLesJoursFeries($annee);
-		$nb= count($tableau_jours_feries );
-		$tableau = array();
+    	$date_debut = strtotime($date_depart );   // date de debut 
+    	$date_fin = strtotime($date_fin1 );       // date de debut 
+    	$tableau_jours_feries = array(); 
+	    $annee = (int)date('Y', $date_debut);     // année 
+	    $feris = new Default_Model_Ferie();       
+	    $tableau_jours_feries = $feris->RecupererLesJoursFeries($annee); // recupérer les jours fériés relative à l'année en cours 
+		$nb= count($tableau_jours_feries );  	  // taille du tableau 
+		$tableau = array();                 
 		
-		for ($i=0;$i<$nb;$i++)
+		for ($i=0;$i<$nb;$i++)    // remplir le tableau avec les jours fériés 
 		{
-			$tableau[$i]=$tableau_jours_feries[$i]['date_debut'];
-			
+			$tableau[$i]=$tableau_jours_feries[$i]['date_debut'];	
 		}
-   		 $nb_jours_ouvres = 0;
+   
+	 $nb_jours_ouvres = 0;		 
     // Mettre <= si on souhaite prendre en compte le dernier jour dans le décompte
-    while ($date_debut <= $date_fin) 
-    {
-    // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvrés
-	    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date(date('Y', $date_debut).'-n-j', $date_debut), $tableau)) 
+    
+	 while ($date_debut <= $date_fin)  
+    {   
+         
+    	// Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvrés
+	    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date(date('Y', $date_debut).'-m-d', $date_debut),$tableau) )    // MTA : date('Y', $date_debut).'-m-d', $date_debut)
 	    {
-	    	$nb_jours_ouvres++;
+	    		$nb_jours_ouvres++;
 	    }
 	    	$date_debut = mktime(date('H', $date_debut), date('i', $date_debut), date('s', $date_debut), date('m', $date_debut), date('d', $date_debut) + 1, date('Y', $date_debut));
-	}
+    }
+
+   // si la date de debut et la date de fin sont ni un weekend ni un jour fériés 
+  // if((!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date(date('Y', $date_debut).'-m-d', $date_debut),$tableau)) && (!in_array(date('w', $date_fin), array(0, 6)) && !in_array(date(date('Y', $date_fin).'-m-d', $date_fin),$tableau)))
+   //{    
+   	// si ( D_journée = 1  || F_journée = 1 )    et     Date_debut == Date_fin 
 		if ((($this->getMi_debut_journee() == True) ||($this->getMi_fin_journee() == True)) && ($this->getDate_debut() ==$this->getDate_fin()) )
 		{
 			$nb_jours_ouvres = 0;
-			return $nb_jours_ouvres + 0.5 ;
+			return $nb_jours_ouvres + 0.5 ;           
 		}
-		/* MTA : Mohamed khalil Takafi */
+
+	   // si ( D_journée = 1  &&  F_journée = 1 )    et     Date_debut <> Date_fin 
 		elseif ((($this->getMi_debut_journee() == True) && ($this->getMi_fin_journee() == True))  && ($this->getDate_debut() != $this->getDate_fin()) )
-		{
-			return $nb_jours_ouvres - 1;   // MTA : ajout de "-1" à return $nb_jours_ouvres
+		{  
+	
+		    // date_debut = weekend  ou date_debut=férié     et   date_fin = weekend  ou date_fin=férié
+			if ((in_array(date('w', $date_debut), array(0, 6)) || in_array(date(date('Y', $date_debut).'-m-d', $date_debut), $tableau)) && (in_array(date('w', $date_fin), array(0, 6)) || in_array(date(date('Y', $date_fin).'-m-d', $date_fin), $tableau)))
+			 	return $nb_jours_ouvres; // MTA
+			 
+			// date_debut <> weekend  et date_debut<>férié     et   date_fin <> weekend  <> date_fin=férié	
+			elseif((!in_array(date('w', $date_debut), array(0, 6)) || !in_array(date(date('Y', $date_debut).'-m-d', $date_debut), $tableau)) && (!in_array(date('w', $date_fin), array(0, 6)) || !in_array(date(date('Y', $date_fin).'-m-d', $date_fin), $tableau)))
+			 	
+			      return $nb_jours_ouvres - 1; // MTA
+	
+			
 		}
-		elseif ((($this->getMi_debut_journee() ==True) ||($this->getMi_fin_journee() == True))  && ($this->getDate_debut() !=$this->getDate_fin()) )
-		{
-			return $nb_jours_ouvres - 0.5;
-		}
+
 		
+	     //  si ( D_journée = 1  || F_journée = 1 )    et     Date_debut <> Date_fin 
+		elseif ((($this->getMi_debut_journee() == True) || ($this->getMi_fin_journee() == True))  && ($this->getDate_debut() !=$this->getDate_fin()) )
+		{	
+				
+		    //(1)// (date_debut == weekend   ou   date_debut == ferié)     et   (date_fin == weekend    ou   date_fin == ferié)
+			if((in_array(date('w', $date_debut), array(0, 6)) || in_array(date(date('Y', $date_debut).'-m-d', $date_debut), $tableau)) && (in_array(date('w', $date_fin), array(0, 6)) || in_array(date(date('Y', $date_fin).'-m-d', $date_fin), $tableau))) 
+			    return $nb_jours_ouvres ; 
+			    
+		    //(2)// (date_debut <> weekend et date_debut <> ferié)     et   (date_fin <> weekend et date_fin <> ferié)
+		    elseif((!in_array(date('w', $date_debut), array(0, 6)) || !in_array(date(date('Y', $date_debut).'-m-d', $date_debut), $tableau)) && (!in_array(date('w', $date_fin), array(0, 6)) || !in_array(date(date('Y', $date_fin).'-m-d', $date_fin), $tableau))) 
+		
+		      	return $nb_jours_ouvres - 0.5 ; 
+
+			
+			//(3)// (date_debut == weekend  ou  date_debut == ferié)    et    (date_fin <>  weekend et date_fin <>  ferié)			
+			elseif((in_array(date('w', $date_debut), array(0, 6)) || in_array(date(date('Y', $date_debut).'-m-d', $date_debut), $tableau)) && (!in_array(date('w', $date_fin), array(0, 6)) && !in_array(date(date('Y', $date_fin).'-m-d', $date_fin), $tableau)))
+			{
+				    if($this->getMi_fin_journee() == True)   // fin_midi = true 
+						return $nb_jours_ouvres - 0.5;
+					else                                       // fin_midi = false ===> debut_midi = true 
+						return $nb_jours_ouvres;
+				
+			}			
+			//4)// (date_debut <> weekend  et  date_debut <> ferié)    et    (date_fin ==  weekend ou date_fin ==  ferié)			
+			elseif((!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date(date('Y', $date_debut).'-m-d', $date_debut), $tableau)) && (in_array(date('w', $date_fin), array(0, 6)) || in_array(date(date('Y', $date_fin).'-m-d', $date_fin), $tableau)))
+			{
+				    if($this->getMi_debut_journee() == True)   // debut_midi = true 
+						return $nb_jours_ouvres - 0.5;
+					else                                       // debut_midi = false  ===> fin_midi = true 
+						return $nb_jours_ouvres;
+			}	
+		}
 		return $nb_jours_ouvres;
 	}
 
 	public function joursOuvresDuMois($debut_mois,$fin_mois)
 	{
+
 		// tu peut utiliser cette fonction pour afficher les nombre totale ouvere pour un mois donné
     	$date_debut = strtotime($debut_mois);
     	$date_fin = strtotime($fin_mois);
+
     	$tableau_jours_feries = array(); // Tableau des jours feriés
 	    $annee = (int)date('Y', $date_debut);
 	    $feris = new Default_Model_Ferie();
@@ -274,9 +324,9 @@ class Default_Model_Proposition
     while ($date_debut <= $date_fin) 
     {
     // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvrés
-	    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date(date('Y', $date_debut).'-n-j', $date_debut), $tableau)) 
+	    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date(date('Y', $date_debut).'-n-j', $date_debut),$tableau)) 
 	    {
-	    	$nb_jours_ouvres++;
+	    	$nb_jours_ouvres ++;
 	    }
 	    	$date_debut = mktime(date('H', $date_debut), date('i', $date_debut), date('s', $date_debut), date('m', $date_debut), date('d', $date_debut) + 1, date('Y', $date_debut));
 	}

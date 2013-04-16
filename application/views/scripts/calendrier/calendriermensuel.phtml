@@ -98,6 +98,8 @@ $d=0;
 $f=0;
 $mt =0;
 
+
+
 while ($L <= count($this->calendrierArray)+1 ) //  c'est le nombre des ressources et c'est le meme le nombre de lignes remplace le par le $nombre_ligne
 {
 	// aide pour les calcule des jour ferie et valorisés au niveau du calendrier 
@@ -124,7 +126,7 @@ while ($L <= count($this->calendrierArray)+1 ) //  c'est le nombre des ressource
 					elseif ($L!=1 && $j ==($nombreDeJoursDeMois)+1)
 					{
 						    // affichage NBR JOURS dans calendrier MTA : 
-						    echo $this->calendrierArray[$L-2][0]['nombre_jours']; // MTA : resultat correcte mais négatif * -1 
+						    echo $this->calendrierArray[$L-2][0]['nombre_jours'];  // MTA : resultat correcte mais négatif * -1 
 						
 					} 
 					elseif ($L!=1 && $j ==0)
@@ -263,8 +265,8 @@ while ($L <= count($this->calendrierArray)+1 ) //  c'est le nombre des ressource
 	$numjour =$numjour1[date("w",$timestamp)];
 	$L++;
 	$s =0;
-
-				
+			// MTA var_dump($tableau_jours_feries);
+			// MTA var_dump($this->calendrierArray);
 }
 ?>
 

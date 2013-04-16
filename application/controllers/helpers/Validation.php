@@ -166,7 +166,6 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 	    $tableau_jours_feries[0][7] = $annee.'-11-6'; 
 	    $tableau_jours_feries[0][8] = $annee.'-11-18'; 
         
-	    
 	    $tableau_jours_feries[1][0] =  "Jour de lan";
 	    $tableau_jours_feries[1][1] =  "Anniversaire du manifeste de lindependance";
 	    $tableau_jours_feries[1][2] =  "Fete du travail";
@@ -180,7 +179,7 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
         return  $tableau_jours_feries;
         }
         
-    /* Mohamed khalil TAKAFI */
+        
 	public function calendrier($tableau_id,$debut_mois,$fin_mois)
 	{
 		$month =$_SESSION['salut']['mois'];
@@ -195,7 +194,6 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 		$typeconge = new Default_Model_TypeConge();
 		$result_set_types = $typeconge->fetchAll($str=array());
 		$tableau_types = array();
-		
 		foreach($result_set_types as $p)
 		{
 			$tableau_types[$p->getId()] = $p->getCode();
@@ -257,7 +255,7 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 						$calendrier[$j][$t]['centre_service']=$reponse2[0]['centre_service'];
 						$calendrier[$j][$t]['date_debut']=new Zend_Date($reponse2[0]['date_debut']);
 						$calendrier[$j][$t]['date_fin']=new Zend_Date($reponse2[0]['date_fin']);
-						$calendrier[$j][$t]['nombre_jours']=$this->calculNombreJour(1,$calendrier[$j][$t]['date_debut'],$calendrier[$j][$t]['date_fin'],$reponse2[0]['centre_service'],$reponse2[0]['nombre_jours']);  // MTA : Valeur $reponse2[0]['nombre_jours'] ERRONE A VOIR 
+						$calendrier[$j][$t]['nombre_jours']=$this->calculNombreJour(1,$calendrier[$j][$t]['date_debut'],$calendrier[$j][$t]['date_fin'],$reponse2[0]['centre_service'],$reponse2[0]['nombre_jours']);
 						$calendrier[$j][$t]['id_type_conge']=$tableau_types[$reponse2[0]['id_type_conge']];
 						$calendrier[$j][$t]['mi_debut_journee']=$reponse2[0]['mi_debut_journee'];
 						$calendrier[$j][$t]['mi_fin_journee']=$reponse2[0]['mi_fin_journee'];
@@ -274,19 +272,19 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 						{
 							$date_debut = new Zend_Date($reponse2[$l]['date_debut']);
 							$date_fin = new Zend_Date($reponse2[$l]['date_fin']);
-							$somme[$l] = $this->calculNombreJour(0,$date_debut,$date_fin,$reponse2[$l]['centre_service'],$reponse2[$l]['nombre_jours']);  // MTA : Valeur $reponse2[0]['nombre_jours'] ERRONE A VOIR 
+							$somme[$l] = $this->calculNombreJour(0,$date_debut,$date_fin,$reponse2[$l]['centre_service'],$reponse2[$l]['nombre_jours']);
 							$totaljours = $totaljours + $somme[$l];
-						
+								
 						}
-
+						
 					 	
 						if ($reponse2[$i]['centre_service'] ==1) 
 						{
-							$totaljours = $nb_jr_ouv_mois_ma - $totaljours;  // MTA : inverser equation ( origine )
+							$totaljours = $totaljours -  $nb_jr_ouv_mois_ma;
 						}
 						elseif($reponse2[$i]['centre_service'] ==0) 
 						{
-							$totaljours = $nb_jr_ouv_mois_fr - $totaljours;  // MTA : inverser equation ( origine )
+							$totaljours = $totaljours - $nb_jr_ouv_mois_fr; 
 						}
 						$calendrier[$j][$i]['nom']=$reponse2[$i]['nom'];
 						$calendrier[$j][$i]['id']=$reponse2[$i]['id'];
@@ -338,7 +336,7 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 			}
 			return($calendrier) ;
 		}
-		  
+		
 	}
 
 	public function calculNombreJour($flag,$date_debut,$date_fin,$centre_cervice,$nombre_jours)
@@ -350,7 +348,7 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 		$propostion = new Default_Model_Proposition();
 		$nb_jr_ouv_mois_fr = $conge->joursOuvresDuMois($debut_mois,$fin_mois);
 		$nb_jr_ouv_mois_ma = $propostion->joursOuvresDuMois($debut_mois,$fin_mois);
-		
+	
 		// (date_fin->mois  > session.mois)  et (date_debut->mois  < session.mois)  
 		if (($date_fin->get(Zend_Date::MONTH)>$_SESSION['salut']['mois']) &&($date_debut->get(Zend_Date::MONTH)<$_SESSION['salut']['mois']))
 		{
@@ -361,14 +359,14 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 		elseif((($date_fin->get(Zend_Date::MONTH)== $_SESSION['salut']['mois']) &&($date_debut->get(Zend_Date::MONTH)== $_SESSION['salut']['mois'])))	
 		{
 			if (($centre_cervice==1)) 
-			{   	
+			{
 				// bug corrigé : retourne un nombre négatif 
 				return 	$nombre_jours - $propostion->joursOuvresDuMois($debut_mois,$date_fin) ; // MTA : inversion de B - A => A - B
 				
 			}
 			elseif (($centre_cervice==0)) 
-			{	
-				return  $conge->joursOuvresDuMois($debut_mois,$fin_mois) - $nombre_jours; 	
+			{
+				return 	$conge->joursOuvresDuMois($debut_mois,$fin_mois) - $nombre_jours ; 
 			}
 		
 		}
@@ -382,30 +380,32 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 			}
 			elseif (($centre_cervice==0)) 
 			{	
-				return $nb_jr_ouv_mois_fr - $conge->joursOuvresDuMois($debut_mois,$date_fin); 
+				return 	 $nb_jr_ouv_mois_fr - $conge->joursOuvresDuMois($debut_mois,$date_fin); 
 				
 			}
-
-		}
-	
-		// (date_fin->mois  > session.mois)  et (date_debut->mois < session.mois) 
 		
+		}
+		// (date_fin->mois  > session.mois)  et (date_debut->mois < session.mois) 
 		elseif((($date_fin->get(Zend_Date::MONTH)> $_SESSION['salut']['mois']) &&($date_debut->get(Zend_Date::MONTH)== $_SESSION['salut']['mois'])))	
 		{
 			
 			if (($centre_cervice==1)) 
 			{
 				
-				return  $nb_jr_ouv_mois_ma - $propostion->joursOuvresDuMois($date_debut,$fin_mois);
+				return 	$nb_jr_ouv_mois_ma - $propostion->joursOuvresDuMois($date_debut,$fin_mois);
 				
 			}
 			elseif (($centre_cervice==0)) 
 			{
-				return 	$nb_jr_ouv_mois_fr - $conge->joursOuvresDuMois($date_debut,$fin_mois);
+				
+				return 	 $nb_jr_ouv_mois_fr - $conge->joursOuvresDuMois($date_debut,$fin_mois);
+				
 			}
 		
 		}
-								
+		
+							
+							
 	}
 	
 	public function CompteurJours($date_debut,$date_fin)

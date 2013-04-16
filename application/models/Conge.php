@@ -296,7 +296,6 @@ class Default_Model_Conge
 	    $tableau_jours_feries[] = '1_11_'.$annee; // Toussaint
 	    $tableau_jours_feries[] = '11_11_'.$annee; // Armistice 1918
 	    $tableau_jours_feries[] = '25_12_'.$annee; // Noel
-	       $tableau_jours_feries[] = '9_5_'.$annee; // exemple
 	    // Récupération de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
 	    $easter = easter_date($annee);
 	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + 86400); // Paques
@@ -304,80 +303,34 @@ class Default_Model_Conge
 	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*50)); // Pentecote
     }
 
- $nb_jours_ouvres = 0;		 
+    	 $nb_jours_ouvres = 0;
     // Mettre <= si on souhaite prendre en compte le dernier jour dans le décompte
-    
-	 while ($date_debut <= $date_fin)  
-    {   
-         
-    	// Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvrés
-	    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date('j_n_'.date('Y', $date_debut), $date_debut),$tableau_jours_feries) )    // MTA : date('Y', $date_debut).'-m-d', $date_debut)
+    while ($date_debut <= $date_fin) 
+    {
+    // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvrés
+	    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date(date('Y', $date_debut).'-n-j', $date_debut),$tableau)) // MTA 
 	    {
-	    		$nb_jours_ouvres++;
+	    	$nb_jours_ouvres ++;
 	    }
 	    	$date_debut = mktime(date('H', $date_debut), date('i', $date_debut), date('s', $date_debut), date('m', $date_debut), date('d', $date_debut) + 1, date('Y', $date_debut));
-    }
-
-
-     	// si ( D_journée = 1  || F_journée = 1 )    et     Date_debut == Date_fin 
+	}
 		if ((($this->getMi_debut_journee() == True) ||($this->getMi_fin_journee() == True)) && ($this->getDate_debut() ==$this->getDate_fin()) )
 		{
 			$nb_jours_ouvres = 0;
-			return $nb_jours_ouvres + 0.5 ;           
+			return $nb_jours_ouvres + 0.5 ;
 		}
-
-	   // si ( D_journée = 1  &&  F_journée = 1 )    et     Date_debut <> Date_fin 
+		
 		elseif ((($this->getMi_debut_journee() == True) && ($this->getMi_fin_journee() == True))  && ($this->getDate_debut() != $this->getDate_fin()) )
-		{  
-	
-		    // date_debut = weekend  ou date_debut=férié     et   date_fin = weekend  ou date_fin=férié
-			if ((in_array(date('w', $date_debut), array(0, 6)) || in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) && (in_array(date('w', $date_fin), array(0, 6)) || in_array(date('j_n_'.date('Y', $date_fin), $date_fin), $tableau_jours_feries)))
-			 	return $nb_jours_ouvres; // MTA
-			 
-			// date_debut <> weekend  et date_debut<>férié     et   date_fin <> weekend  <> date_fin=férié	
-			elseif((!in_array(date('w', $date_debut), array(0, 6)) || !in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) && (!in_array(date('w', $date_fin), array(0, 6)) || !in_array(date('j_n_'.date('Y', $date_fin), $date_fin), $tableau_jours_feries)))
-			 	
-			      return $nb_jours_ouvres - 1; // MTA
-	
-			
+		{
+			return $nb_jours_ouvres - 1;   
+		}
+		elseif ((($this->getMi_debut_journee() ==True) ||($this->getMi_fin_journee() == True))  && ($this->getDate_debut() !=$this->getDate_fin()) )
+		{
+			return $nb_jours_ouvres - 0.5;
 		}
 
-		
-	     //  si ( D_journée = 1  || F_journée = 1 )    et     Date_debut <> Date_fin 
-		elseif ((($this->getMi_debut_journee() == True) || ($this->getMi_fin_journee() == True))  && ($this->getDate_debut() !=$this->getDate_fin()) )
-		{	
-				
-		    //(1)// (date_debut == weekend   ou   date_debut == ferié)     et   (date_fin == weekend    ou   date_fin == ferié)
-			if((in_array(date('w', $date_debut), array(0, 6)) || in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) && (in_array(date('w', $date_fin), array(0, 6)) || in_array(date('j_n_'.date('Y', $date_fin), $date_fin), $tableau_jours_feries))) 
-			    return $nb_jours_ouvres ; 
-			    
-		    //(2)// (date_debut <> weekend et date_debut <> ferié)     et   (date_fin <> weekend et date_fin <> ferié)
-		    elseif((!in_array(date('w', $date_debut), array(0, 6)) || !in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) && (!in_array(date('w', $date_fin), array(0, 6)) || !in_array(date('j_n_'.date('Y', $date_fin), $date_fin), $tableau_jours_feries))) 
-		
-		      	return $nb_jours_ouvres - 0.5 ; 
-
-			
-			//(3)// (date_debut == weekend  ou  date_debut == ferié)    et    (date_fin <>  weekend et date_fin <>  ferié)			
-			elseif((in_array(date('w', $date_debut), array(0, 6)) || in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) && (!in_array(date('w', $date_fin), array(0, 6)) && !in_array(date('j_n_'.date('Y', $date_fin), $date_fin), $tableau_jours_feries)))
-			{
-				    if($this->getMi_fin_journee() == True)   // fin_midi = true 
-						return $nb_jours_ouvres - 0.5;
-					else                                       // fin_midi = false ===> debut_midi = true 
-						return $nb_jours_ouvres;
-				
-			}			
-			//4)// (date_debut <> weekend  et  date_debut <> ferié)    et    (date_fin ==  weekend ou date_fin ==  ferié)			
-			elseif((!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) && (in_array(date('w', $date_fin), array(0, 6)) || in_array(date('j_n_'.date('Y', $date_fin), $date_fin), $tableau_jours_feries)))
-			{
-				    if($this->getMi_debut_journee() == True)   // debut_midi = true 
-						return $nb_jours_ouvres - 0.5;
-					else                                       // debut_midi = false  ===> fin_midi = true 
-						return $nb_jours_ouvres;
-			}	
-		}
 		return $nb_jours_ouvres;
 	}
-
 
 	/*
 	 * calcule de nombre de jours ouvres dans un mois  

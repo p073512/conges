@@ -1,20 +1,29 @@
 <?php 
-class My_Form_Decorators_Ftextinput extends Zend_Form_Decorator_Abstract 
+class My_Form_Decorators_Fselect extends Zend_Form_Decorator_Abstract 
 {
 	
 	protected $_label = '<label for="%s">%s</label>';
-	protected $_format = '   <input type="text" id="%s" css:id="%s" name="%s" placeholder="%s" value="%s">';
-	protected $_error = '<span class="help-inline" id="inputError" for="%s">%s</span>';
+	protected $_format = '<select id="%s" css:id="%s" name="%s" value="%s" >%s</select>';
+	
+	protected $_error = '<span class="help-inline" id="inputError" for="%s">%a</span>';
 	
 	
 	public function render($content)
 	{
+		
 		$element = $this->getElement();
 		$name = htmlentities($element->getFullyQualifiedName());
 		$label = htmlentities($element->getLabel()). ":";
 		$value = htmlentities($element->getValue());
 		$id = htmlentities($element->getId());
-		$placeholder = htmlentities($element->getAttrib('placeholder'));
+		
+		$elementOptions = $element->getMultiOptions() ;
+		$options ="";
+ 		foreach($elementOptions as $id_opt=>$option)
+		{
+			$options .= "<option value='$id_opt'>$option</option>";
+		}
+		
 		$separateur = "<br/>";
 		if($element->isRequired())
 		{
@@ -42,12 +51,12 @@ class My_Form_Decorators_Ftextinput extends Zend_Form_Decorator_Abstract
 				
 			}
 			$css_id = "inputError";
-		    $markup = "<div class='control-group error'>".sprintf($label,"inputError",$label)."<br/>".sprintf($this->_format,$id,$css_id,$name,$placeholder,$value).
+		    $markup = "<div class='control-group error'>".sprintf($label,"inputError",$label)."<br/>".sprintf($this->_format,$id,$css_id,$name,$value,$options).
 		          sprintf($this->_error,"inputError",$error)."</div>";
 		          return $markup.$separateur;
 		}
 		
-		$markup = sprintf($this->_label,"",$label).sprintf($this->_format,$id,$css_id,$name,$placeholder,$value).sprintf($this->_error,"",$error);
+		$markup = sprintf($this->_label,"",$label).sprintf($this->_format,$id,$css_id,$name,$value,$options).sprintf($this->_error,"",$error);
 		
 		return $markup.$separateur ;
 	}

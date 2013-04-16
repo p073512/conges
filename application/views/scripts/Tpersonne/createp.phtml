@@ -1,0 +1,76 @@
+ <?php
+ /*
+  * Import de la bibliotheque JqueryUI et datePicker elles seront utilisées dans le formulaire
+  */
+		   $this->JQuery()->addStyleSheet($this->baseUrl() . '/js/jquery/themes/smoothness/jquery-ui-1.8.23.custom.css');
+			    //indique le fichier de script javascript à utliser avec jQuery UI
+			    $this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
+			    $this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/jquery.ui.datepicker.js');
+			   
+		  echo $this->jQuery(); ?> 
+<div class="row-fluid offset1">
+            <div id="header-container">
+            
+               <div class="dropdown">
+                  <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
+                     Personnes
+                     <b class="caret"></b>
+                  </a>
+                  
+                   <ul class="dropdown-menu">
+                             <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'index'), 'default', true) ?>">Afficher Personnels</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'create'), 'default', true) ?>">Initialiser les soldes</a></li>
+                             <li class="nav-header">France</li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'create'), 'default', true) ?>">Ajouter Personne</a></li>
+                             <li class="divider"></li>
+                             <li class="nav-header">CSM</li>
+                             <li><a href="#">Ajouter Personne</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'create'), 'default', true) ?>">Declarer jours feries CSM</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'index'), 'default', true) ?>">Afficher jours feries CSM</a></li>
+                           </ul>
+              
+            </div>
+          
+            </div>
+         </div>
+         <br/>
+<?php
+
+
+
+$this->layout()->setLayout('mylayout');
+$this->form->setAction($this->url());
+?>
+
+
+	   <div class="container">
+	
+					<div class="well row-fluid">
+	<?php if(isset($this->error)){ ?>
+
+						<div class="alert">
+							<button type="button" class="close span6" data-dismiss="alert"></button>
+							<strong>Alerte!</strong><?php echo "error :".$this->error; ?>
+						</div>
+
+	<?php }else if(isset($this->success)){?>
+	                    <div class="alert alert-info">
+							<button type="button" class="close span8" data-dismiss="alert"></button>
+							<strong>Success!</strong>
+	<?php echo "success : '". $this->success ."' a été bien créé <a href='".$this->url(array('controller' => 'personne', 'action' => 'index'), 'default', true)."'>Afficher la table Personnels </a>"; ?>
+						</div>
+	<?php }?>
+			
+			<fieldset>
+				<legend >Ajout Personne (CSM)</legend>
+					<div class="offset3">
+                      <?php echo $this->form; ?>
+                   </div>
+           </fieldset>
+                  </div>
+          </div>
+
+
+
+  
+ <?php #endregion MBA

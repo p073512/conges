@@ -49,13 +49,14 @@ class TpersonneController extends Zend_Controller_Action
             	$personne->setId_entite($entite->getId());
             	$personne->setCentre_service($entite->getCs());
             	$personne->setId_modalite("7");
-            	
+            	var_dump($data);
             	try {
             			$personne->save();
             	}
                 catch (Zend_Db_Exception $e){
                 	    
-         
+                        $form->getElement('fonctions')->addError("erreur");
+                        $form->getElement('pole')->addError("erreur");
 				        $this->view->error = "Erreur d'insertion : ".$e->getMessage();
 				     	$form->populate($data); 
                      
@@ -65,6 +66,7 @@ class TpersonneController extends Zend_Controller_Action
             
             }
             else {
+            	var_dump($data);
             	
             	$form->populate($data); 
             }  

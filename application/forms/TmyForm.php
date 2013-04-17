@@ -2,21 +2,67 @@
 #region MBA
 // application/forms/TPersonne.php
  
-class Default_Form_TPersonne extends Zend_Form
-{
+class Default_TmyForm_TPersonne extends Zend_Form
+{   
+	protected $iNom;
+	protected $iPrenom;
+	protected $iDate_entree;
+	protected $iDate_debut;
+	protected $iEntite;
+	protected $iPole;
+	protected $iPourcentage;
+	protected $iStage;
+	protected $iSubmit;
+	
+    public function getiNom()
+    {
+    	return $this->iNom;
+    }
+	public function getiPrenom()
+	    {
+	    	return $this->iPrenom;
+	    }
+	public function getiDate_entree()
+	    {
+	    	return $this->iDate_entree;
+	    }
+	public function getiDate_debut()
+	    {
+	    	return $this->iDate_debut;
+	    }
+	public function getiEntite()
+	    {
+	    	return $this->iEntite;
+	    }
+	public function getiPole()
+	    {
+	    	return $this->iPole;
+	    }
+	public function getiPourcentage()
+	    {
+	    	return $this->iPourcentage;
+	    }
+	public function getiStage()
+	    {
+	    	return $this->iStage;
+	    }
+    public function getiSubmit()
+	    {
+	    	return $this->iSubmit;
+	    }
+	
+	
 	public function init()
 	{
-	 	// nom du formulaire 
-		$this->setName('createPersonne');
-	   
-     	// La m�thode HTTP d'envoi du formulaire
+	 	
+     	// La méthode HTTP d'envoi du formulaire
    		 $this->setMethod('post');
    		  $decorators = array('label','ViewHelper','Errors','description','htmltag','DtDdWrapper');
    		 foreach ($decorators as $decorator)
    		 { $this->removeDecorator($decorator);}
    		 
    		
-   		 // le chemin du d�corateur est d�fini.
+   		 // le chemin du décorateur est défini.
            $this->addElementPrefixPath('My_Form_Decorators',
                        APPLICATION_PATH.'../../My/Form/Decorators',
 		              'decorator');
@@ -32,7 +78,7 @@ class Default_Form_TPersonne extends Zend_Form
          * Filtre : StringTrim (supprime les espaces en début et fin ),
          *          StringTags (supprime les balises html et php)
          */
-   		 $this->addElement('text','Nom',array(
+   		$iNom =  new Zend_Form_Element('text','Nom',array(
    		 'label' => 'Nom',
    		 'placeholder' => 'Entrez nom..',
    		 'required' => true,
@@ -47,10 +93,10 @@ class Default_Form_TPersonne extends Zend_Form
         /*
          * Champ input type text Prenom 
          * Validation : requis,
-         * Filtre : StringTrim (supprime les espaces en d�but et fin ),
+         * Filtre : StringTrim (supprime les espaces en début et fin ),
          *          StringTags (supprime les balises html et php)
          */
-        $this->addElement('text', 'Prenom', array(
+        $iPrenom =  new Zend_Form_Element('text', 'Prenom', array(
             'label'      => 'Prenom',
             'required'   => true,
             'placeholder' => 'Entrez prenom..',
@@ -65,16 +111,16 @@ class Default_Form_TPersonne extends Zend_Form
            
         ));
         /*
-         * Date entr"e type jquery_x datepicker
+         * Date entrée type jquery_x datepicker
          * 
          */
         
-		$date_entree_pr = new ZendX_JQuery_Form_Element_DatePicker('date_entree');
-		$date_entree_pr->setJQueryParam('dateFormat', 'yy-mm-dd');
-		$date_entree_pr->setLabel("Date d'entree");
-		$date_entree_pr->setRequired(true);
-		$date_entree_pr->addValidator('date',true,array('date' => 'yy-MM-dd'));
-		$date_entree_pr->addDecorator('Ftextinput', array('label'));
+		$iDate_entree = new ZendX_JQuery_Form_Element_DatePicker('date_entree');
+		$iDate_entree->setJQueryParam('dateFormat', 'yy-mm-dd');
+		$iDate_entree->setLabel("Date d'entree");
+		$iDate_entree->setRequired(true);
+		$iDate_entree->addValidator('date',true,array('date' => 'yy-MM-dd'));
+		$iDate_entree->addDecorator('Ftextinput', array('label'));
 		
         
 		$this->addElement($date_entree_pr);
@@ -84,17 +130,13 @@ class Default_Form_TPersonne extends Zend_Form
          * 
          */
 		
-		$date_debut = new ZendX_JQuery_Form_Element_DatePicker('date_debut');
-		$date_debut->setJQueryParam('dateFormat', 'yy-mm-dd');
-		$date_debut->setLabel("Date debut");
-		$date_debut->addValidator('date',true,array('date' => 'yy-MM-dd'));
-		$date_debut->addDecorator('Ftextinput', array('label'));
+		$iDate_debut = new ZendX_JQuery_Form_Element_DatePicker('date_debut');
+		$iDate_debut->setJQueryParam('dateFormat', 'yy-mm-dd');
+		$iDate_debut->setLabel("Date debut");
+		$iDate_debut->addValidator('date',true,array('date' => 'yy-MM-dd'));
+		$iDate_debut->addDecorator('Ftextinput', array('label'));
 		
 		
-		
-        
-		$this->addElement($date_debut);
-		    
 		
         
 		
@@ -103,7 +145,7 @@ class Default_Form_TPersonne extends Zend_Form
          */
 		
 		
-		$this->addElement('select','pole',array(
+		$iPole = new Zend_Form_Element('select','pole',array(
 		    'label'  => 'Pole',
 		    'name' => 'pole',
 			'decorators' => array(
@@ -116,7 +158,7 @@ class Default_Form_TPersonne extends Zend_Form
          * Liste déroulante "Fonctions" peuplée à partir de la BD via setDbOptions
          */
 		 
-		$this->addElement('select', 'fonctions' ,array(
+		$iPole = new Zend_Form_Element('select', 'fonctions' ,array(
 		    'label'  => 'Fonctions',
 		     'name' => 'fonctions',
 		     'decorators' => array(
@@ -128,11 +170,11 @@ class Default_Form_TPersonne extends Zend_Form
 		 /*
          * Champ type text 
          * Validation : requis,NotEmpty,Regex (entre 0 et 100)
-         * Filtre : StringTrim (supprime les espaces en d�but et fin ),
+         * Filtre : StringTrim (supprime les espaces en début et fin ),
          *          StringTags (supprime les balises html et php)
          */
 		
-		 $this->addElement('text','pourcentage',array(
+		 $iPourcentage = new Zend_Form_Element('text','pourcentage',array(
 		 'label' => 'Pourcentage',
 		 'value' => '100',
 		 'required' => true,
@@ -151,22 +193,22 @@ class Default_Form_TPersonne extends Zend_Form
 		  ));
 		
 		  
-		  $this->addElement('checkbox','Stage',array(
+		  $iStage =   new Zend_Form_Element('checkbox','Stage',array(
 		  'label' => 'stage ?',
 		  
 		  ));
 		  
 		  
 		  
-		  $this->addElement('submit', 'creer',
+		  $iSubmit =   new Zend_Form_Element('submit', 'creer',
 		   array('label' => 'valider'));
       
     
 	}
 	
-    /*
-     * function return : zend_element_select($elementNam) peuplé | null
-     * function params :
+    /**
+     * function @return : zend_element_select($elementNam) peuplé | null
+     * function @param :
      * &$objet : la référence du type de l'objet dont on veut récupèrer la liste depuis la BD 
      * 
      * $id_function : le nom de la fonction qui retourne le Id de l'objet, par défaut getId sinon il faut
@@ -211,7 +253,6 @@ class Default_Form_TPersonne extends Zend_Form
 							$objArray = (array)$selectOptionLibelle + (array)$objArray;
 							
 						
-							
 
 			  	return $this->getElement($elementName)->setOptions(array('MultiOptions' =>  $objArray));
 					}	

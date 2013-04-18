@@ -3,8 +3,28 @@ class TestController extends Zend_Controller_Action
 {
 	public function indexAction()
 	{
+		$utils = new Default_Controller_Helpers_Validation_Utils();
+		$this->view->var = $utils->function_bidon("khalil");
 		
+		/*$annee = "2013";
+		$maroc = false;
+		$alsacemoselle=false;
+		
+		
+		$this->view->var = $utils->Paques_saint_ascension_pentacote($annee);
+		
+		$this->view->var = $utils->jours_feries_maroc($annee);
+		*/
+		
+        
 	} 
+	
+	
+	
+	
+	
+	
+	
     /*function afficheAction() 
     {
     	 //chercher toutes les propositions validees par admin

@@ -339,6 +339,16 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 		
 	}
 
+	/*
+	 * calculNombreJour
+	 * définition : calcul le nombre de jours de congés pour un ressource
+	 * paramètres :
+	 * $flag			: ???
+	 * $date_debut		: date de début renseignée dans le formulaire (jour inclus)
+	 * $date_fin		: date de fin renseignée dans le formulaire (jour inclus)
+	 * $centre_cervice	: distinction congé FRANCE ou MAROC
+	 * $nombre_jours	: ???
+	 */
 	public function calculNombreJour($flag,$date_debut,$date_fin,$centre_cervice,$nombre_jours)
 	{
 		$month =$_SESSION['salut']['mois'];

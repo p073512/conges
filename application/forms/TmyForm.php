@@ -2,210 +2,95 @@
 #region MBA
 // application/forms/TPersonne.php
  
-class Default_TmyForm_TPersonne extends Zend_Form
+class Default_Form_TmyForm extends Zend_Form
 {   
-	protected $iNom;
-	protected $iPrenom;
-	protected $iDate_entree;
-	protected $iDate_debut;
-	protected $iEntite;
-	protected $iPole;
-	protected $iPourcentage;
-	protected $iStage;
-	protected $iSubmit;
-	
-    public function getiNom()
-    {
-    	return $this->iNom;
-    }
-	public function getiPrenom()
-	    {
-	    	return $this->iPrenom;
-	    }
-	public function getiDate_entree()
-	    {
-	    	return $this->iDate_entree;
-	    }
-	public function getiDate_debut()
-	    {
-	    	return $this->iDate_debut;
-	    }
-	public function getiEntite()
-	    {
-	    	return $this->iEntite;
-	    }
-	public function getiPole()
-	    {
-	    	return $this->iPole;
-	    }
-	public function getiPourcentage()
-	    {
-	    	return $this->iPourcentage;
-	    }
-	public function getiStage()
-	    {
-	    	return $this->iStage;
-	    }
-    public function getiSubmit()
-	    {
-	    	return $this->iSubmit;
-	    }
+    /**
+     * Les décorateurs définis qu'on veut appliqué sont stockés dans $eDecorator
+     * sinon decorateur 'label' est assigné.
+     * 
+     * @var $eDecorator tableau contient 
+     */
+	private $eDecorator =array('Zend_Form_Element_Text'=>'Ftextinput', 
+                                 'Zend_Form_Element_Select'=>'Fselect',
+									'Zend_Form_Element_Checkbox' =>'label',
+	                                    'Zend_Form_Element_Submit'=>'label');
 	
 	
-	public function init()
-	{
-	 	
-     	// La méthode HTTP d'envoi du formulaire
-   		 $this->setMethod('post');
-   		  $decorators = array('label','ViewHelper','Errors','description','htmltag','DtDdWrapper');
-   		 foreach ($decorators as $decorator)
-   		 { $this->removeDecorator($decorator);}
-   		 
-   		
-   		 // le chemin du décorateur est défini.
-           $this->addElementPrefixPath('My_Form_Decorators',
-                       APPLICATION_PATH.'../../My/Form/Decorators',
-		              'decorator');
-   		 /*
-   		  * Test decorator ftextinput
-   		  * 
-   		  */
-   		
-   		 
-		 /*
-         * Champ input type text nom 
-         * Validation : requis,
-         * Filtre : StringTrim (supprime les espaces en début et fin ),
-         *          StringTags (supprime les balises html et php)
-         */
-   		$iNom =  new Zend_Form_Element('text','Nom',array(
-   		 'label' => 'Nom',
-   		 'placeholder' => 'Entrez nom..',
-   		 'required' => true,
-   		 'description' => 'required',
-   		 'decorators' => array(
-            'Ftextinput', array()),
-   		 
-   		 
-   		 ));
-   		 
-        
-        /*
-         * Champ input type text Prenom 
-         * Validation : requis,
-         * Filtre : StringTrim (supprime les espaces en début et fin ),
-         *          StringTags (supprime les balises html et php)
-         */
-        $iPrenom =  new Zend_Form_Element('text', 'Prenom', array(
-            'label'      => 'Prenom',
-            'required'   => true,
-            'placeholder' => 'Entrez prenom..',
-            'filters'    => array('StringTrim','StripTags'),
-            'validators' => array(
-               
-            ),
-            'description' =>'description ici..',
-            'decorators' => array(
-            'Ftextinput', array()),
-            
-           
-        ));
-        /*
-         * Date entrée type jquery_x datepicker
-         * 
-         */
-        
-		$iDate_entree = new ZendX_JQuery_Form_Element_DatePicker('date_entree');
-		$iDate_entree->setJQueryParam('dateFormat', 'yy-mm-dd');
-		$iDate_entree->setLabel("Date d'entree");
-		$iDate_entree->setRequired(true);
-		$iDate_entree->addValidator('date',true,array('date' => 'yy-MM-dd'));
-		$iDate_entree->addDecorator('Ftextinput', array('label'));
-		
-        
-		$this->addElement($date_entree_pr);
-		
-		/*
-         * Date debut type jquery_x datepicker
-         * 
-         */
-		
-		$iDate_debut = new ZendX_JQuery_Form_Element_DatePicker('date_debut');
-		$iDate_debut->setJQueryParam('dateFormat', 'yy-mm-dd');
-		$iDate_debut->setLabel("Date debut");
-		$iDate_debut->addValidator('date',true,array('date' => 'yy-MM-dd'));
-		$iDate_debut->addDecorator('Ftextinput', array('label'));
-		
-		
-		
-        
-		
-		/*
-         * Liste déroulante "Pôle" peuplée à partir de la BD via setDbOptions
-         */
-		
-		
-		$iPole = new Zend_Form_Element('select','pole',array(
-		    'label'  => 'Pole',
-		    'name' => 'pole',
-			'decorators' => array(
-	            'Fselect', array()),
-		    ));
-                            
-		
-		
-		/*
-         * Liste déroulante "Fonctions" peuplée à partir de la BD via setDbOptions
-         */
-		 
-		$iPole = new Zend_Form_Element('select', 'fonctions' ,array(
-		    'label'  => 'Fonctions',
-		     'name' => 'fonctions',
-		     'decorators' => array(
-                'Fselect', array()),
-		   
-		    
-		 ));
-		 
-		 /*
-         * Champ type text 
-         * Validation : requis,NotEmpty,Regex (entre 0 et 100)
-         * Filtre : StringTrim (supprime les espaces en début et fin ),
-         *          StringTags (supprime les balises html et php)
-         */
-		
-		 $iPourcentage = new Zend_Form_Element('text','pourcentage',array(
-		 'label' => 'Pourcentage',
-		 'value' => '100',
-		 'required' => true,
-		 'filters' => array('StringTrim','StripTags'),
-		 'description' => 'description : entre 0 et 100',
-		 'validators' => array(  array('Regex', 
-				                        true,
-				                        array('pattern'=> '/^[1-9]?[0-9]{1}$|^100$/',
-				                        'messages' => array(
-                                        'regexNotMatch'=>'Pourcentage : Seulement valeurs entre 0 et 1 accept�es'
-                               ))),
-		                       ),
-		 'decorators' => array(
-            'Ftextinput', array()),
-		 
-		  ));
-		
-		  
-		  $iStage =   new Zend_Form_Element('checkbox','Stage',array(
-		  'label' => 'stage ?',
-		  
-		  ));
-		  
-		  
-		  
-		  $iSubmit =   new Zend_Form_Element('submit', 'creer',
-		   array('label' => 'valider'));
-      
+	
+	/**
+	 * Tableau qui contiendra les éléments créés par la méthode createElement.
+	 * (createElement est 'overridé' dans cette classe)
+	 * @var $elements tableau de type Zend_Form_Element
+	 */
+	protected $elements = array();
     
+    
+    
+    
+    /**
+	 * Fonction qui supprime tous les décorateurs par défault.
+	 * supprime les décorateurs du formulaire si pas de paramètre passés.
+	 * supprime les décorateurs de l'élément si nom de l'élément(Zend_Form_Element->getName()) est passé en paramètre.
+	 *
+	 * @param null|string $name (optionnel)
+	 */
+    public function removeAllDecorators($name= null)
+	{
+	 // définie les décorateurs par défaut.
+	 $decorators = array('label','ViewHelper','Errors','description','htmltag','DtDdWrapper');
+		
+	 if(isset($name)) // si nom de l'élément est passé
+		{    
+			 foreach ($decorators as $decorator)
+			// recupére l'élement stocké dans elements[] et supprime ses décorateurs par défaut
+	    	 { $this->elements[$name]->removeDecorator($decorator);
+	    	   }
+			    
+	    	
+	    }  
+	    else 
+        {
+		     foreach ($decorators as $decorator)
+		     // pointe sur le formulaire en question supprime ses décorateurs par défaut
+	     	 { $this->removeDecorator($decorator);}
+
+	     	
+	    }
+	    return $this;
 	}
 	
+	/**
+	 * 
+	 * Override de la fonction Zend_Form::createElement() :
+	 * à la création d'un élément depuis la classe courante ou les classe filles
+	 * via createElement(); les décorateurs par défaut sont supprimés (removeAlldecorators)
+	 * et les décorateurs définis dans $eDecorator sont appliqués en fonction du type 
+	 * de l'élément créé.
+	 *
+	 * (non-PHPdoc)
+	 * @see Zend_Form::createElement()
+	 */
+	public function createElement($type, $name, $options=null)
+	{
+		$element = parent::createElement($type, $name, $options);
+		
+		/* on stocke la référence de l'élément créé dans le tableau
+		* vu que createElement n'enregistre pas l'élément.
+		*/
+		$this->elements[$name] = &$element;
+		
+		// suppression des décorateurs de l'élément créé
+		$this->removeAllDecorators($name);
+		// on applique l'un des décorateurs définies en fonction du type de l'élément récemment créé.
+		
+		$this->elements[$name]->setDecorators((array)$this->eDecorator[$element->getType()]);
+       
+		$element = $this->elements[$name];
+		
+		return $element;
+	}
+	
+
     /**
      * function @return : zend_element_select($elementNam) peuplé | null
      * function @param :
@@ -221,10 +106,12 @@ class Default_TmyForm_TPersonne extends Zend_Form
      * desc : fonction qui sert à peupler un element du formulaire select à partir d'une liste d'objet
      * récupèrée de la base de donnée. la fonction s'applique sur "tout" type d'objet.
      */
-	public function setDbOptions($elementName, &$object, $id_function ='getId', $libelle_function = 'getLibelle', $str = array())
+	
+
+	public function setDbOptions($elementName, &$object, $id_function ='getId', $libelle_function = 'getLibelle',$where = null, $str = array())
 				{
-					// v�rifie si le champ en question est un "select"
-					if($this->getElement($elementName) instanceof Zend_Form_Element_Select)
+					// vérifie si le champ en question est un "select"
+					if($this->elements[$elementName] instanceof Zend_Form_Element_Select)
 					{
 						// check si l'objet à la méthode getMapper (pour la liaison avec la base)
 						if(method_exists($object, "getMapper"))
@@ -233,7 +120,7 @@ class Default_TmyForm_TPersonne extends Zend_Form
 						// check la méthode fetchAll() existe
 						  if(method_exists($mapper, "fetchAll"))
 							{ 
-							   $str = $object->getMapper()->fetchAll($str);
+							   $str = $object->getMapper()->fetchAll($str,$where);
 						    }
 							$objArray = array();
 						    foreach($str as $p)
@@ -252,12 +139,28 @@ class Default_TmyForm_TPersonne extends Zend_Form
 							$selectOptionLibelle = array('x' => 'Choisissez :' );
 							$objArray = (array)$selectOptionLibelle + (array)$objArray;
 							
-						
 
-			  	return $this->getElement($elementName)->setOptions(array('MultiOptions' =>  $objArray));
+			  	return $this->elements[$elementName]->setOptions(array('MultiOptions' =>  $objArray));
 					}	
 					return; }
-				return ;			}
+				return ;			
+				}
+	
+	/*
+	 * Initialisation du formulaire.
+	 * 
+	 */
+	public function init()
+	{
+		 // le chemin du décorateur est défini.
+           $this->addElementPrefixPath('My_Form_Decorators',
+                       APPLICATION_PATH.'../../My/Form/Decorators',
+		              'decorator');
+	 	
+   		
+   		 
+	}
+	
 				
 
 		

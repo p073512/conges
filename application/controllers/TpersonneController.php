@@ -54,8 +54,10 @@ class TpersonneController extends Zend_Controller_Action
             			$personne->save();
             	}
                 catch (Zend_Db_Exception $e){
-                	    
+                	  if($form->getElement('fonction')->getValue() == 'x') 
                       $form->getElement('fonction')->addError("erreur");
+
+                      if($form->getElement('pole')->getValue() == 'x') 
                       $form->getElement('pole')->addError("erreur");
 				        $this->view->error = "Erreur d'insertion : ".$e->getMessage();
 				     	$form->populate($data); 
@@ -109,7 +111,9 @@ public function createpfAction()
             	$personne->setNom($data['Nom']);
             	$personne->setPrenom($data['Prenom']);
             	$personne->setDate_entree($data['date_entree']);
-            	$personne->setId_Entite($data['entite']);
+	              $entite = $personne->getEntite()->find((int) $data['entite']);
+	               $personne->setId_entite($entite->getId());
+	               $personne->setCentre_service($entite->getCs());
             	$personne->setId_modalite($data['modalite']);
             	$personne->setId_pole($data['pole']);
             	$personne->setId_fonction($data['fonction']);
@@ -128,11 +132,18 @@ public function createpfAction()
             			$personne->save();
             	}
                 catch (Zend_Db_Exception $e){
-                	  
-                	  $form->getElement('modalite')->addError("erreur");
-                      $form->getElement('entite')->addError("erreur");
+                	  if($form->getElement('fonction')->getValue() == 'x') 
                       $form->getElement('fonction')->addError("erreur");
+                      
+                       if($form->getElement('modalite')->getValue() == 'x') 
+                      $form->getElement('modalite')->addError("erreur");
+                      
+                	  if($form->getElement('entite')->getValue() == 'x') 
+                      $form->getElement('entite')->addError("erreur");
+                      
+                      if($form->getElement('pole')->getValue() == 'x')
                       $form->getElement('pole')->addError("erreur");
+                      
 				        $this->view->error = "Erreur d'insertion : ".$e->getMessage();
 				     	$form->populate($data); 
                       var_dump($data);

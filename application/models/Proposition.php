@@ -204,7 +204,7 @@ class Default_Model_Proposition
 	/*
 	 * retourne le nombre de jours ouveres entre la date du debut de conge et la date du fin de conge
 	 * */
-
+    
     /* MTA : Mohamed khalil Takafi */		
      public function calculNombreDuJours()
 	{
@@ -225,7 +225,7 @@ class Default_Model_Proposition
 		{
 			$tableau[$i]=$tableau_jours_feries[$i]['date_debut'];	
 		}
-     //var_dump($tableau);
+     var_dump($tableau);
 	 $nb_jours_ouvres = 0;		 
     // Mettre <= si on souhaite prendre en compte le dernier jour dans le décompte
     
@@ -257,7 +257,22 @@ class Default_Model_Proposition
 		   		return   $nb_jours_ouvres - 0.5; 
 
 		}
+     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	                             //  si ( D_journée = 0  et F_journée = 0 )    et     Date_debut == Date_fin 
+     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	   elseif ((($this->getMi_debut_journee() == false) && ($this->getMi_fin_journee() == false)) && ($this->getDate_debut() == $this->getDate_fin()) )
+		{   
+		    $nb_jours_ouvres = 1;
+			
+            // date_debut ==  weekend   ou    date_debut == férié 
+		   if ((in_array(date('w', $date_debut - 1), array(0, 6)) || in_array(date(date('Y', $date_debut - 1).'-m-d', $date_debut - 1), $tableau))) 	
+		   		return   $nb_jours_ouvres - 1;
+		   else
+		   		return   $nb_jours_ouvres; 
 
+		}
+		
+		
        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	                          // si ( D_journée = 1  &&  F_journée = 1 )    et     Date_debut <> Date_fin 
 	   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -15,9 +15,9 @@ class Default_Model_DbTable_Ferie extends Zend_Db_Table_Abstract
         			
            return $this->fetchAll($select)->toArray();
     }
-	
+
 	public function RecupererLesJoursFeries( $annee_reference) 
-    {
+    { 	
     	$db = $this->getAdapter();  
         $select = $this->select()
        				 ->from(array('f' => $this->_name),'date_debut')

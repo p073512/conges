@@ -51,7 +51,9 @@ class Default_Model_EntiteMapper
 			$this->getDbTable()->update($data, array('id = ?' => $id));
 		}
 	}
-
+  
+	
+	
 	//récupére une entrée dans la table
 	public function find($id, Default_Model_Entite $entite)
 	{
@@ -73,10 +75,10 @@ class Default_Model_EntiteMapper
 	}
 
 	//récupére toutes les entrées de la table
-	public function fetchAll($str)
+	public function fetchAll($str,$where = null)
 	{
 		//récupération dans la variable $resultSet de toutes les entrées de notre table
-		$resultSet = $this->getDbTable()->fetchAll($str);
+		$resultSet = $this->getDbTable()->fetchAll($where,$str);
 
 		//chaque entrée est représentée par un objet Default_Model_Entite
 		//qui est ajouté dans un tableau
@@ -89,6 +91,7 @@ class Default_Model_EntiteMapper
 			$entry->setCs($row->cs);    // MBA : récupération du champ cs
 			$entry->setMapper($this);
 			$entries[] = $entry;
+			
 		}
 
 		return $entries;

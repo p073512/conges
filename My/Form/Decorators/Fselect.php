@@ -18,10 +18,13 @@ class My_Form_Decorators_Fselect extends Zend_Form_Decorator_Abstract
 		$id = htmlentities($element->getId());
 		
 		$elementOptions = $element->getMultiOptions() ;
-		$options ="";
+		
+		$options="";
  		foreach($elementOptions as $id_opt=>$option)
 		{
-			$options .= "<option value='$id_opt'>$option</option>";
+			$selected = ($value == $id_opt) ?"selected":"";
+		    $options .= "<option value='$id_opt' ".$selected.">$option</option>";
+		   
 		}
 		
 		$separateur = "<br/>";

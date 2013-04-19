@@ -89,7 +89,7 @@
 		<!-- ICI L'AFFICHAGE DU FORMULAIRE -->
 			
 		<fieldset>
-			<legend >Ajout Personne (CSM)</legend>
+			<legend ><?php if(isset($this->title))echo $this->title;?></legend>
 				
 				<!-- On récupére les informations nécessaire du formulaire via le $this->form -->
 					<form action="<?php $this->form->getAction() ?>" name="<?php $this->form->getName() ?>" method="post">

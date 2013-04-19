@@ -22,7 +22,7 @@ echo $this->doctype() ?>
    <!-- ligne à supprimer en cas d'utilisation de font locals -->
    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
    <!-- Le fav and touch icons -->
-   <link rel="shortcut icon" href="content/ico/favicon.ico">
+   <link rel="shortcut icon" href="<?php echo $this->baseUrl();?>./content/ico/favicon.ico">
    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="content/ico/apple-touch-icon-144-precomposed.png">
    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="content/ico/apple-touch-icon-114-precomposed.png">
    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="content/ico/apple-touch-icon-72-precomposed.png">
@@ -88,7 +88,7 @@ echo $this->doctype() ?>
          <div class="span9">
            
                
-			<div class="navbar ">
+			<div class="navbar">
                  <div class="navbar-inner">
                    <div class="container" >
                      <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
@@ -96,7 +96,7 @@ echo $this->doctype() ?>
                        <span class="icon-bar"></span>
                        <span class="icon-bar"></span>
                      </a>
-                     <a class="brand" style="margin-top: 0px;padding-top: 0px;" href="#"><img width="60"  height="70" botom="0" src="/eclipse/conges/public/content/img/cgi.png" /></a>
+                     <a class="brand" style="margin-top: 0px;padding-top: 0px;" href="#"><img width="60"  height="70" botom="0" src="<?php echo $this->baseUrl();?>./content/img/cgi.png" /></a>
                      <div class="nav-collapse collapse navbar-responsive-collapse">
                        
                        
@@ -173,7 +173,7 @@ echo $this->doctype() ?>
                $profil = str_replace("Deconnexion","", $profil);
                $profil  = strip_tags($profil);
                echo $profil;?></h3>
-               <h4>Déconnexion</h4>
+               <h4><a href="<?php echo $this->url(array('controller' =>'connexion', 'action' => 'deconnexion'), 'default', true);?>">Déconnexion</a></h4>
             </div>
             <div class="top-info-block">
                <b class="icon-user"></b>

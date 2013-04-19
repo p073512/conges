@@ -135,10 +135,10 @@ echo $this->doctype() ?>
                              <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'index'), 'default', true) ?>">Afficher Personnels</a></li>
                              <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'create'), 'default', true) ?>">Initialiser les soldes</a></li>
                              <li class="nav-header">France</li>
-                             <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'create'), 'default', true) ?>">Ajouter Personne</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'createpf'), 'default', true) ?>">Ajouter Personne</a></li>
                              <li class="divider"></li>
                              <li class="nav-header">CSM</li>
-                             <li><a href="#">Ajouter Personne</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'createp'), 'default', true) ?>">Ajouter Personne</a></li>
                              <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'create'), 'default', true) ?>">Declarer jours feries CSM</a></li>
                              <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'index'), 'default', true) ?>">Afficher jours feries CSM</a></li>
                            </ul>

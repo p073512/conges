@@ -1,26 +1,61 @@
 
 <?php 
 
-//function Paques_saint_ascension_pentacote($annee)
+///////////Function Paques_saint_ascension_pentacote($annee)///////////
+/*	echo 'les jours de paques </br>';
+	for ($i = 0; $i < 5; $i++) 
+	{
+		echo $this->var[$i].'</br>' ;
+	}
+*/
 
-//echo 'les jours fériés Maroc'.'</br>';
-//for ($i = 0; $i < 5; $i++) 
-//{
-//	echo $this->var[$i].'</br>' ;
-//}
+///////////Function recupére les jours fériés maroc///////////
+/*  echo 'les jours fériés Maroc </br>';
+	for ($i = 0; $i <  count($this->var); $i++) 
+	{
+		echo $this->var[$i]['date_debut'].'</br>' ;
+	}
+*/
 
 
-// Function recupére les jours fériés maroc 
-//echo 'les jours fériés Maroc'.'</br>';
-//for ($i = 0; $i <  count($this->var) - 1; $i++) 
-//{
+
+///////////Function jours_feries($annee, $alsacemoselle=false, $maroc=false)///////////
+/*   echo 'les jours fériés Maroc / France selon le cas ! </br>';
+   
+   for ($i = 0; $i <  count($this->var); $i++) 
+	{
+   		// multidimentionnel		
+  		 if ((count($this->var,COUNT_RECURSIVE) - count($this->var,COUNT_NORMAL) > 0 ))    
+   		{
+  			 	echo $this->var[$i]['date_debut'].'</br>' ;  
+   		}
+   		// multidimentionnel
+  		 else                
+ 	    {
+  			   echo $this->var[$i].'</br>' ;
+  	    }
 	
-//	echo $this->var[$i]['date_debut'].'</br>' ;
-//}
+	}
+*/
 
-// fonction bidon 
+///////////Function est_ferie($jour, $alsacemoselle, $maroc)
+/*     echo 'tester si un jour est férié ou non ! </br>';
+    echo " le jour est il férié ?  :".$this->var;  */ 
+
+
+
+///////////Function normaliser les dates debut et fin///////////
+/*	   echo 'Normaliser les dates debut et fin </br>'; 
+	
+       for ($i = 0; $i <  count($this->var); $i++) 
+       {
+       	echo  $this->var[$i].'</br>' ;   	
+       }
+*/
+
+///////////Function calcul_nombre_jours_conges///////////
+echo 'Calculer le nombre de jours entre deux dates ! </br>'; 
 echo $this->var;
-
 
 ?>
 

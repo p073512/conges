@@ -4,19 +4,30 @@ class TestController extends Zend_Controller_Action
 	public function indexAction()
 	{
 		$utils = new Default_Controller_Helpers_Validation_Utils();
-		$this->view->var = $utils->function_bidon("khalil");
 		
-		/*$annee = "2013";
+		$annee = "2013";
 		$maroc = false;
 		$alsacemoselle=false;
+		$jour = "01-05-2013";
+		
+		$date_debut = "2013-05-15";
+		$date_fin = "2013-05-20";
+		$debut_midi = true;
+		$fin_midi = false;
 		
 		
-		$this->view->var = $utils->Paques_saint_ascension_pentacote($annee);
+		// $this->view->var = $utils->Paques_saint_ascension_pentacote($annee);
 		
-		$this->view->var = $utils->jours_feries_maroc($annee);
-		*/
-		
+		// $this->view->var = $utils->jours_feries_maroc($annee);
+	   
+		// $this->view->var = array_values($utils->jours_feries($annee,$alsacemoselle,$maroc));
         
+        // $this->view->var = $utils->est_ferie($jour, $alsacemoselle, $maroc);
+        
+		// $this->view->var = $utils->normaliser_dates_debut_fin($date_debut, $date_fin,$maroc);
+		
+		  $this->view->var = $utils->calcul_nombre_jours_conges($date_debut, $date_fin,$debut_midi,$fin_midi,$maroc);
+		
 	} 
 	
 	

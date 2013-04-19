@@ -2,7 +2,7 @@
 #region MBA
 // application/forms/TPersonne.php
  
-class Default_Form_TFPersonne extends Default_Form_TBaseForm
+class Default_Form_PersonneFr extends Default_Form_BasePersonne
 {
 	
 	

@@ -260,10 +260,17 @@ class Default_Model_Personne
 		return $this;
 	}
 
-	//récupère toutes les entrées de la table
-	public function fetchAll($str)
+	// vérifie si personne exist par nom et prenom
+	public function IsExist($nom,$prenom)
 	{
-		return $this->getMapper()->fetchAll($str);
+		return $this->getMapper()->IsExist($nom,$prenom);
+	}
+	
+	
+	//récupère toutes les entrées de la table
+	public function fetchAll($str,$where = null)
+	{
+		return $this->getMapper()->fetchAll($where,$str);
 	}
 
 	//permet la suppression

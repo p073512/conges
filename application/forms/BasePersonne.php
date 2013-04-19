@@ -2,7 +2,7 @@
 #region MBA
 // application/forms/TPersonne.php
  
-class Default_Form_TBaseForm extends Default_Form_TmyForm
+class Default_Form_BasePersonne extends Default_Form_MyForm
 {   
 	/*Nommage Variable:
 	 * i pour input.
@@ -127,6 +127,7 @@ public function init()
 		$iDateEntree->setLabel("Date d'entree");
 		$iDateEntree->setRequired(true);
 		$iDateEntree->addValidator('date',true,array('date' => 'yy-MM-dd'));
+	
 	    $iDateEntree->addDecorator('Ftextinput', array('label'));
 		
         $this->iDateEntree =  $iDateEntree;

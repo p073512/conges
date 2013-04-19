@@ -70,10 +70,10 @@ class Default_Model_ModaliteMapper
 	}
 
 	//récupére toutes les entrées de la table
-	public function fetchAll($str)
+	public function fetchAll($str,$where = null)
 	{
 		//récupération dans la variable $resultSet de toutes les entrées de notre table
-		$resultSet = $this->getDbTable()->fetchAll($str);
+		$resultSet = $this->getDbTable()->fetchAll($where,$str);
 
 		//chaque entrée est représentée par un objet Default_Model_Modalite
 		//qui est ajouté dans un tableau

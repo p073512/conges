@@ -1,27 +1,24 @@
 <?php if ($this->pageCount): ?>
-<div id="paginationControl">
- 
-<!-- Lien vers page précédente -->
+
+ <div  id="paginationControl" class="pagination">
+<ul>
+
 <?php if (isset($this->previous)): ?>
-  <a href="<?php echo $this->url(array('page' => $this->previous)); ?>">&lt; <?php echo "précédent"; ?></a> |
-<?php else: ?>
-  <span class="disabled">&lt; <?php "précédent"; ?></span> |
+<li><a href="<?php echo $this->url(array('page' => $this->previous)); ?>">PrÃ©cÃ©dent</a></li>
+
 <?php endif; ?>
- 
-<!-- Liens numéros de page -->
 <?php foreach ($this->pagesInRange as $page): ?>
-  <?php if ($page != $this->current): ?>
-    <a href="<?php echo $this->url(array('page' => $page)); ?>"><?php echo $page; ?></a> |
-  <?php else: ?>
-    <span class="current"><?php echo $page; ?></span> |
-  <?php endif; ?>
-<?php endforeach; ?>
- 
-<!-- Lien vers page suivante -->
-<?php if (isset($this->next)): ?>
-  <a href="<?php echo $this->url(array('page' => $this->next)); ?>"><?php echo "suivant" ?> &gt;</a>
+ <?php if ($page != $this->current): ?>
+<li><a href="<?php echo $this->url(array('page' => $page)); ?>"><?php echo $page; ?></a></li>
 <?php else: ?>
-  <span class="disabled"><?php echo "suivant"; ?> &gt;</span>
+<li><a style="font-size:16px;" href="#"><?php echo $page; ?> </a></li>
+<?php endif; ?>
+<?php endforeach; ?>
+<?php if (isset($this->next)): ?>
+<li><a href="<?php echo $this->url(array('page' => $this->next)); ?>">Suivant</a></li>
+<?php else: ?>
+
+</ul>
 <?php endif; ?>
 </div>
 <?php endif; ?>

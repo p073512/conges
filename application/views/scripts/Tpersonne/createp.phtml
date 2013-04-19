@@ -21,13 +21,13 @@
                   </a>
                   
                    <ul class="dropdown-menu">
-                        <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'index'), 'default', true) ?>">Afficher Personnels</a></li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'index'), 'default', true) ?>">Afficher Personnels</a></li>
                         <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'create'), 'default', true) ?>">Initialiser les soldes</a></li>
                         <li class="nav-header">France</li>
-                        <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'create'), 'default', true) ?>">Ajouter Personne</a></li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'createpf'), 'default', true) ?>">Ajouter Personne</a></li>
                         <li class="divider"></li>
                         <li class="nav-header">CSM</li>
-                        <li><a href="#">Ajouter Personne</a></li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'createp'), 'default', true) ?>">Ajouter Personne</a></li>
                         <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'create'), 'default', true) ?>">Declarer jours feries CSM</a></li>
                         <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'index'), 'default', true) ?>">Afficher jours feries CSM</a></li>
                   </ul>
@@ -82,7 +82,7 @@
             <div class="alert alert-info">
 				<button type="button" class="close " data-dismiss="alert"></button>
 				<strong>Succes!</strong> <?php //Message succes
-	                                      echo $this->success ."' a été bien créé <a href='".$this->url(array('controller' => 'personne', 'action' => 'index'), 'default', true)."'>Afficher la table Personnels </a>"; ?>
+	                                      echo $this->success ."' a été bien créé <a href='".$this->url(array('controller' => 'tpersonne', 'action' => 'index'), 'default', true)."'>Afficher la table Personnels </a>"; ?>
 			</div>
 	<?php }?>
 	

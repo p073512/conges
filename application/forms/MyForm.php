@@ -2,7 +2,7 @@
 #region MBA
 // application/forms/TPersonne.php
  
-class Default_Form_TmyForm extends Zend_Form
+class Default_Form_MyForm extends Zend_Form
 {   
     /**
      * Les décorateurs définis qu'on veut appliqué sont stockés dans $eDecorator

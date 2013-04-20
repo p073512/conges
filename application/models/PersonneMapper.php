@@ -92,12 +92,28 @@ class Default_Model_PersonneMapper
 			$personne->setCentre_service($row->centre_service);
 			$personne->setStage($row->stage);
 	}
+	
+	public function IsExist($nom,$prenom){
+		$DbT = $this->getDbTable();
+		$Select =  $DbT->select()
+		         ->from($DbT,'count(id) as nombre')
+                 ->where('LOWER(nom) = ?' , strtolower($nom))
+                 ->where('LOWER(prenom) = ?', strtolower($prenom))
+                 ->order('id');
+	     
+        $rows = $DbT->fetchAll($Select);
+       
+        return($rows[0]->nombre);       
+    
+        
+               
+	}
 
 	//récupére toutes les entrées de la table
-	public function fetchAll($str)
+	public function fetchAll($str,$where = null)
 	{
 		//récupération dans la variable $resultSet de toutes les entrées de notre table
-		$resultSet = $this->getDbTable()->fetchAll($str);
+		$resultSet = $this->getDbTable()->fetchAll($where,$str);
 
 		//chaque entrée est représentée par un objet Default_Model_Personne
 		//qui est ajouté dans un tableau

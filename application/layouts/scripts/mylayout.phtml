@@ -15,14 +15,14 @@ echo $this->doctype() ?>
 
    <title>Application de gestion de Congés</title>
    <meta name="robots" content="index, nofollow">
-   <meta name="description" content="Application de gestion de congé : Application qui gére les cong�s du csm et france du projet Presstalis." />
+   <meta name="description" content="Application de gestion de congé : Application qui gére les congés du csm et france du projet Presstalis." />
    <meta name="keywords" content="Application gestion congé,congé,calendrier,Presstalis" />
    <meta name="author" content="MedB"/>
    
-   <!-- ligne � supprimer en cas d'utilisation de font locals -->
+   <!-- ligne à supprimer en cas d'utilisation de font locals -->
    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
    <!-- Le fav and touch icons -->
-   <link rel="shortcut icon" href="content/ico/favicon.ico">
+   <link rel="shortcut icon" href="<?php echo $this->baseUrl();?>./content/ico/favicon.ico">
    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="content/ico/apple-touch-icon-144-precomposed.png">
    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="content/ico/apple-touch-icon-114-precomposed.png">
    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="content/ico/apple-touch-icon-72-precomposed.png">
@@ -88,7 +88,7 @@ echo $this->doctype() ?>
          <div class="span9">
            
                
-			<div class="navbar ">
+			<div class="navbar">
                  <div class="navbar-inner">
                    <div class="container" >
                      <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
@@ -96,7 +96,7 @@ echo $this->doctype() ?>
                        <span class="icon-bar"></span>
                        <span class="icon-bar"></span>
                      </a>
-                     <a class="brand" style="margin-top: 0px;padding-top: 0px;" href="#"><img width="60"  height="70" botom="0" src="/eclipse/conges/public/content/img/cgi.png" /></a>
+                     <a class="brand" style="margin-top: 0px;padding-top: 0px;" href="#"><img width="60"  height="70" botom="0" src="<?php echo $this->baseUrl();?>./content/img/cgi.png" /></a>
                      <div class="nav-collapse collapse navbar-responsive-collapse">
                        
                        
@@ -132,7 +132,7 @@ echo $this->doctype() ?>
                          <li class="dropdown">
                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Personne<b class="caret"></b></a>
                            <ul class="dropdown-menu">
-                             <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'index'), 'default', true) ?>">Afficher Personnels</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'index'), 'default', true) ?>">Afficher Personnels</a></li>
                              <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'create'), 'default', true) ?>">Initialiser les soldes</a></li>
                              <li class="nav-header">France</li>
                              <li><a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'createpf'), 'default', true) ?>">Ajouter Personne</a></li>
@@ -164,7 +164,7 @@ echo $this->doctype() ?>
         
          <div class="span3">
          <div id="top-info" class="pull-right">
-         <a href="#" class="pull-left">
+         <a href="#" class="pull-left"></a>
             <div class="top-info-block">
             
             
@@ -173,12 +173,12 @@ echo $this->doctype() ?>
                $profil = str_replace("Deconnexion","", $profil);
                $profil  = strip_tags($profil);
                echo $profil;?></h3>
-               <h4>Déconnexion</h4>
+               <h4><a href="<?php echo $this->url(array('controller' =>'connexion', 'action' => 'deconnexion'), 'default', true);?>">Déconnexion</a></h4>
             </div>
             <div class="top-info-block">
                <b class="icon-user"></b>
             </div>
-         </a>
+       
          <hr class="separator pull-left"/>
          <a id="settings" class="pull-left" href="#">
             <b class="icon-settings"></b>

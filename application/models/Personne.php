@@ -299,6 +299,10 @@ class Default_Model_Personne
 	{
 		return $this->getMapper()->ObtenirID($id_pole,$id_fontion,$id_entite) ;
 	}
+	
+	public function toString() {
+		return $this->_nom. ' '.$this->_prenom;
+	}
 
 
 }

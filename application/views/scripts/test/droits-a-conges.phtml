@@ -1,0 +1,15 @@
+<?php 
+
+	$logger = new Zend_Log();
+	$writer = new Zend_Log_Writer_Stream('php://output');
+	$logger->addWriter($writer);
+	$droits = $this->var;
+	
+	$logger->log("CP : ".$droits['CP'], Zend_Log::INFO);
+	$logger->log("CPA : ".$droits['CPA'], Zend_Log::INFO);
+	$logger->log("Q1 : ".$droits['Q1'], Zend_Log::INFO);
+	 
+	//echo $this->var;
+
+
+?>

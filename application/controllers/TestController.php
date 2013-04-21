@@ -30,11 +30,90 @@ class TestController extends Zend_Controller_Action
 		
 	} 
 	
-	
-	
-	
-	
-	
+
+	public function calculJoursCongesAction()
+	{
+
+		$logger = new Zend_Log();
+		$writer = new Zend_Log_Writer_Stream('php://output');
+		$logger->addWriter($writer);
+			
+		// DEBUT de mon programme
+		$logger->log('Calcul des jours ouvrés sur une période donnée', Zend_Log::INFO);
+
+		/* format :
+		 d et j 	Jour du mois, sur 2 chiffres, avec ou sans le zéro initial 	01 à 31 ou 1 à 31
+		 D and l 	Une représentation textuelle du jour 	De Mon jusqu'à Sun ou de Sunday jusqu'à Saturday
+		 w 	Jour de la semaine au format numérique 	0 (pour dimanche) à 6 (pour samedi)
+		 z 	Jour de l'année 	0 à 365
+		 a et A 	Ante meridiem et Post meridiem 	am ou pm
+
+		 */
+
+		// Définition de mes paramètres d'entrée
+		$date_debut = new DateTime('2013-01-01');
+		$date_fin = new DateTime('2013-01-31');
+		$debut_midi = false;
+		$fin_midi = true;
+		$maroc = true;
+
+		// Sauver les flags midi après normalisation et avant le calcul de nombre de jours de congés
+		$this->_helper->validation->normaliser_flag_midi($date_debut,$debut_midi,$maroc);
+		$this->_helper->validation->normaliser_flag_midi($date_fin,$fin_midi,$maroc);
+
+		// Sauver les date de début et fin congés après normalisation et avant le calcul de nombre de jours de congés
+		$d1 = new DateTime(date_format($date_debut, 'Y-m-d'));
+		$d2 = new DateTime(date_format($date_fin, 'Y-m-d'));
+		$date_debut = $this->_helper->validation->normaliser_date_debut_conge($date_debut,$maroc);
+		$date_fin = $this->_helper->validation->normaliser_date_fin_conge($date_fin,$maroc);
+
+		// Terminer par le calcul du nombre de jours de congés
+		$nb_conges = $this->_helper->validation->calculer_jours_ouvres($d1,$d2,$debut_midi,$fin_midi,$maroc);
+		 
+		if ($nb_conges <= 0) {
+			$logger->log('Erreur, intervalle incorrect', Zend_Log::INFO);
+		}
+		else if ($maroc)
+			$logger->log("Conge posé au CSM du ". date_format($d1, 'Y-m-d') . " au " . date_format($d2, 'Y-m-d') . " soit " . $nb_conges . " jours", Zend_Log::INFO);
+		else
+			$logger->log("Conge posé en France du ". date_format($d1, 'Y-m-d') . " au " . date_format($d2, 'Y-m-d') . " soit " . $nb_conges . " jours", Zend_Log::INFO);
+
+		$this->view->var = $nb_conges;
+		
+	}	
+
+	public function droitsACongesAction()
+	{
+
+		$logger = new Zend_Log();
+		$writer = new Zend_Log_Writer_Stream('php://output');
+		$logger->addWriter($writer);
+			
+		// DEBUT de mon programme
+		$logger->log('Calcul des droits à congés pour une ressource', Zend_Log::INFO);
+
+		/* format :
+		 d et j 	Jour du mois, sur 2 chiffres, avec ou sans le zéro initial 	01 à 31 ou 1 à 31
+		 D and l 	Une représentation textuelle du jour 	De Mon jusqu'à Sun ou de Sunday jusqu'à Saturday
+		 w 	Jour de la semaine au format numérique 	0 (pour dimanche) à 6 (pour samedi)
+		 z 	Jour de l'année 	0 à 365
+		 a et A 	Ante meridiem et Post meridiem 	am ou pm
+
+		 */
+
+		// Définition de mes paramètres d'entrée
+		$ressource = new Default_Model_Personne();
+		$ressource = $ressource->fetchAll("nom = 'TRIFOL'");
+		$ressource = $ressource[0];
+		$logger->log('Nom Prenom : '.$ressource->toString(), Zend_Log::INFO);
+		$anne_reference = '2013';
+		
+		// Sauver les flags midi après normalisation et avant le calcul de nombre de jours de congés
+		$droits = $this->_helper->validation->calculer_droits_a_conges($ressource,$anne_reference);
+		
+		$this->view->var = $droits;
+		
+	}	
 	
     /*function afficheAction() 
     {

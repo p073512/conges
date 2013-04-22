@@ -26,7 +26,7 @@ class TestController extends Zend_Controller_Action
         
 		// $this->view->var = $utils->normaliser_dates_debut_fin($date_debut, $date_fin,$maroc);
 		
-		  $this->view->var = $utils->calcul_nombre_jours_conges($date_debut, $date_fin,$debut_midi,$fin_midi,$maroc);
+		//  $this->view->var = $utils->calcul_nombre_jours_conges($date_debut, $date_fin,$debut_midi,$fin_midi,$maroc);
 		
 	} 
 	

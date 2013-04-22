@@ -1,23 +1,7 @@
 <?php
-class  Default_Controller_Helpers_Validation_Utils    
+class  Default_Controller_Helpers_Utils    
 {
 
-	
-	
-///////Fonction qui retourne un tableau de jours Paques/saint/ascension/pentacote
-	   public function Paques_saint_ascension_pentacote($annee)
-	{
-   	 	$dimanche_paques = date("Y-m-d", easter_date($annee));
-    	$vendredi_saint = date("Y-m-d", strtotime("$dimanche_paques - 2 day"));
-		$lundi_paques = date("Y-m-d", strtotime("$dimanche_paques + 1 day"));
-		$jeudi_ascension = date("Y-m-d", strtotime("$dimanche_paques + 39 day"));
-    	$lundi_pentecote = date("Y-m-d", strtotime("$dimanche_paques + 50 day"));
-  	    $tab_psap = array(0=>$dimanche_paques,1=>$vendredi_saint,2=>$lundi_paques,3=>$jeudi_ascension,4=>$lundi_pentecote);
-  	    return $tab_psap;
-	}
-	
-	
-	
 ///////Function recupére les jours fériés maroc 
 	   public function jours_feries_maroc($annee) 
 	{   /*****/
@@ -28,14 +12,11 @@ class  Default_Controller_Helpers_Validation_Utils
 		return $jours_feries_maroc; 
 	}
 	
-	
+
 ///////Indique si une date doit être normalisée ou non
 	public function a_normaliser($date,$maroc) 
 	{   
-		/*****/
-	    $utils = new Default_Controller_Helpers_Validation_Utils();   // couplage fort 
-		/*****/
-	    if (in_array(date('l',strtotime($date)),array('Saturday','Sunday')) || $utils->est_ferie($date,false,$maroc))
+		if (in_array(date_format($date, 'l'),array('Saturday','Sunday')) || $this->est_ferie(date_format($date, 'Y-m-d'),false,$maroc)) 
 		{
 			return true;
 		}
@@ -46,11 +27,9 @@ class  Default_Controller_Helpers_Validation_Utils
 
 ///////On normalise un flag midi par rapport à une date non normalisée
 	public function normaliser_flag_midi($date,$midi,$maroc) 
-	{   /*****/
-	    $utils = new Default_Controller_Helpers_Validation_Utils();    // couplage fort
-	    /*****/
+	{   
 		// Si la date de début ou fin congé tombe un WE ou JF, le flag midi ne peut pas être actif
-		if ($utils->a_normaliser($date,$maroc)) 
+		if (a_normaliser($date,$maroc)) 
 		{
 			$midi = false;
 		}
@@ -58,51 +37,39 @@ class  Default_Controller_Helpers_Validation_Utils
 		return $midi;
 	}
 
+
 ///////Si la date de début de congé tombe un WE ou JF, on l'avance au 1er JO
-	public function normaliser_date_debut_conge($date,$maroc) 
-	{   
-		/*****/
-		$utils = new Default_Controller_Helpers_Validation_Utils();   // couplage fort 
-		/*****/
-		while (in_array(date('l',strtotime($date)),array('Saturday','Sunday')) || $utils->est_ferie($date,false,$maroc))
+	public function normaliser_date_debut_conge($date,$maroc)   
+	{ 
+		while (in_array(date_format($date, 'l'),array('Saturday','Sunday')) || $this->est_ferie(date_format($date, 'Y-m-d'),false,$maroc)) 
 		{
-			$new_timestamp = strtotime("+1 day",strtotime($date));
-		    $date = date('Y-m-d',$new_timestamp) ;	
-		}	
+			$date->add(new DateInterval("P1D"));
+		}
 		return $date;
 	}
-	
+
+
 ///////Si la date de fin de congé tombe un WE ou JF, on la retarde au dernier JO
 	public function normaliser_date_fin_conge($date,$maroc=false) 
-	{   /*****/
-		$utils = new Default_Controller_Helpers_Validation_Utils();  // couplage fort 
-		/*****/
-		while (in_array(date('l',strtotime($date)),array('Saturday','Sunday')) || $utils->est_ferie($date,false,$maroc)) 
+	{  
+		while (in_array(date_format($date, 'l'),array('Saturday','Sunday')) || $this->est_ferie(date_format($date, 'Y-m-d'),false,$maroc)) 
 		{
-			$new_timestamp = strtotime("-1 day",strtotime($date));
-		    $date = date('Y-m-d',$new_timestamp) ;	
+			$date->sub(new DateInterval("P1D"));
 		}
 		return $date;
 	}	
 	
-	
-	
 /////// Fonction calcul les jours fériés Maroc / France 	
 	   public function jours_feries($annee, $alsacemoselle, $maroc)
 	  { 	
-	    /*****/
-	  	$utils = new Default_Controller_Helpers_Validation_Utils();
-	  	$tab_psap = $utils->Paques_saint_ascension_pentacote($annee);   // Couplage fort 
-	    $jours_f_maroc = $utils->jours_feries_maroc($annee); 
-	    /*****/
-	    
+        $dimanche_paques = date("Y-m-d", easter_date($annee));
 		if (!$maroc)   // si France 
 	   	{    
 			$jours_feries = array
-			(    $tab_psap[0]   //  $dimanche_paques
-			,    $tab_psap[2]   //  $lundi_paques($annee)
-			,    $tab_psap[3]   //  $jeudi_ascension($annee)
-			,    $tab_psap[4]   //  $lundi_pentecote
+			(    $dimanche_paques  //  $dimanche_paques
+			,    date("Y-m-d", strtotime("$dimanche_paques + 1 day"))  //  $lundi_paques($annee)
+			,    date("Y-m-d", strtotime("$dimanche_paques + 39 day"))  //  $jeudi_ascension($annee)
+			,    date("Y-m-d", strtotime("$dimanche_paques + 50 day"))   //  $lundi_pentecote
 			
 			,    "$annee-01-01"        //    Nouvel an
 			,    "$annee-05-01"        //    Fête du travail
@@ -116,14 +83,14 @@ class  Default_Controller_Helpers_Validation_Utils
 			if($alsacemoselle)
 			{
 				$jours_feries[] = "$annee-12-26";
-				$jours_feries[] = $tab_psap[1];
+				$jours_feries[] = date("Y-m-d", strtotime("$dimanche_paques - 2 day")); // $vendredi_saint
 			}
 			sort($jours_feries);
 			return $jours_feries; // retourné les jours fériés france 
 		}
 		else         // si Maroc 
 		{
-			return  $jours_f_maroc;  // appel de la fonction qui retourne les jours fériés maroc 
+			return  $this->jours_feries_maroc($annee);  // appel de la fonction qui retourne les jours fériés maroc 
 		}
 	}
 	   
@@ -133,8 +100,7 @@ class  Default_Controller_Helpers_Validation_Utils
 			$jour = date("Y-m-d", strtotime($jour));
 			$annee = substr($jour, 0, 4);
 			/*****/
-			$utils = new Default_Controller_Helpers_Validation_Utils();                     // Couplage fort 
-			$tab_jours_feries = $utils-> jours_feries($annee, $alsacemoselle, $maroc);
+			$tab_jours_feries = $this->jours_feries($annee, $alsacemoselle, $maroc);
 			/*****/
 			$tab_tmp = array();  // tab temporaire 
 			
@@ -157,25 +123,25 @@ class  Default_Controller_Helpers_Validation_Utils
 ///////Fonction qui calcul le nombre de jours entre deux dates 
 function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,$maroc) 
 {
-    $utils = new Default_Controller_Helpers_Validation_Utils();
-    
 	$nombre_jours_conges = 0;
 	
 	// Normaliser : commencer par les flag midi...
-	$debut_midi = $utils->normaliser_flag_midi($date_debut,$debut_midi,$maroc);
-	$fin_midi = $utils->normaliser_flag_midi($date_fin,$fin_midi,$maroc);
+	$debut_midi = $this->normaliser_flag_midi($date_debut,$debut_midi,$maroc);
+	$fin_midi = $this->normaliser_flag_midi($date_fin,$fin_midi,$maroc);
 	//... terminer par les dates
-	$date_debut = $utils->normaliser_date_debut_conge($date_debut,$maroc);
-	$date_fin = $utils->normaliser_date_fin_conge($date_fin,$maroc);
+	$date_debut = $this->normaliser_date_debut_conge($date_debut,$maroc);
+	$date_fin = $this->normaliser_date_fin_conge($date_fin,$maroc);
 	
 	// Parcourir l'intervalle
 	$date_iterator = $date_debut;
+	
+	
 	while ($date_iterator <= $date_fin) 
 	{
 		
 		// Loguer les jours ouvrés (tous les jours sauf les samedi, dimanche, fériés)
 		$weekday =  date('l',strtotime($date_iterator));
-		if (!in_array($weekday,array('Saturday','Sunday')) && !$utils->est_ferie($date_iterator,false,$maroc)) 
+		if (!in_array($weekday,array('Saturday','Sunday')) && !$this->est_ferie($date_iterator,false,$maroc)) 
 		{
 			$nombre_jours_conges++;
 	    }	
@@ -186,8 +152,7 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
 	   }
 		
 		// Incrémenter l'iterator
-		$new_timestamp = strtotime("+1 day",strtotime($date_iterator));
-	    $date_iterator = date('Y-m-d',$new_timestamp) ;
+		$date_iterator->add(new DateInterval("P1D"));
 	}
 	
 	// Traiter les demi journées

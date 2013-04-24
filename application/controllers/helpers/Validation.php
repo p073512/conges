@@ -505,7 +505,7 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
 	 * $centre_cervice	: distinction congé FRANCE ou MAROC
 	 * $nombre_jours	: ???
 	 */
-/*	public function calculNombreJour($flag,$date_debut,$date_fin,$centre_cervice,$nombre_jours)
+	public function calculNombreJour($flag,$date_debut,$date_fin,$centre_cervice,$nombre_jours)
 	{
 		$month =$_SESSION['salut']['mois'];
 		$fin_mois=date('Y-m-d',mktime(0,0,0,$month+1,0,$_SESSION['salut']['annee']));
@@ -573,7 +573,7 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
 							
 	}
 
-*/
+
 	/*
 	 * PTRI - Ajout des fonctions de calcul de jour de congés
 	 */

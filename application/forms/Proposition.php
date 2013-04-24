@@ -28,7 +28,9 @@ class Default_Form_Proposition extends Default_Form_MyForm
 			  															'name' => 'NomPrenom'
 																		)
 	         							   );    
-         
+	         							   
+	         							   
+	         							   
         /*
          * Date debut type jquery_x datepicker
          * 
@@ -38,7 +40,8 @@ class Default_Form_Proposition extends Default_Form_MyForm
 		$iDateDebut->setJQueryParam('dateFormat', 'yy-mm-dd');
 		$iDateDebut->setLabel("Date debut");
 		$iDateDebut->addValidator('date',true,array('date' => 'yy-MM-dd'));
-		$iDateDebut->addDecorator('Ftextinput', array('label'));     
+		$iDateDebut->addDecorator('Ftextinput', array('label'));  
+		$iDateDebut->setRequired(true);   
 		
 		/*
          * Debut midi type checkbox 
@@ -57,7 +60,7 @@ class Default_Form_Proposition extends Default_Form_MyForm
 		$iDateFin->setLabel("Date fin");
 		$iDateFin->addValidator('date',true,array('date' => 'yy-MM-dd'));
 		$iDateFin->addDecorator('Ftextinput', array('label'));
-
+        $iDateFin->setRequired(true); 
 		
 		/*
          * Debut midi type checkbox 

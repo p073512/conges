@@ -1,6 +1,14 @@
 <?php
 class PropositionController extends Zend_Controller_Action
 {
+	
+     public function preDispatch() /* MTA : Mohamed khalil Takafi */
+    {
+		
+    	    $doctypeHelper = new Zend_View_Helper_Doctype();
+            $doctypeHelper->doctype('HTML5');
+    		$this->_helper->layout->setLayout('mylayout');
+	}
  
 	public function indexAction()
 	{
@@ -45,17 +53,23 @@ class PropositionController extends Zend_Controller_Action
 		$this->view->propositionArray = $paginator;*/
 	}
 
-	public function createAction()   /* MTA : Mohamed khalil Takafi */
+	public function createpropositionAction()   /* MTA : Mohamed khalil Takafi */
 	{
 		//création du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
 		$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'create'), 'default', true));
-		$form->submit_pro->setLabel('Valider');
+		
 		$data = array();
 		//assigne le formulaire à la vue
 		$this->view->form = $form;
 		$this->view->title = "Creer Proposition";
+		
+		$where = array('centre_service = ?' => '1');
+		$form->setDbOptions('NomPrenom',new Default_Model_Personne(),'getId','getNomPrenom',$where);
+		
+		 $this->_helper->viewRenderer('createproposition');
+	     $this->view->form = $form;
 		//si la page est POSTée = formulaire envoyé
 		if($this->_request->isPost())   
 		{
@@ -69,11 +83,13 @@ class PropositionController extends Zend_Controller_Action
 				//création et initialisation d'un objet Default_Model_Proposition
 				//qui sera enregistré dans la base de données
 				$proposition = new Default_Model_Proposition();
-				$proposition->setId_personne($form->getValue('id_personne_pro'));
-				$proposition->setDate_debut($form->getValue('date_debut_pro'),'yy-mm-dd');
-				$proposition->setDate_fin($form->getValue('date_fin_pro'),'yy-mm-dd');
-				$proposition->setMi_debut_journee($form->getValue('mi_debut_journee_pro'));
-				$proposition->setMi_fin_journee($form->getValue('mi_fin_journee_pro'));
+                 
+			
+				$proposition->setId_personne($data['NomPrenom']);
+				$proposition->setDate_debut($data['date_debut']);
+				$proposition->setDate_fin($data['date_fin']);
+				$proposition->setMi_debut_journee($data['DebutMidi']);
+				$proposition->setMi_fin_journee($data['FinMidi']);
 				$proposition->setNombre_jours();
 				$proposition->setEtat('NC');
 				
@@ -82,17 +98,21 @@ class PropositionController extends Zend_Controller_Action
 				 * on appelle le helper pour verifierl'existance des proposition avant 
 				 * l'enregistrement dans la base
 				 */
-				if($this->_helper->validation->verifierConges($form->getValue('id_personne_pro'),$form->getValue('date_debut_pro'),$form->getValue('date_fin_pro'),$form->getValue('mi_debut_journee_pro'),$form->getValue('mi_fin_journee_pro'),1,1)&& $this->_helper->validation->verifierPropositions($form->getValue('id_personne_pro'),$form->getValue('date_debut_pro'),$form->getValue('date_fin_pro'),$form->getValue('mi_debut_journee_pro'),$form->getValue('mi_fin_journee_pro')))
+				
+
+				
+				if($this->_helper->validation->verifierConges($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi'],1,1)&& $this->_helper->validation->verifierPropositions($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi']))
 				{
 					$proposition->save();
 					//redirection
+					
 					$this->_helper->redirector('index');
 					
 				}
 				else   /* MTA : Mohamed khalil Takafi */ 
 				{
 					$form->populate($data);
-					if ($form->getValue('date_debut_pro') > $form->getValue('date_fin_pro'))
+					if ($data['date_debut'] > $data['date_fin'])
 					// MTA : modification du message echo "......."
 					echo "<strong><em><span style='background-color:rgb(255,0,0)'> La date de début doit être inférieure ou égale à la date de fin</span></em></strong>";
 				}

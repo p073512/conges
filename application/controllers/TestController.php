@@ -61,10 +61,10 @@ class TestController extends Zend_Controller_Action
 
 		// Définition de mes paramètres d'entrée
 		$date_debut = new DateTime('2013-01-01');
-		$date_fin = new DateTime('2013-01-31');
+		$date_fin = new DateTime('2013-01-01');
 		$debut_midi = false;
-		$fin_midi = true;
-		$maroc = true;
+		$fin_midi = false;
+		$maroc = false;
 
 
 		// Sauver les flags midi après normalisation et avant le calcul de nombre de jours de congés
@@ -78,18 +78,17 @@ class TestController extends Zend_Controller_Action
 		$date_fin = $this->_helper->validation->normaliser_date_fin_conge($date_fin,$maroc);
 
 		// Terminer par le calcul du nombre de jours de congés
-		$nb_conges = $this->_helper->validation->calculer_jours_ouvres($d1,$d2,$debut_midi,$fin_midi,$maroc);
+		$nb_conges = $this->_helper->validation->calculer_jours_conges($d1,$d2,$debut_midi,$fin_midi,$maroc);
 
-		
 		if ($nb_conges <= 0) {
 			$logger->log('Erreur, intervalle incorrect', Zend_Log::INFO);
 			
 		}
 		else if ($maroc)
-			$logger->log("Conge posé au CSM du ". date_format($d1, 'Y-m-d') . " au " . date_format($d2, 'Y-m-d') . " soit " . $nb_conges . " jours", Zend_Log::INFO);
+			$logger->log("Conge posé au CSM du ". date_format($date_debut, 'Y-m-d') . " au " . date_format($date_fin, 'Y-m-d') . " soit " . $nb_conges . " jours", Zend_Log::INFO);
 		else
-			$logger->log("Conge posé en France du ". date_format($d1, 'Y-m-d') . " au " . date_format($d2, 'Y-m-d') . " soit " . $nb_conges . " jours", Zend_Log::INFO);
-           
+			$logger->log("Conge posé en France du ". date_format($date_debut, 'Y-m-d') . " au " . date_format($date_fin, 'Y-m-d') . " soit " . $nb_conges . " jours", Zend_Log::INFO);
+
 		$this->view->var = $nb_conges;
 		
 	}	

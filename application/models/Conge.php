@@ -173,7 +173,7 @@ class Default_Model_Conge
 		 $maroc = true;     // maroc 
         }
     
-        $this->_nombre_jours = $utils->calcul_nombre_jours_conges($date_debut, $date_fin, $debut_midi, $fin_midi,$maroc);
+        $this->_nombre_jours = $utils->calculer_jours_conges($date_debut, $date_fin, $debut_midi, $fin_midi,$maroc);
 		return $this;  
 	}
 	

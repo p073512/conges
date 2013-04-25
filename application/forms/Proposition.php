@@ -23,13 +23,15 @@ class Default_Form_Proposition extends Default_Form_MyForm
          * Validation : requis,
          */
 		
+         
+         
 		$iNomPrenom = $this->createElement('select', 'NomPrenom', array(
 			  															'label'  => 'Nom Prenom',
-			  															'name' => 'NomPrenom'
-																		)
-	         							   );    
+			  															'name' => 'NomPrenom',
+																		) 
+	         							   ); 
 	         							   
-	         							   
+	     							   
 	         							   
         /*
          * Date debut type jquery_x datepicker
@@ -42,7 +44,7 @@ class Default_Form_Proposition extends Default_Form_MyForm
 		$iDateDebut->addValidator('date',true,array('date' => 'yy-MM-dd'));
 		$iDateDebut->addDecorator('Ftextinput', array('label'));  
 		$iDateDebut->setRequired(true);   
-		
+		$iDateDebut->setErrorMessages(array("Champs vide !"));
 		/*
          * Debut midi type checkbox 
          * 
@@ -61,6 +63,7 @@ class Default_Form_Proposition extends Default_Form_MyForm
 		$iDateFin->addValidator('date',true,array('date' => 'yy-MM-dd'));
 		$iDateFin->addDecorator('Ftextinput', array('label'));
         $iDateFin->setRequired(true); 
+        $iDateFin->setErrorMessages(array("Champs vide !"));
 		
 		/*
          * Debut midi type checkbox 
@@ -76,9 +79,11 @@ class Default_Form_Proposition extends Default_Form_MyForm
 		   $iSubmit =   new Zend_Form_Element_submit( 'Valider',
 		   array('label' => 'Valider'));
 		   
+
+			
 		   
 		   
-		//ajout des �l�ments au formulaire
+		//ajout des éléments au formulaire
 		$this->addElements(array(
 								 $iNomPrenom,
 								 $iDateDebut,

@@ -93,10 +93,10 @@
             <td><?php echo $proposition->etat; ?></td>
             <td>
 
-                <a href="<?php if ($proposition->etat ==  "NC") { echo $this->url(array('controller' => 'proposition', 'action' => 'edit', 'id' => $proposition->id), 'default', true);} ?>">Edit</a>
+                 <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'edit', 'id' => $proposition->id), 'default', true); ?>">Edit</a>
             </td>
            <td>
-                <a href="<?php if ($proposition->etat =="NC"){ echo $this->url(array('controller' => 'proposition', 'action' => 'delete', 'id' => $proposition->id), 'default', true);} ?>">Delete</a>
+               <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'delete', 'id' => $proposition->id), 'default', true); ?>">Delete</a>
             </td>
 
         </tr>

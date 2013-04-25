@@ -17,8 +17,8 @@ class PropositionController extends Zend_Controller_Action
 		$proposition = new Default_Model_Proposition;
 		//$this->view->propositionArray =$proposition->fetchAll('Etat = "NV"');
 
-		//cr�ation de notre objet Paginator avec comme param�tre la m�thode
-		//r�cup�rant toutes les entr�es dans notre base de donn�es
+		//création de notre objet Paginator avec comme paramétre la méthode
+		//récupérant toutes les entrées dans notre base de donn�es
 		$paginator = Zend_Paginator::factory($proposition->fetchAll($str=array()));
 		//indique le nombre d�l�ments � afficher par page
 		$paginator->setItemCountPerPage(20);
@@ -99,13 +99,12 @@ class PropositionController extends Zend_Controller_Action
 				 * l'enregistrement dans la base
 				 */
 				
-				if($this->_helper->validation->verifierConges($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi'],1,1)&& $this->_helper->validation->verifierPropositions($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi']))
+				if($this->_helper->validation->verifierConges($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi'],1,1)) //&& $this->_helper->validation->verifierPropositions($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi']))
 				{
 					
 					$proposition->save();
 
 					//redirection
-					//$this->view->success = "La proposition a été ajouté !";
 					$this->_helper->redirector('affichercsm');
 					
 				}
@@ -114,8 +113,6 @@ class PropositionController extends Zend_Controller_Action
 					$form->populate($data);
 					if ($data['date_debut'] > $data['date_fin'])
 					// MTA : modification du message echo "......."
-
-				    
 					echo "<div align=center><strong><em><span style='background-color:rgb(255,0,0)'> La date de début doit être inférieure ou égale à la date de fin</span></em></strong></div>";
 				
 				}
@@ -137,6 +134,7 @@ class PropositionController extends Zend_Controller_Action
 
 	public function editAction()
 	{
+
 		//cr�ation du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
@@ -251,7 +249,7 @@ class PropositionController extends Zend_Controller_Action
 			$result = $proposition->delete("id=$id");
 
 			//redirection
-			$this->_helper->redirector('index');
+			$this->_helper->redirector('affichercsm');
 		}
 		else
 		{

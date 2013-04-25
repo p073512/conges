@@ -10,6 +10,7 @@ class PropositionController extends Zend_Controller_Action
     		$this->_helper->layout->setLayout('mylayout');
 	}
  
+	//:::::::::::::// ACTION INDEX //::::::::::::://
 	public function indexAction()
 	{
 		// on ajoute le filtre sur la vue des propositions
@@ -18,50 +19,51 @@ class PropositionController extends Zend_Controller_Action
 		//$this->view->propositionArray =$proposition->fetchAll('Etat = "NV"');
 
 		//création de notre objet Paginator avec comme paramétre la méthode
-		//récupérant toutes les entrées dans notre base de donn�es
+		//récupérant toutes les entrées dans notre base de données
 		$paginator = Zend_Paginator::factory($proposition->fetchAll($str=array()));
-		//indique le nombre d�l�ments � afficher par page
+		//indique le nombre déléments é afficher par page
 		$paginator->setItemCountPerPage(20);
-		//r�cup�re le num�ro de la page � afficher
+		//récupére le numéro de la page é afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 
-		//$this->view permet d'acc�der � la vue qui sera utilis�e par l'action
+		//$this->view permet d'accéder é la vue qui sera utilisée par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
 		$this->view->propositionArray = $paginator;
 		
-		/*//cr�ation d'un d'une instance Default_Model_Users
+		/*//création d'un d'une instance Default_Model_Users
 		$proposition = new Default_Model_Proposition();
 
-		//$this->view permet d'acc�der � la vue qui sera utilis�e par l'action
+		//$this->view permet d'accéder é la vue qui sera utilisée par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
-		//la valeur correspond � un tableau d'objets de type Default_Model_Users r�cup�r�s par la m�thode fetchAll($str)
+		//la valeur correspond é un tableau d'objets de type Default_Model_Users récupérés par la méthode fetchAll($str)
 		//$this->view->PropositionArray = $propositon->fetchAll($str);
 
-		//cr�ation de notre objet Paginator avec comme param�tre la m�thode
-		//r�cup�rant toutes les entr�es dans notre base de donn�es
+		//création de notre objet Paginator avec comme paramétre la méthode
+		//récupérant toutes les entrées dans notre base de données
 		$paginator = Zend_Paginator::factory($proposition->fetchAll($str=array()));
-		//indique le nombre d�l�ments � afficher par page
+		//indique le nombre déléments é afficher par page
 		$paginator->setItemCountPerPage(10);
-		//r�cup�re le num�ro de la page � afficher
+		//récupére le numéro de la page é afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 
-		//$this->view permet d'acc�der � la vue qui sera utilis�e par l'action
+		//$this->view permet d'accéder é la vue qui sera utilisée par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
 		$this->view->propositionArray = $paginator;*/
 	}
 
+	//:::::::::::::// ACTION CREATEPROPOSITION //::::::::::::://
 	public function createpropositionAction()   /* MTA : Mohamed khalil Takafi */
 	{
-		//cr�ation du fomulaire
+		//création du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'create'), 'default', true));
+		//$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'create'), 'default', true));
 		
 		$data = array();
-		//assigne le formulaire � la vue
+		//assigne le formulaire é la vue
 		$this->view->form = $form;
 		$this->view->title = "Creer Proposition";
 		
@@ -70,18 +72,18 @@ class PropositionController extends Zend_Controller_Action
 		
 		 $this->_helper->viewRenderer('createproposition');
 	     $this->view->form = $form;
-		//si la page est POST�e = formulaire envoy�
+		//si la page est POSTée = formulaire envoyé
 		if($this->_request->isPost())   
 		{
-			//r�cup�ration des donn�es envoy�es par le formulaire
+			//récupération des données envoyées par le formulaire
 			
 			$data = $this->_request->getPost();
 
-			//v�rifie que les donn�es r�pondent aux conditions des validateurs
+			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))  
 			{
-				//cr�ation et initialisation d'un objet Default_Model_Proposition
-				//qui sera enregistr� dans la base de donn�es
+				//création et initialisation d'un objet Default_Model_Proposition
+				//qui sera enregistré dans la base de données
 				$proposition = new Default_Model_Proposition();
                  
 			
@@ -125,127 +127,144 @@ class PropositionController extends Zend_Controller_Action
 		}
 		else 
 		{
-			//si erreur rencontr�e, le formulaire est rempli avec les donn�es
-			//envoy�es pr�c�demment
+			//si erreur rencontrée, le formulaire est rempli avec les données
+			//envoyées précédemment
 			$form->populate($data);
 		}
 	
 	}
-
+	
+	
+// /* MOHAMED KHALIL TAKAFI*/	
+// MTA : corrigé !
 	public function editAction()
 	{
-
-		//cr�ation du fomulaire
+        $this->_helper->viewRenderer('createproposition');
+		//création du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'edit'), 'default', true));
-		$form->submit_pro->setLabel('Modifier');
-
-		//assigne le formulaire � la vue
+		//$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'edit'), 'default', true));
+		$form->Valider->setLabel('Modifier');
+		//assigne le formulaire à la vue
 		$this->view->form = $form;
+		$this->view->title = "Modifier Proposition"; //MTA
+		
+		//récupération des données envoyées par le formulaire
+		$data_id =  $this->getRequest()->getParams();
+  
+		
+		
+		
+        // recuperer des données a charger dans le formulaire 
+         $proposition = new Default_Model_Proposition();
+         $personne = new Default_Model_Personne();
+         
+         // recupere l'id personne qui a posé la proposition  
+         $prop = $proposition->find($data_id['id']);
+	     $id_personne =  $prop->getId_personne();  // id personne 
+	  
+	     $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
+	     
+	     
+	    // stocker les anciennes valeurs du formulaire 
+		$PreData['date_debut']=  $proposition->getDate_debut();
+		$PreData['DebutMidi'] = $proposition->getMi_debut_journee();
+		$PreData['date_fin'] = $proposition->getDate_fin();
+		$PreData['FinMidi'] = $proposition->getMi_fin_journee();
+	     
+	     // stocker les nouvelles valeurs du formulaire 
+	     $data = array();
+	     $data['_date_debut'] = $form->getElement('date_debut')->getValue();
+	     $data['_mi_debut_journee'] = $form->getElement('DebutMidi')->getValue();
+	     $data['_date_fin'] = $form->getElement('date_fin')->getValue();
+	     $data['_mi_fin_journee'] = $form->getElement('FinMidi')->getValue();
+	     
+	     
+	    
+		 
+	            
+	     // remplie le select avec le  nom et prenom de la personne ayant id personne  
+	     $where = array('id = ?' => $id_personne);
+		 $form->setDbOptions('NomPrenom',new Default_Model_Personne(),'getId','getNomPrenom',$where);
 
-		//si la page est POST�e = formulaire envoy�
+
+		 
+		// remplir le formulaire par les données recupérer 
+		$form->getElement('NomPrenom')->setValue($id_personne);
+		$form->getElement('date_debut')->setValue($PreData['date_debut']);
+		$form->getElement('date_fin')->setValue($PreData['date_fin']);
+		$form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);
+		$form->getElement('FinMidi')->setValue($PreData['FinMidi']);
+		
+
+		//si la page est POSTée = formulaire envoyé
 		if($this->getRequest()->isPost())
-		{
-			//r�cup�ration des donn�es envoy�es par le formulaire
-			$data = $this->getRequest()->getPost();
-
-			//v�rifie que les donn�es r�pondent aux conditions des validateurs
+		{ 
+			//récupération des données envoyées par le formulaire
+			$data =  $this->getRequest()->getParams();
+            
+			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))
 			{
-				
-				//cr�ation et initialisation d'un objet Default_Model_Proposition
-				//qui sera enregistr� dans la base de donn�es
-				$proposition = new Default_Model_Proposition();
-				$proposition->setId($form->getValue('id'));
-				$proposition->setId_personne($form->getValue('id_personne_pro'));
-				
-				//$date_debut = new Zend_Date;
-				//$date_debut->set($form->getValue('date_debut_pro'),'yy-mm-dd');
-				$proposition->setDate_debut($form->getValue('date_debut_pro'),'yy-mm-dd');
-				$proposition->setDate_fin($form->getValue('date_fin_pro'),'yy-mm-dd');
-				$proposition->setMi_debut_journee($form->getValue('mi_debut_journee_pro'));
-				$proposition->setMi_fin_journee($form->getValue('mi_fin_journee_pro'));
-				$proposition->setNombre_jours();
-				//$proposition->setAnnee_reference($form->getValue('annee_reference'));
-				$proposition->setEtat('NC');
-					// regarde le probleme de l'anne de reference
-						$personne = new Default_Model_Personne();
-						$result_set_personnes = $personne->find($form->getValue('id_personne_pro'));
-				$this->view->title = "Modification de la proposition de Mr/Mme : ".$result_set_personnes->getNom()." ".$result_set_personnes->getPrenom();	
-				
-			
-				if($this->_helper->validation->verifierConges($form->getValue('id_personne_pro'),$form->getValue('date_debut_pro'),$form->getValue('date_fin_pro'),$form->getValue('mi_debut_journee_pro'),$form->getValue('mi_fin_journee_pro')))
-				{
-					$proposition->save();
-					//redirection
-					$this->_helper->redirector('index');
-				}
-				else 
-				{
-					$form->populate($data);
-					echo "<strong><em><span style='background-color:rgb(255,0,0)'> conge deja demande</span></em></strong>";
-				}
-			}
-			else
-			{
-				//si erreur rencontr�e, le formulaire est rempli avec les donn�es
-				//envoy�es pr�c�demment
-				$form->populate($data);
-			}
-		}
-		else
-		{
-			//r�cup�ration de l'id pass� en param�tre
-			$id = $this->_getParam('id', 0);
+                
+				           $i = 1;
+					       // vérifie si les données ont subit une modification
+					        foreach($PreData as $k=>$v)
+					        {
+					        	if((string)$PreData[$k] != (string)$data[$k])
+					        	{
+					        		$i*=0;
+					        	}
+					        	
+					        }
+					        
+							if($i == 1)
+				        	{
+				        	 	 $this->view->error = "Vous n'avez modifié aucun champ !";
+				         	}
+				         	else 
+			                {       
+			                	 
+			     
+				        	     // remplir l'objet proposition par les valeurs modifiées     
+			                	 $proposition->setId($data_id['id']);
+			                     $proposition->setId_personne($id_personne);
+			                	 $proposition->setDate_debut($data['date_debut']);
+					             $proposition->setDate_fin($data['date_fin']);
+					             $proposition->setMi_debut_journee($data['DebutMidi']);
+					             $proposition->setMi_fin_journee($data['FinMidi']);
+					             $proposition->setNombre_jours();
+					             $proposition->setEtat('NC');
+					             
+					             $this->view->title = "Modification de la proposition de Mr/Mme : ".$pers->getNomPrenom();	
 
-			if($id > 0)
-			{
-				//r�cup�ration de l'entr�e
-				$proposition = new Default_Model_Proposition();
-				$proposition = $proposition->find($id);
+								 $proposition->save();  // insérer dans la base 
+									
+								 //redirection vers afficher csm 	
+								 $this->_helper->redirector('affichercsm');
 
-				//assignation des valeurs de l'entr�e dans un tableau
-				//tableau utilis� pour la m�thode populate() qui va remplir le champs du formulaire
-				//avec les valeurs du tableau
-				$data[] = array();
-				$data['id'] = $proposition->getId();
-				$data['id_personne'] = $proposition->getId_personne();
-				$data['date_debut'] = $proposition->getDate_debut();
-				$data['mi_debut_journee'] = $proposition->getMi_debut_journee();
-				$data['date_fin'] = $proposition->getDate_fin();
-				$data['mi_fin_journee'] = $proposition->getMi_fin_journee();
-				$data['nombre_jours'] = $proposition->getNombre_jours();
-			//	$data['nombre_jours'] = $proposition->getAnnee_reference();
-				$data['etat'] = $proposition->getEtat();
-				$personne = new Default_Model_Personne();
-				$result_set_personnes = $personne->find($id);
-				$this->view->title = "Modification de la proposition de Mr/Mme : ".$result_set_personnes->getNom()." ".$result_set_personnes->getPrenom();
-				$form->populate($data);
-			
-				
-				
+			                }
+
 			}
 		}
 	}
-
 	public function deleteAction()
 	{
-		//r�cup�re les param�tres de la requ�te
+		//récupére les paramétres de la requéte
 		
 		$params = $this->getRequest()->getParams();
 
 	
 
-		//v�rifie que le param�tre id existe
+		//vérifie que le paramétre id existe
 		if(isset($params['id']))
 		{
 			
 			$id = $params['id'];
-			//cr�ation du mod�le pour la suppression
+			//création du modéle pour la suppression
 			$proposition = new Default_Model_Proposition();
 			//appel de la fcontion de suppression avec en argument,
-			//la clause where qui sera appliqu�e
+			//la clause where qui sera appliquée
 			$result = $proposition->delete("id=$id");
 
 			//redirection
@@ -257,16 +276,16 @@ class PropositionController extends Zend_Controller_Action
 		}
 	}
 		/*
-		 * cette fonction permet � l'admin de valiser les propositions et les enregistr� dans 
+		 * cette fonction permet é l'admin de valiser les propositions et les enregistré dans 
 		 * la table :conge
 		 */
 	
 	public function accepterAction()
 	{
-		//r�cup�re les param�tres de la requ�te
+		//récupére les paramétres de la requéte
 		
 		$params = $this->getRequest()->getParams();
-		//v�rifie que le param�tre id existe
+		//vérifie que le paramétre id existe
 		
 		
 	if(isset($params['id']))
@@ -357,14 +376,14 @@ class PropositionController extends Zend_Controller_Action
 	
 	public function refuserAction()
 	{
-		//r�cup�re les param�tres de la requ�te
+		//récupére les paramétres de la requéte
 		$params = $this->getRequest()->getParams();
-		//v�rifie que le param�tre id existe
+		//vérifie que le paramétre id existe
 		if(isset($params['id']))
 		{
 			$id = $params['id'];
 
-			//cr�ation du mod�le pour le refus
+			//création du modéle pour le refus
 			$proposition = new Default_Model_Proposition();
 						
 			$result = $proposition->find($id);
@@ -384,7 +403,7 @@ class PropositionController extends Zend_Controller_Action
 		$proposition = new Default_Model_Proposition;
 		$paginator = Zend_Paginator::factory($proposition->fetchAll('Etat = "NC"'));
 		$paginator->setItemCountPerPage(10);
-		//r�cup�re le num�ro de la page � afficher
+		//récupére le numéro de la page à afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 		//on initialise la valeur PropositionArray de la vue
 		$this->view->propositionArray = $paginator;

@@ -30,8 +30,7 @@ class Default_Form_Proposition extends Default_Form_MyForm
 			  															'name' => 'NomPrenom',
 																		) 
 	         							   ); 
-	         							   
-	     							   
+
 	         							   
         /*
          * Date debut type jquery_x datepicker

@@ -66,80 +66,91 @@ class PropositionController extends Zend_Controller_Action
 		//assigne le formulaire é la vue
 		$this->view->form = $form;
 		$this->view->title = "Creer Proposition";
-		
-		$where = array('centre_service = ?' => '1');
-		$form->setDbOptions('NomPrenom',new Default_Model_Personne(),'getId','getNomPrenom',$where);
-		
-		 $this->_helper->viewRenderer('createproposition');
+	
+	
+        $where = array('centre_service = ?' => '1');
+	    $form->setDbOptions('NomPrenom',new Default_Model_Personne(),'getId','getNomPrenom',$where);
+
+	    
+
+		 $this->_helper->viewRenderer('create-proposition');
 	     $this->view->form = $form;
+
 		//si la page est POSTée = formulaire envoyé
 		if($this->_request->isPost())   
-		{
+		{    
+		    
 			//récupération des données envoyées par le formulaire
 			
 			$data = $this->_request->getPost();
-
+            
 			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))  
 			{
+				if($data['NomPrenom'] === 'x')
+				{
+				   $this->view->error = "Veuillez selectionner une ressource !";
+				}
+				else
+				{ 
 				//création et initialisation d'un objet Default_Model_Proposition
 				//qui sera enregistré dans la base de données
-				$proposition = new Default_Model_Proposition();
-                 
-			
-				$proposition->setId_personne($data['NomPrenom']);
-				$proposition->setDate_debut($data['date_debut']);
-				$proposition->setDate_fin($data['date_fin']);
-				$proposition->setMi_debut_journee($data['DebutMidi']);
-				$proposition->setMi_fin_journee($data['FinMidi']);
-				$proposition->setNombre_jours();
-				$proposition->setEtat('NC');
-				
+	
+				    $proposition = new Default_Model_Proposition();
+			    	$proposition->setId_personne($data['NomPrenom']);		
+					$proposition->setDate_debut($data['date_debut']);
+					$proposition->setDate_fin($data['date_fin']);
+					$proposition->setMi_debut_journee($data['DebutMidi']);
+					$proposition->setMi_fin_journee($data['FinMidi']);
+					$proposition->setNombre_jours();
+					$proposition->setEtat('NC');
+
 				/*
 				 * Gestion du chevauchement
 				 * on appelle le helper pour verifierl'existance des proposition avant 
 				 * l'enregistrement dans la base
 				 */
 				
-				if($this->_helper->validation->verifierConges($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi'],1,1)) //&& $this->_helper->validation->verifierPropositions($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi']))
-				{
-					
+				//if($this->_helper->validation->verifierConges($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi'],1,1)) //&& $this->_helper->validation->verifierPropositions($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi']))
+				//{ 
 					$proposition->save();
-
-					//redirection
 					$this->_helper->redirector('affichercsm');
-					
-				}
-				else   /* MTA : Mohamed khalil Takafi */ 
-				{
+				//}
+				//else   /* MTA : Mohamed khalil Takafi */ 
+				//{
 					$form->populate($data);
 					if ($data['date_debut'] > $data['date_fin'])
 					// MTA : modification du message echo "......."
-					echo "<div align=center><strong><em><span style='background-color:rgb(255,0,0)'> La date de début doit être inférieure ou égale à la date de fin</span></em></strong></div>";
-				
-				}
+					$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";
+			
+				//}
+			  }
 			}
 			else 
 			{
 				$form->populate($data);
-				echo "<div align=center><strong><em><span style='background-color:rgb(255,0,0)'> proposition ou conge deja demande </span></em></strong></div>";
+				$this->view->error = "Formulaire invalide !";
 			}
+		
 		}
 		else 
 		{
 			//si erreur rencontrée, le formulaire est rempli avec les données
 			//envoyées précédemment
+			
 			$form->populate($data);
 		}
-	
-	}
+		
+}
+
 	
 	
 // /* MOHAMED KHALIL TAKAFI*/	
 // MTA : corrigé !
+//:::::::::::::// ACTION EDIT //::::::::::::://
 	public function editAction()
 	{
-        $this->_helper->viewRenderer('createproposition');
+        $this->_helper->viewRenderer('create-proposition');
 		//création du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
@@ -248,6 +259,11 @@ class PropositionController extends Zend_Controller_Action
 			}
 		}
 	}
+	
+	
+// /* MOHAMED KHALIL TAKAFI*/	
+// MTA : EN COURS DE TRAITEMENT !
+	//:::::::::::::// ACTION DELETE //::::::::::::://
 	public function deleteAction()
 	{
 		//récupére les paramétres de la requéte
@@ -279,7 +295,7 @@ class PropositionController extends Zend_Controller_Action
 		 * cette fonction permet é l'admin de valiser les propositions et les enregistré dans 
 		 * la table :conge
 		 */
-	
+	//:::::::::::::// ACTION ACCEPTER //::::::::::::://
 	public function accepterAction()
 	{
 		//récupére les paramétres de la requéte

@@ -62,10 +62,14 @@
 			<div class="alert">
 				<button type="button" class="close " data-dismiss="alert"></button>
 				<strong>Alerte!</strong>  <?php //Message d'erreur
-                                         echo "error :".$this->error; ?>
+                                         echo "    error : ".$this->error; ?>
 			</div>
 
 	<?php }
+
+	
+	
+	
     /*
 	 * Si erreurs de traitements* renvoyé depuis le controlleur 
 	 * traitemets : logique, ajout BD, Exception ...
@@ -78,7 +82,7 @@
             <div class="alert alert-info">
 				<button type="button" class="close " data-dismiss="alert"></button>
 				<strong>Succes!</strong> <?php //Message succes
-	                                      echo $this->success ."' a été bien créé <a href='".$this->url(array('controller' => 'proposition', 'action' => 'index'), 'default', true)."'>Afficher la table propositions </a>"; ?>
+	                                      echo $this->success . "' a été bien créé <a href='".$this->url(array('controller' => 'proposition', 'action' => 'index'), 'default', true)."'>Afficher la table propositions </a>"; ?>
 			</div>
 	<?php }?>
 	
@@ -91,6 +95,11 @@
 					<form action="<?php $this->form->getAction() ?>" name="<?php $this->form->getName() ?>" method="post">
 					
                       <?php
+                      	
+                      
+                      
+                      
+                      
                       /*
                        * On récupére les élements du formulaire , et on compte le nombre de ceux ci
                        */

@@ -23,13 +23,26 @@ class Default_Form_Proposition extends Default_Form_MyForm
          * Validation : requis,
          */
 		
+         /*
+          * 
+          * $roomSelect->setMultiOptions($roomsTab);
+			$roomSelect->setLabel($this->getTranslator()->translate("Salle :"));
+			$roomSelect->setRequired(true);
+			$roomSelect->addValidator(new Zend_Validate_Int());
+			$this->addElement($roomSelect);
+          * 
+         */
          
-         
+   
+        
+       
 		$iNomPrenom = $this->createElement('select', 'NomPrenom', array(
 			  															'label'  => 'Nom Prenom',
 			  															'name' => 'NomPrenom',
+		                                                                'required'   => 'true',
 																		) 
 	         							   ); 
+	
 
 	         							   
         /*
@@ -77,7 +90,6 @@ class Default_Form_Proposition extends Default_Form_MyForm
          */
 		   $iSubmit =   new Zend_Form_Element_submit( 'Valider',
 		   array('label' => 'Valider'));
-		   
 
 			
 		   

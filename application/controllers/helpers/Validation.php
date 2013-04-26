@@ -5,7 +5,7 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 /*
  *  MTA :  Fonctions utilitaires pour calculer le nombre de jours de congé 
  */
-
+/*
 //MTA 
 ///////Function recupére les jours fériés maroc 
 	   public function jours_feries_maroc($annee) 
@@ -179,7 +179,7 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
 	return $nombre_jours_conges;
 }
 
-
+*/
 
 
 
@@ -576,7 +576,7 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
 	/*
 	 * PTRI - Ajout des fonctions de calcul de jour de congés
 	 */
-/*
+
 	function dimanche_paques($annee)
 	{
 		return date("Y-m-d", easter_date($annee));
@@ -778,7 +778,7 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
 
 		return $nombre_jours_ouvres;
 	}
-*/
+
 	/*
 	 * PTRI - FIN des fonctions de calcul de nombre de jours de congés
 	 */

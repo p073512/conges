@@ -1,8 +1,61 @@
-<div >
- <div class = "Table_Afficher_Valider">  <!--  MTA / Mohamed khalil Takafi  -->
-    <table border="1">
-    
-        <tr>
+
+
+<div class="row-fluid offset1">
+		<div id="header-container">
+            
+			<div class="dropdown">
+                  <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
+                     Proposition
+                     <b class="caret"></b>
+                  </a>
+                  
+                 	 
+                   <ul class="dropdown-menu">
+                       <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'createproposition'), 'default', true) ?>">CrÃ©er</a></li>
+                       <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'affichercsm'), 'default', true) ?>">Afficher / Modifier</a></li>
+                       <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'afficheradmin'), 'default', true) ?>">Valider / Refuser</a></li>                         
+                   </ul>
+              
+			</div><!--MBA : fermeture dropdown -->
+          
+		</div><!-- MBA : fermeture div="header-container" -->
+	</div><!-- MBA : fermeture div="row-fluid -->
+         <br/>
+
+<div class="container">
+		<div class="well row-fluid">
+		<h2>Liste des Propositions :</h2><br/>
+	<?php 	if(isset($this->error)){ 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Alerte!</strong>  <?php //Message d'erreur
+                                         echo "Erreur :".$this->error; ?>
+			</div>
+
+	<?php }
+    /*
+	 * Si erreurs de traitements* renvoyÃ© depuis le controlleur 
+	 * traitemets : logique, ajout BD, Exception ...
+	 */
+	
+	else if(isset($this->success)){
+	?>
+	
+	<!-- afficage message succÃ©s  -->
+            <div class="alert alert-info">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Succes!</strong> <?php //Message succes
+	                                      echo $this->success; ?>
+			</div>
+	<?php }?>
+
+ <table class="table table-hover ">
+
+     <thead> 
+       <tr>
             
             <th>Nom Prenom</th>
             <th>date_debut</th>
@@ -12,13 +65,14 @@
             <th>Accepter</th>
             <th>Refuser</th>
             
-        </tr>
+       </tr>
+     </thead>
         <?php
-            //$this->usersArray est une variable qui peut être garnie par le controller
+            //$this->usersArray est une variable qui peut ï¿½tre garnie par le controller
             //elle doit recevoir un tableau contenant des objets de type Default_Model_Proposition
-            //le tableau est parcouru par foreach pour afficher les propiétés des objets contenus dans le tableau
+            //le tableau est parcouru par foreach pour afficher les propiï¿½tï¿½s des objets contenus dans le tableau
             foreach ($this->propositionArray as $proposition) :
-        	$personne = new Default_Model_Personne();
+            $personne = new Default_Model_Personne();
 			$result_set_personnes = $personne->find($proposition->id_personne);
         ?>
         <tr>
@@ -45,10 +99,10 @@
 </div>
     </br>    <!--  MTA / Mohamed khalil Takafi  -->
     <?php
-    //nous affichons, à la suite du tableau (après la balise </table>), notre template qui permettra de gérer la pagination
-    //la méthode pginationControl() prend, ici, 3 arguments:
+    //nous affichons, Ã  la suite du tableau (aprÃ¨s la balise </table>), notre template qui permettra de gÃ©rer la pagination
+    //la mÃ©thode pginationControl() prend, ici, 3 arguments:
     //  - l'instane paginator
-    //  - le style de défilement
+    //  - le style de dÃ©filement
     //  - le template de pagination
     echo $this->paginationControl($this->propositionArray, 'Sliding', 'common/my_paginator_control.phtml');
 	?>

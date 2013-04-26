@@ -3,33 +3,42 @@ class TestController extends Zend_Controller_Action
 {
 	public function indexAction()
 	{
-		$utils = new Default_Controller_Helpers_Validation_Utils();
+		$utils = new Default_Controller_Helpers_Validation();
+		
+		$maroc = true;
+		$alsacemoselle=false;
+		
+		$date_debut = new DateTime("2013-04-04");
+		$date_fin = new DateTime("2013-04-04");
+		
+		$debut_midi = true;
+		$fin_midi = true;
 		
 		$annee = "2013";
-		$maroc = false;
-		$alsacemoselle=false;
-		$jour = "01-05-2013";
 		
-		$date_debut = "2013-05-15";
-		$date_fin = "2013-05-20";
-		$debut_midi = true;
-		$fin_midi = false;
+        // mettre les jours fériés maroc dans session TEST 
+		//$jours_feries_maroc = new Zend_Session_Namespace('TEST',false);
+        //$jours_feries_maroc->jfm = $utils->jours_feries_maroc($annee);
+		///////////////////////////////////////////////////////////////
+
 		
-		
-		// $this->view->var = $utils->Paques_saint_ascension_pentacote($annee);
-		
-		// $this->view->var = $utils->jours_feries_maroc($annee);
-	   
-		// $this->view->var = array_values($utils->jours_feries($annee,$alsacemoselle,$maroc));
+		// $this->view->var = $utils->jours_feries($annee, $alsacemoselle, $maroc);            //OK 
         
-        // $this->view->var = $utils->est_ferie($jour, $alsacemoselle, $maroc);
+        // $this->view->var = $utils->est_ferie($date_debut, $alsacemoselle, $maroc);          //OK
         
-		// $this->view->var = $utils->normaliser_dates_debut_fin($date_debut, $date_fin,$maroc);
+        //  $this->view->var  = $utils->a_normaliser($date_debut, $maroc);                      //OK
+
+        //  $this->view->var =  $utils->normaliser_flag_midi($date_debut,$debut_midi,$maroc);   //OK
+        
+        //  $this->view->var = $utils->normaliser_date_debut_conge($date_debut,$maroc);         //OK
+        
+		//  $this->view->var = $utils->normaliser_date_fin_conge($date_fin,$maroc);             //OK
 		
-		  $this->view->var = $utils->calcul_nombre_jours_conges($date_debut, $date_fin,$debut_midi,$fin_midi,$maroc);
+		//  $this->view->var = $utils->calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,$maroc);
+		
 		
 	} 
-	
+
 
 	public function calculJoursCongesAction()
 	{
@@ -37,10 +46,10 @@ class TestController extends Zend_Controller_Action
 		$logger = new Zend_Log();
 		$writer = new Zend_Log_Writer_Stream('php://output');
 		$logger->addWriter($writer);
-			
+
 		// DEBUT de mon programme
 		$logger->log('Calcul des jours ouvrés sur une période donnée', Zend_Log::INFO);
-
+        
 		/* format :
 		 d et j 	Jour du mois, sur 2 chiffres, avec ou sans le zéro initial 	01 à 31 ou 1 à 31
 		 D and l 	Une représentation textuelle du jour 	De Mon jusqu'à Sun ou de Sunday jusqu'à Saturday
@@ -52,10 +61,11 @@ class TestController extends Zend_Controller_Action
 
 		// Définition de mes paramètres d'entrée
 		$date_debut = new DateTime('2013-01-01');
-		$date_fin = new DateTime('2013-01-31');
+		$date_fin = new DateTime('2013-01-01');
 		$debut_midi = false;
-		$fin_midi = true;
-		$maroc = true;
+		$fin_midi = false;
+		$maroc = false;
+
 
 		// Sauver les flags midi après normalisation et avant le calcul de nombre de jours de congés
 		$this->_helper->validation->normaliser_flag_midi($date_debut,$debut_midi,$maroc);
@@ -68,23 +78,23 @@ class TestController extends Zend_Controller_Action
 		$date_fin = $this->_helper->validation->normaliser_date_fin_conge($date_fin,$maroc);
 
 		// Terminer par le calcul du nombre de jours de congés
-		$nb_conges = $this->_helper->validation->calculer_jours_ouvres($d1,$d2,$debut_midi,$fin_midi,$maroc);
-		 
+		$nb_conges = $this->_helper->validation->calculer_jours_conges($d1,$d2,$debut_midi,$fin_midi,$maroc);
+
 		if ($nb_conges <= 0) {
 			$logger->log('Erreur, intervalle incorrect', Zend_Log::INFO);
+			
 		}
 		else if ($maroc)
-			$logger->log("Conge posé au CSM du ". date_format($d1, 'Y-m-d') . " au " . date_format($d2, 'Y-m-d') . " soit " . $nb_conges . " jours", Zend_Log::INFO);
+			$logger->log("Conge posé au CSM du ". date_format($date_debut, 'Y-m-d') . " au " . date_format($date_fin, 'Y-m-d') . " soit " . $nb_conges . " jours", Zend_Log::INFO);
 		else
-			$logger->log("Conge posé en France du ". date_format($d1, 'Y-m-d') . " au " . date_format($d2, 'Y-m-d') . " soit " . $nb_conges . " jours", Zend_Log::INFO);
+			$logger->log("Conge posé en France du ". date_format($date_debut, 'Y-m-d') . " au " . date_format($date_fin, 'Y-m-d') . " soit " . $nb_conges . " jours", Zend_Log::INFO);
 
 		$this->view->var = $nb_conges;
 		
 	}	
-
+/*
 	public function droitsACongesAction()
 	{
-
 		$logger = new Zend_Log();
 		$writer = new Zend_Log_Writer_Stream('php://output');
 		$logger->addWriter($writer);
@@ -102,20 +112,20 @@ class TestController extends Zend_Controller_Action
 		 */
 
 		// Définition de mes paramètres d'entrée
-		$ressource = new Default_Model_Personne();
-		$ressource = $ressource->fetchAll("nom = 'TRIFOL'");
-		$ressource = $ressource[0];
-		$logger->log('Nom Prenom : '.$ressource->toString(), Zend_Log::INFO);
-		$anne_reference = '2013';
-		
+//		$ressource = new Default_Model_Personne();
+//		$ressource = $ressource->fetchAll("nom = 'TRIFOL'");
+//		$ressource = $ressource[0];
+//		$logger->log('Nom Prenom : '.$ressource->toString(), Zend_Log::INFO);
+//		$anne_reference = '2013';
+/*		
 		// Sauver les flags midi après normalisation et avant le calcul de nombre de jours de congés
 		$droits = $this->_helper->validation->calculer_droits_a_conges($ressource,$anne_reference);
 		
 		$this->view->var = $droits;
 		
-	}	
-	
-    /*function afficheAction() 
+}
+*/	
+    function afficheAction() 
     {
     	 //chercher toutes les propositions validees par admin
     	$proposition = new Default_Model_Proposition;
@@ -152,7 +162,7 @@ class TestController extends Zend_Controller_Action
 	       	var_dump($conge);
 		}
 		
-	}*/
+	}
 
 	/*public function afficheAction()
 	{
@@ -869,24 +879,25 @@ echo $year;
 		var_dump($tab);
 		
 	}*/
-	public function afficheAction()
-	{
-		$form = new Default_Form_Personne();
-		$form->setAction($this->view->url(array('controller' => 'personne', 'action' => 'create'), 'default', true));
-		$form->submit_pr->setLabel('Ajouter');
-		$this->view->form = $form;
-		if($this->_request->isPost())
-		{
-			if ($form->getValue('centre_service_pr') == 1)
-			{
-				$form = $form->getDisplayGroup> ('login');
-			}
+//	public function afficheAction()
+//	{
+//		$form = new Default_Form_Personne();
+//		$form->setAction($this->view->url(array('controller' => 'personne', 'action' => 'create'), 'default', true));
+//		$form->submit_pr->setLabel('Ajouter');
+//		$this->view->form = $form;
+//		if($this->_request->isPost())
+//		{
+//			if ($form->getValue('centre_service_pr') == 1)
+//			{
+//				$form = $form->getDisplayGroup> ('login');
+//			}
 			
-		}
+//		}
 		
 	
 	
-	}
+//	}
 	
 	
-}	
+//}	
+}

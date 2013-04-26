@@ -241,12 +241,12 @@ class TpersonneController extends Zend_Controller_Action
 				$this->view->form = $form;
 				
 				if($this->getRequest()->isPost())
-		        	{
+		        {
 				//récupération des données envoyées par le formulaire
 				     $data = $this->getRequest()->getPost();
 	              //vérifie que les données répondent aux conditions des validateurs
 				     if($form->isValid($data))
-					      {
+					 {
 					  	    $i = 1;
 					   // vérifie si les données ont subit une modification
 					        foreach($PreData as $k=>$v)

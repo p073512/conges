@@ -23,7 +23,8 @@ class Default_Model_Conge
 	//pour l'initialisation de l'objet
 	public function __construct(array $options = null)
 	{
-		if (is_array($options)) {
+		if (is_array($options)) 
+		{
 			$this->setOptions($options);
 		}
 	}
@@ -33,7 +34,8 @@ class Default_Model_Conge
 	public function __set($name, $value)
 	{
 		$method = 'set' . $name;
-		if (('mapper' == $name) || !method_exists($this, $method)) {
+		if (('mapper' == $name) || !method_exists($this, $method)) 
+		{
 			throw new Exception('Invalid guestbook property');
 		}
 		$this->$method($value);
@@ -44,7 +46,8 @@ class Default_Model_Conge
 	public function __get($name)
 	{
 		$method = 'get' . $name;
-		if (('mapper' == $name) || !method_exists($this, $method)) {
+		if (('mapper' == $name) || !method_exists($this, $method)) 
+		{
 			throw new Exception('Invalid guestbook property');
 		}
 		return $this->$method();
@@ -56,9 +59,11 @@ class Default_Model_Conge
 	public function setOptions(array $options)
 	{
 		$methods = get_class_methods($this);
-		foreach ($options as $key => $value) {
+		foreach ($options as $key => $value) 
+		{
 			$method = 'set' . ucfirst($key);
-			if (in_array($method, $methods)) {
+			if (in_array($method, $methods)) 
+			{
 				$this->$method($value);
 			}
 		}
@@ -119,10 +124,6 @@ class Default_Model_Conge
 
 	public function setDate_fin($date_fin)
 	{
-		/*if (!($date_fin instanceof Zend_Date))
-		{
-			throw new Exception('Valeur date de fin  non valide');
-		}*/
 		$this->_date_fin = $date_fin;
 		return $this;
 	}
@@ -141,11 +142,43 @@ class Default_Model_Conge
 	{
 		return $this->_mi_fin_journee;
 	}
-	public function setNombre_jours()
+	
+	/* Mohamed khalil TAKAFI */
+	public function setNombre_jours()  // MTA : calcul nombre de jours Congé
 	{
-		$this->_nombre_jours = (float)$this->calculNombreDuJours();
+		$date_debut = new DateTime($this->getDate_debut());    // date_debut 
+    	$date_fin = new DateTime($this->getDate_fin());        // date_fin
+    	
+    	$date_depart =  date_timestamp_get($date_debut);
+    	$annee = (string)date('Y', $date_depart);              // année 
+	    
+        $debut_midi = $this->getMi_debut_journee();            // debut midi 
+        $fin_midi = $this->getMi_fin_journee();                // fin midi 
+
+        $maroc = false;                                        // France 
+        
+        $utils = new Default_Controller_Helpers_Validation();
+
+        // mettre les jours fériés maroc dans session TEST 
+		$jours_feries_maroc = new Zend_Session_Namespace('TEST',false);
+        $jours_feries_maroc->jfm = $utils->jours_feries_maroc($annee);
+        
+        //MTA :  verifié si c'est un CSM ou France     
+        $personne = new Default_Model_Personne();
+        $per = $personne->find($this->getId_personne());
+        $per->getCentre_service();
+        
+        if ($per->getCentre_service() == 1) 
+        {
+		 $maroc = true;     // maroc 
+        }
+    
+        $this->_nombre_jours = $utils->calculer_jours_conges($date_debut, $date_fin,$debut_midi,$fin_midi,$maroc);
 		return $this;  
 	}
+	
+	
+	
 	public function  getNombre_jours()
 	{
 		return $this->_nombre_jours;
@@ -191,7 +224,8 @@ class Default_Model_Conge
 	public function getMapper()
 	{
 		//si la valeur $_mapper n'est pas initialisée, on l'initialise (
-		if(null == $this->_mapper){
+		if(null == $this->_mapper)
+		{
 			$this->setMapper(new Default_Model_CongeMapper());
 		}
 
@@ -269,117 +303,8 @@ class Default_Model_Conge
     	return $this->getMapper()->CongesNondoublontPole( $tableau_id,$debut_mois,$fin_mois)  ;
     }
     
-	/*
-	 * calcule de nombre de jours ouvres dans periode de conge
-	 */
 	
-	public function calculNombreDuJours()  /* MTA : Mohamed khalil Takafi */
-	{
-		// tu peut utiliser cette fonction pour afficher les nombre totale ouvere pour un mois donné
-		$date_depart = $this->getDate_debut();
-    	$date_fin1 = $this->getDate_fin();
-    	$date_debut = strtotime($date_depart );
-    	$date_fin = strtotime($date_fin1 );
-        $tableau = array(); // MTA: Tableau à ignorer pour l'instant  
-    	$tableau_jours_feries = array(); // Tableau des jours feriés
-    // On boucle dans le cas où l'année de départ serait différente de l'année d'arrivée
-    	$difference_annees = date('Y', $date_fin) - date('Y', $date_debut);
-    	for ($i = 0; $i <= $difference_annees; $i++) 
-   		{
-	    $annee = (int)date('Y', $date_debut) + $i;
-	    // Liste des jours feriés
-	    $tableau_jours_feries[] = '1_1_'.$annee; // Jour de l'an
-	    $tableau_jours_feries[] = '1_5_'.$annee; // Fete du travail
-	    $tableau_jours_feries[] = '8_5_'.$annee; // Victoire 1945
-	    $tableau_jours_feries[] = '14_7_'.$annee; // Fete nationale
-	    $tableau_jours_feries[] = '15_8_'.$annee; // Assomption
-	    $tableau_jours_feries[] = '1_11_'.$annee; // Toussaint
-	    $tableau_jours_feries[] = '11_11_'.$annee; // Armistice 1918
-	    $tableau_jours_feries[] = '25_12_'.$annee; // Noel
-	       $tableau_jours_feries[] = '9_5_'.$annee; // exemple
-	    // Récupération de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
-	    $easter = easter_date($annee);
-	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + 86400); // Paques
-	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*39)); // Ascension
-	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*50)); // Pentecote
-    }
-
- $nb_jours_ouvres = 0;		 
-    // Mettre <= si on souhaite prendre en compte le dernier jour dans le décompte
-    
-	 while ($date_debut <= $date_fin)  
-    {   
-         
-    	// Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvrés
-	    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date('j_n_'.date('Y', $date_debut), $date_debut),$tableau_jours_feries) )    // MTA : date('Y', $date_debut).'-m-d', $date_debut)
-	    {
-	    		$nb_jours_ouvres++;
-	    }
-	    	$date_debut = mktime(date('H', $date_debut), date('i', $date_debut), date('s', $date_debut), date('m', $date_debut), date('d', $date_debut) + 1, date('Y', $date_debut));
-    }
-
-
-     	// si ( D_journée = 1  || F_journée = 1 )    et     Date_debut == Date_fin 
-		if ((($this->getMi_debut_journee() == True) ||($this->getMi_fin_journee() == True)) && ($this->getDate_debut() ==$this->getDate_fin()) )
-		{
-			$nb_jours_ouvres = 0;
-			return $nb_jours_ouvres + 0.5 ;           
-		}
-
-	   // si ( D_journée = 1  &&  F_journée = 1 )    et     Date_debut <> Date_fin 
-		elseif ((($this->getMi_debut_journee() == True) && ($this->getMi_fin_journee() == True))  && ($this->getDate_debut() != $this->getDate_fin()) )
-		{  
-	
-		    // date_debut = weekend  ou date_debut=férié     et   date_fin = weekend  ou date_fin=férié
-			if ((in_array(date('w', $date_debut), array(0, 6)) || in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) && (in_array(date('w', $date_fin), array(0, 6)) || in_array(date('j_n_'.date('Y', $date_fin), $date_fin), $tableau_jours_feries)))
-			 	return $nb_jours_ouvres; // MTA
-			 
-			// date_debut <> weekend  et date_debut<>férié     et   date_fin <> weekend  <> date_fin=férié	
-			elseif((!in_array(date('w', $date_debut), array(0, 6)) || !in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) && (!in_array(date('w', $date_fin), array(0, 6)) || !in_array(date('j_n_'.date('Y', $date_fin), $date_fin), $tableau_jours_feries)))
-			 	
-			      return $nb_jours_ouvres - 1; // MTA
-	
-			
-		}
-
-		
-	     //  si ( D_journée = 1  || F_journée = 1 )    et     Date_debut <> Date_fin 
-		elseif ((($this->getMi_debut_journee() == True) || ($this->getMi_fin_journee() == True))  && ($this->getDate_debut() !=$this->getDate_fin()) )
-		{	
-				
-		    //(1)// (date_debut == weekend   ou   date_debut == ferié)     et   (date_fin == weekend    ou   date_fin == ferié)
-			if((in_array(date('w', $date_debut), array(0, 6)) || in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) && (in_array(date('w', $date_fin), array(0, 6)) || in_array(date('j_n_'.date('Y', $date_fin), $date_fin), $tableau_jours_feries))) 
-			    return $nb_jours_ouvres ; 
-			    
-		    //(2)// (date_debut <> weekend et date_debut <> ferié)     et   (date_fin <> weekend et date_fin <> ferié)
-		    elseif((!in_array(date('w', $date_debut), array(0, 6)) || !in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) && (!in_array(date('w', $date_fin), array(0, 6)) || !in_array(date('j_n_'.date('Y', $date_fin), $date_fin), $tableau_jours_feries))) 
-		
-		      	return $nb_jours_ouvres - 0.5 ; 
-
-			
-			//(3)// (date_debut == weekend  ou  date_debut == ferié)    et    (date_fin <>  weekend et date_fin <>  ferié)			
-			elseif((in_array(date('w', $date_debut), array(0, 6)) || in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) && (!in_array(date('w', $date_fin), array(0, 6)) && !in_array(date('j_n_'.date('Y', $date_fin), $date_fin), $tableau_jours_feries)))
-			{
-				    if($this->getMi_fin_journee() == True)   // fin_midi = true 
-						return $nb_jours_ouvres - 0.5;
-					else                                       // fin_midi = false ===> debut_midi = true 
-						return $nb_jours_ouvres;
-				
-			}			
-			//4)// (date_debut <> weekend  et  date_debut <> ferié)    et    (date_fin ==  weekend ou date_fin ==  ferié)			
-			elseif((!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) && (in_array(date('w', $date_fin), array(0, 6)) || in_array(date('j_n_'.date('Y', $date_fin), $date_fin), $tableau_jours_feries)))
-			{
-				    if($this->getMi_debut_journee() == True)   // debut_midi = true 
-						return $nb_jours_ouvres - 0.5;
-					else                                       // debut_midi = false  ===> fin_midi = true 
-						return $nb_jours_ouvres;
-			}	
-		}
-		return $nb_jours_ouvres;
-	}
-
-
-	/*
+/*
 	 * calcule de nombre de jours ouvres dans un mois  
 	 */
 
@@ -426,6 +351,8 @@ class Default_Model_Conge
 
 		return $nb_jours_ouvres; 
 	}
+
+	
 	
 	/*
 	 * cette fonction a pour role de chercher les jours feries d'un mois 

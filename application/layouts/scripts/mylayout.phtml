@@ -63,14 +63,16 @@ echo $this->doctype() ?>
 		  ?>
 		  <?php 
 			   
-			  	echo $this->headTitle();
+		  echo $this->headTitle();
 			  	
 		  ?>
 		  <!-- All JavaScript at the bottom, except for Modernizr and Respond.
           Modernizr enables HTML5 elements & feature detects; Respond is a polyfill for min/max-width CSS3 Media Queries
           For optimal performance, use a custom Modernizr build: www.modernizr.com/download/ -->
           <?php 
-            echo $this->jQuery();
+          
+          echo $this->jQuery();
+          
           $this->headScript()->appendFile($this->baseUrl( 'scriptjs/modernizr-2.6.1.min.js'));
 
           echo $this->headScript();
@@ -113,7 +115,7 @@ echo $this->doctype() ?>
                        	 <li class="dropdown">
                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Proposition<b class="caret"></b></a>
                            <ul class="dropdown-menu">
-                             <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'create'), 'default', true) ?>">Créer</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'createproposition'), 'default', true) ?>">Créer</a></li>
                              <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'affichercsm'), 'default', true) ?>">Afficher / Modifier</a></li>
                              <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'afficheradmin'), 'default', true) ?>">Valider / Refuser</a></li>
                             

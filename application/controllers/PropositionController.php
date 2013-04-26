@@ -1,7 +1,16 @@
 <?php
 class PropositionController extends Zend_Controller_Action
 {
+	
+     public function preDispatch() /* MTA : Mohamed khalil Takafi */
+    {
+		
+    	    $doctypeHelper = new Zend_View_Helper_Doctype();
+            $doctypeHelper->doctype('HTML5');
+    		$this->_helper->layout->setLayout('mylayout');
+	}
  
+	//:::::::::::::// ACTION INDEX //::::::::::::://
 	public function indexAction()
 	{
 		// on ajoute le filtre sur la vue des propositions
@@ -9,226 +18,273 @@ class PropositionController extends Zend_Controller_Action
 		$proposition = new Default_Model_Proposition;
 		//$this->view->propositionArray =$proposition->fetchAll('Etat = "NV"');
 
-		//création de notre objet Paginator avec comme paramètre la méthode
-		//récupérant toutes les entrées dans notre base de données
+		//crÃ©ation de notre objet Paginator avec comme paramÃ©tre la mÃ©thode
+		//rÃ©cupÃ©rant toutes les entrÃ©es dans notre base de donnÃ©es
 		$paginator = Zend_Paginator::factory($proposition->fetchAll($str=array()));
-		//indique le nombre déléments à afficher par page
+		//indique le nombre dÃ©lÃ©ments Ã© afficher par page
 		$paginator->setItemCountPerPage(20);
-		//récupère le numéro de la page à afficher
+		//rÃ©cupÃ©re le numÃ©ro de la page Ã© afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 
-		//$this->view permet d'accéder à la vue qui sera utilisée par l'action
+		//$this->view permet d'accÃ©der Ã© la vue qui sera utilisÃ©e par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
 		$this->view->propositionArray = $paginator;
 		
-		/*//création d'un d'une instance Default_Model_Users
+		/*//crÃ©ation d'un d'une instance Default_Model_Users
 		$proposition = new Default_Model_Proposition();
 
-		//$this->view permet d'accéder à la vue qui sera utilisée par l'action
+		//$this->view permet d'accÃ©der Ã© la vue qui sera utilisÃ©e par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
-		//la valeur correspond à un tableau d'objets de type Default_Model_Users récupérés par la méthode fetchAll($str)
+		//la valeur correspond Ã© un tableau d'objets de type Default_Model_Users rÃ©cupÃ©rÃ©s par la mÃ©thode fetchAll($str)
 		//$this->view->PropositionArray = $propositon->fetchAll($str);
 
-		//création de notre objet Paginator avec comme paramètre la méthode
-		//récupérant toutes les entrées dans notre base de données
+		//crÃ©ation de notre objet Paginator avec comme paramÃ©tre la mÃ©thode
+		//rÃ©cupÃ©rant toutes les entrÃ©es dans notre base de donnÃ©es
 		$paginator = Zend_Paginator::factory($proposition->fetchAll($str=array()));
-		//indique le nombre déléments à afficher par page
+		//indique le nombre dÃ©lÃ©ments Ã© afficher par page
 		$paginator->setItemCountPerPage(10);
-		//récupère le numéro de la page à afficher
+		//rÃ©cupÃ©re le numÃ©ro de la page Ã© afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 
-		//$this->view permet d'accéder à la vue qui sera utilisée par l'action
+		//$this->view permet d'accÃ©der Ã© la vue qui sera utilisÃ©e par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
 		$this->view->propositionArray = $paginator;*/
 	}
 
-	public function createAction()   /* MTA : Mohamed khalil Takafi */
+	//:::::::::::::// ACTION CREATEPROPOSITION //::::::::::::://
+	public function createpropositionAction()   /* MTA : Mohamed khalil Takafi */
 	{
-		//création du fomulaire
+		//crÃ©ation du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'create'), 'default', true));
-		$form->submit_pro->setLabel('Valider');
+		//$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'create'), 'default', true));
+		
 		$data = array();
-		//assigne le formulaire à la vue
+		//assigne le formulaire Ã© la vue
 		$this->view->form = $form;
 		$this->view->title = "Creer Proposition";
-		//si la page est POSTée = formulaire envoyé
+	
+	
+        $where = array('centre_service = ?' => '1');
+	    $form->setDbOptions('NomPrenom',new Default_Model_Personne(),'getId','getNomPrenom',$where);
+
+	    
+
+		 $this->_helper->viewRenderer('create-proposition');
+	     $this->view->form = $form;
+
+		//si la page est POSTÃ©e = formulaire envoyÃ©
 		if($this->_request->isPost())   
-		{
-			//récupération des données envoyées par le formulaire
+		{    
+		    
+			//rÃ©cupÃ©ration des donnÃ©es envoyÃ©es par le formulaire
 			
 			$data = $this->_request->getPost();
-
-			//vérifie que les données répondent aux conditions des validateurs
+            
+			//vÃ©rifie que les donnÃ©es rÃ©pondent aux conditions des validateurs
 			if($form->isValid($data))  
 			{
-				//création et initialisation d'un objet Default_Model_Proposition
-				//qui sera enregistré dans la base de données
-				$proposition = new Default_Model_Proposition();
-				$proposition->setId_personne($form->getValue('id_personne_pro'));
-				$proposition->setDate_debut($form->getValue('date_debut_pro'),'yy-mm-dd');
-				$proposition->setDate_fin($form->getValue('date_fin_pro'),'yy-mm-dd');
-				$proposition->setMi_debut_journee($form->getValue('mi_debut_journee_pro'));
-				$proposition->setMi_fin_journee($form->getValue('mi_fin_journee_pro'));
-				$proposition->setNombre_jours();
-				$proposition->setEtat('NC');
-				
+				if($data['NomPrenom'] === 'x')
+				{
+				   $this->view->error = "Veuillez selectionner une ressource !";
+				}
+				else
+				{ 
+				//crÃ©ation et initialisation d'un objet Default_Model_Proposition
+				//qui sera enregistrÃ© dans la base de donnÃ©es
+	
+				    $proposition = new Default_Model_Proposition();
+			    	$proposition->setId_personne($data['NomPrenom']);		
+					$proposition->setDate_debut($data['date_debut']);
+					$proposition->setDate_fin($data['date_fin']);
+					$proposition->setMi_debut_journee($data['DebutMidi']);
+					$proposition->setMi_fin_journee($data['FinMidi']);
+					$proposition->setNombre_jours();
+					$proposition->setEtat('NC');
+
 				/*
 				 * Gestion du chevauchement
 				 * on appelle le helper pour verifierl'existance des proposition avant 
 				 * l'enregistrement dans la base
 				 */
-				if($this->_helper->validation->verifierConges($form->getValue('id_personne_pro'),$form->getValue('date_debut_pro'),$form->getValue('date_fin_pro'),$form->getValue('mi_debut_journee_pro'),$form->getValue('mi_fin_journee_pro'),1,1)&& $this->_helper->validation->verifierPropositions($form->getValue('id_personne_pro'),$form->getValue('date_debut_pro'),$form->getValue('date_fin_pro'),$form->getValue('mi_debut_journee_pro'),$form->getValue('mi_fin_journee_pro')))
-				{
+				
+				//if($this->_helper->validation->verifierConges($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi'],1,1)) //&& $this->_helper->validation->verifierPropositions($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi']))
+				//{ 
 					$proposition->save();
-					//redirection
-					$this->_helper->redirector('index');
-					
-				}
-				else   /* MTA : Mohamed khalil Takafi */ 
-				{
+					$this->_helper->redirector('affichercsm');
+				//}
+				//else   /* MTA : Mohamed khalil Takafi */ 
+				//{
 					$form->populate($data);
-					if ($form->getValue('date_debut_pro') > $form->getValue('date_fin_pro'))
+					if ($data['date_debut'] > $data['date_fin'])
 					// MTA : modification du message echo "......."
-					echo "<strong><em><span style='background-color:rgb(255,0,0)'> La date de début doit être inférieure ou égale à la date de fin</span></em></strong>";
-				}
+					$this->view->error = "La date de dÃ©but doit Ãªtre infÃ©rieure ou Ã©gale Ã  la date de fin";
+			
+				//}
+			  }
 			}
 			else 
 			{
 				$form->populate($data);
-				echo "<strong><em><span style='background-color:rgb(255,0,0)'> proposition ou conge deja demande </span></em></strong>";
+				$this->view->error = "Formulaire invalide !";
 			}
+		
 		}
 		else 
 		{
-			//si erreur rencontrée, le formulaire est rempli avec les données
-			//envoyées précédemment
+			//si erreur rencontrÃ©e, le formulaire est rempli avec les donnÃ©es
+			//envoyÃ©es prÃ©cÃ©demment
+			
 			$form->populate($data);
 		}
-	
-	}
+		
+}
 
+	
+	
+// /* MOHAMED KHALIL TAKAFI*/	
+// MTA : corrigÃ© !
+//:::::::::::::// ACTION EDIT //::::::::::::://
 	public function editAction()
 	{
-		//création du fomulaire
+        $this->_helper->viewRenderer('create-proposition');
+		//crÃ©ation du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'edit'), 'default', true));
-		$form->submit_pro->setLabel('Modifier');
-
-		//assigne le formulaire à la vue
+		//$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'edit'), 'default', true));
+		$form->Valider->setLabel('Modifier');
+		//assigne le formulaire Ã  la vue
 		$this->view->form = $form;
+		$this->view->title = "Modifier Proposition"; //MTA
+		
+		//rÃ©cupÃ©ration des donnÃ©es envoyÃ©es par le formulaire
+		$data_id =  $this->getRequest()->getParams();
+  
+		
+		
+		
+        // recuperer des donnÃ©es a charger dans le formulaire 
+         $proposition = new Default_Model_Proposition();
+         $personne = new Default_Model_Personne();
+         
+         // recupere l'id personne qui a posÃ© la proposition  
+         $prop = $proposition->find($data_id['id']);
+	     $id_personne =  $prop->getId_personne();  // id personne 
+	  
+	     $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
+	     
+	     
+	    // stocker les anciennes valeurs du formulaire 
+		$PreData['date_debut']=  $proposition->getDate_debut();
+		$PreData['DebutMidi'] = $proposition->getMi_debut_journee();
+		$PreData['date_fin'] = $proposition->getDate_fin();
+		$PreData['FinMidi'] = $proposition->getMi_fin_journee();
+	     
+	     // stocker les nouvelles valeurs du formulaire 
+	     $data = array();
+	     $data['_date_debut'] = $form->getElement('date_debut')->getValue();
+	     $data['_mi_debut_journee'] = $form->getElement('DebutMidi')->getValue();
+	     $data['_date_fin'] = $form->getElement('date_fin')->getValue();
+	     $data['_mi_fin_journee'] = $form->getElement('FinMidi')->getValue();
+	     
+	     
+	    
+		 
+	            
+	     // remplie le select avec le  nom et prenom de la personne ayant id personne  
+	     $where = array('id = ?' => $id_personne);
+		 $form->setDbOptions('NomPrenom',new Default_Model_Personne(),'getId','getNomPrenom',$where);
 
-		//si la page est POSTée = formulaire envoyé
+
+		 
+		// remplir le formulaire par les donnÃ©es recupÃ©rer 
+		$form->getElement('NomPrenom')->setValue($id_personne);
+		$form->getElement('date_debut')->setValue($PreData['date_debut']);
+		$form->getElement('date_fin')->setValue($PreData['date_fin']);
+		$form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);
+		$form->getElement('FinMidi')->setValue($PreData['FinMidi']);
+		
+
+		//si la page est POSTÃ©e = formulaire envoyÃ©
 		if($this->getRequest()->isPost())
-		{
-			//récupération des données envoyées par le formulaire
-			$data = $this->getRequest()->getPost();
-
-			//vérifie que les données répondent aux conditions des validateurs
+		{ 
+			//rÃ©cupÃ©ration des donnÃ©es envoyÃ©es par le formulaire
+			$data =  $this->getRequest()->getParams();
+            
+			//vÃ©rifie que les donnÃ©es rÃ©pondent aux conditions des validateurs
 			if($form->isValid($data))
 			{
-				
-				//création et initialisation d'un objet Default_Model_Proposition
-				//qui sera enregistré dans la base de données
-				$proposition = new Default_Model_Proposition();
-				$proposition->setId($form->getValue('id'));
-				$proposition->setId_personne($form->getValue('id_personne_pro'));
-				
-				//$date_debut = new Zend_Date;
-				//$date_debut->set($form->getValue('date_debut_pro'),'yy-mm-dd');
-				$proposition->setDate_debut($form->getValue('date_debut_pro'),'yy-mm-dd');
-				$proposition->setDate_fin($form->getValue('date_fin_pro'),'yy-mm-dd');
-				$proposition->setMi_debut_journee($form->getValue('mi_debut_journee_pro'));
-				$proposition->setMi_fin_journee($form->getValue('mi_fin_journee_pro'));
-				$proposition->setNombre_jours();
-				//$proposition->setAnnee_reference($form->getValue('annee_reference'));
-				$proposition->setEtat('NC');
-					// regarde le probleme de l'anne de reference
-						$personne = new Default_Model_Personne();
-						$result_set_personnes = $personne->find($form->getValue('id_personne_pro'));
-				$this->view->title = "Modification de la proposition de Mr/Mme : ".$result_set_personnes->getNom()." ".$result_set_personnes->getPrenom();	
-				
-			
-				if($this->_helper->validation->verifierConges($form->getValue('id_personne_pro'),$form->getValue('date_debut_pro'),$form->getValue('date_fin_pro'),$form->getValue('mi_debut_journee_pro'),$form->getValue('mi_fin_journee_pro')))
-				{
-					$proposition->save();
-					//redirection
-					$this->_helper->redirector('index');
-				}
-				else 
-				{
-					$form->populate($data);
-					echo "<strong><em><span style='background-color:rgb(255,0,0)'> conge deja demande</span></em></strong>";
-				}
-			}
-			else
-			{
-				//si erreur rencontrée, le formulaire est rempli avec les données
-				//envoyées précédemment
-				$form->populate($data);
-			}
-		}
-		else
-		{
-			//récupération de l'id passé en paramètre
-			$id = $this->_getParam('id', 0);
+                
+				           $i = 1;
+					       // vÃ©rifie si les donnÃ©es ont subit une modification
+					        foreach($PreData as $k=>$v)
+					        {
+					        	if((string)$PreData[$k] != (string)$data[$k])
+					        	{
+					        		$i*=0;
+					        	}
+					        	
+					        }
+					        
+							if($i == 1)
+				        	{
+				        	 	 $this->view->error = "Vous n'avez modifiÃ© aucun champ !";
+				         	}
+				         	else 
+			                {       
+			                	 
+			     
+				        	     // remplir l'objet proposition par les valeurs modifiÃ©es     
+			                	 $proposition->setId($data_id['id']);
+			                     $proposition->setId_personne($id_personne);
+			                	 $proposition->setDate_debut($data['date_debut']);
+					             $proposition->setDate_fin($data['date_fin']);
+					             $proposition->setMi_debut_journee($data['DebutMidi']);
+					             $proposition->setMi_fin_journee($data['FinMidi']);
+					             $proposition->setNombre_jours();
+					             $proposition->setEtat('NC');
+					             
+					             $this->view->title = "Modification de la proposition de Mr/Mme : ".$pers->getNomPrenom();	
 
-			if($id > 0)
-			{
-				//récupération de l'entrée
-				$proposition = new Default_Model_Proposition();
-				$proposition = $proposition->find($id);
+								 $proposition->save();  // insÃ©rer dans la base 
+									
+								 //redirection vers afficher csm 	
+								 $this->_helper->redirector('affichercsm');
 
-				//assignation des valeurs de l'entrée dans un tableau
-				//tableau utilisé pour la méthode populate() qui va remplir le champs du formulaire
-				//avec les valeurs du tableau
-				$data[] = array();
-				$data['id'] = $proposition->getId();
-				$data['id_personne'] = $proposition->getId_personne();
-				$data['date_debut'] = $proposition->getDate_debut();
-				$data['mi_debut_journee'] = $proposition->getMi_debut_journee();
-				$data['date_fin'] = $proposition->getDate_fin();
-				$data['mi_fin_journee'] = $proposition->getMi_fin_journee();
-				$data['nombre_jours'] = $proposition->getNombre_jours();
-			//	$data['nombre_jours'] = $proposition->getAnnee_reference();
-				$data['etat'] = $proposition->getEtat();
-				$personne = new Default_Model_Personne();
-				$result_set_personnes = $personne->find($id);
-				$this->view->title = "Modification de la proposition de Mr/Mme : ".$result_set_personnes->getNom()." ".$result_set_personnes->getPrenom();
-				$form->populate($data);
-			
-				
-				
+			                }
+
 			}
 		}
 	}
-
+	
+	
+// /* MOHAMED KHALIL TAKAFI*/	
+// MTA : EN COURS DE TRAITEMENT !
+	//:::::::::::::// ACTION DELETE //::::::::::::://
 	public function deleteAction()
 	{
-		//récupére les paramètres de la requête
+		//rÃ©cupÃ©re les paramÃ©tres de la requÃ©te
 		
 		$params = $this->getRequest()->getParams();
 
 	
 
-		//vérifie que le paramètre id existe
+		//vÃ©rifie que le paramÃ©tre id existe
 		if(isset($params['id']))
 		{
 			
 			$id = $params['id'];
-			//création du modèle pour la suppression
+			//crÃ©ation du modÃ©le pour la suppression
 			$proposition = new Default_Model_Proposition();
 			//appel de la fcontion de suppression avec en argument,
-			//la clause where qui sera appliquée
+			//la clause where qui sera appliquÃ©e
 			$result = $proposition->delete("id=$id");
 
 			//redirection
-			$this->_helper->redirector('index');
+			$this->_helper->redirector('affichercsm');
 		}
 		else
 		{
@@ -236,16 +292,16 @@ class PropositionController extends Zend_Controller_Action
 		}
 	}
 		/*
-		 * cette fonction permet à l'admin de valiser les propositions et les enregistré dans 
+		 * cette fonction permet Ã© l'admin de valiser les propositions et les enregistrÃ© dans 
 		 * la table :conge
 		 */
-	
+	//:::::::::::::// ACTION ACCEPTER //::::::::::::://
 	public function accepterAction()
 	{
-		//récupére les paramètres de la requête
+		//rÃ©cupÃ©re les paramÃ©tres de la requÃ©te
 		
 		$params = $this->getRequest()->getParams();
-		//vérifie que le paramètre id existe
+		//vÃ©rifie que le paramÃ©tre id existe
 		
 		
 	if(isset($params['id']))
@@ -336,14 +392,14 @@ class PropositionController extends Zend_Controller_Action
 	
 	public function refuserAction()
 	{
-		//récupére les paramètres de la requête
+		//rÃ©cupÃ©re les paramÃ©tres de la requÃ©te
 		$params = $this->getRequest()->getParams();
-		//vérifie que le paramètre id existe
+		//vÃ©rifie que le paramÃ©tre id existe
 		if(isset($params['id']))
 		{
 			$id = $params['id'];
 
-			//création du modèle pour le refus
+			//crÃ©ation du modÃ©le pour le refus
 			$proposition = new Default_Model_Proposition();
 						
 			$result = $proposition->find($id);
@@ -363,7 +419,7 @@ class PropositionController extends Zend_Controller_Action
 		$proposition = new Default_Model_Proposition;
 		$paginator = Zend_Paginator::factory($proposition->fetchAll('Etat = "NC"'));
 		$paginator->setItemCountPerPage(10);
-		//récupère le numéro de la page à afficher
+		//rÃ©cupÃ©re le numÃ©ro de la page Ã  afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 		//on initialise la valeur PropositionArray de la vue
 		$this->view->propositionArray = $paginator;

@@ -83,6 +83,14 @@ class Default_Model_Personne
 		return $this->_id;
 	}
 
+	// MTA : fonction retourne le nom et prenom concatené 
+	public function getNomPrenom()
+	{
+	
+	return $this->_nom." ".$this->_prenom;
+	}
+	
+	
 	public function setNom($nom)
 	{
 		$this->_nom = (string)$nom;

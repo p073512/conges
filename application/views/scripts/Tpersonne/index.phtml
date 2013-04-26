@@ -1,3 +1,23 @@
+<?php 
+$this->headScript()->appendFile( $this->baseUrl() .'/js/myScriptPers.js');
+echo $this->headScript();
+?>
+
+<!-- Modal Pour confirmation de suppression -->
+ <div id="myModal" class="modal message hide fade" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" style="display: none;">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+		<h3 id="myModalLabel">Confirmer la suppression</h3>
+	</div>
+	<div class="modal-body">
+		<p></p>
+	</div>
+	<div class="modal-footer">
+		<button class="btn" data-dismiss="modal" aria-hidden="true">Annuler</button>
+		<button class="btn  btn-info" id="suppButton">Confirmer</button>
+	</div>
+</div>
+
 <div class="row-fluid offset1">
 		<div id="header-container">
             
@@ -26,11 +46,13 @@
          <br/>
 
 <div class="container">
+	
 		<div class="well row-fluid">
 		<h2>Liste des Ressources :</h2><br/>
-	<?php 	if(isset($this->error)){ 
+		<div id="msgstate">
+	<?php 	if(!empty($this->error)){ 
 	?>
-	
+
       <!-- afficage alerte avec message d'erreur -->
 			<div class="alert">
 				<button type="button" class="close " data-dismiss="alert"></button>
@@ -44,7 +66,7 @@
 	 * traitemets : logique, ajout BD, Exception ...
 	 */
 	
-	else if(isset($this->success)){
+	else if(!empty($this->success)){
 	?>
 	
 	<!-- afficage message succés  -->
@@ -53,7 +75,8 @@
 				<strong>Succes!</strong> <?php //Message succes
 	                                      echo $this->success; ?>
 			</div>
-	<?php }?>
+			
+	<?php }?></div>
     <table class="table table-hover ">
        <thead> 
        <tr>
@@ -68,8 +91,8 @@
             <th>Modalite</th>
             <th>Pourcent</th>
             <th>Stage</th>
-            <th> Modifier </th>
-            <th> Supprimer </th>
+            <th>Modifier </th>
+            <th>Supprimer </th>
 
         </tr>
         </thead>
@@ -80,11 +103,11 @@
             foreach ($this->personneArray as $personne) :
 
         ?>
-       <tbody> <tr>
+       <tbody> <tr id="<?php echo $personne->id;?>">
             
             <td><?php echo $personne->nom; ?></td>
             <td><?php echo $personne->prenom; ?></td>
-            <td><?php echo $personne->date_entree; ?></td>
+            <td><?php echo date('d/m/Y',strtotime($personne->date_entree)); ?></td>
             <td><?php echo $personne->id_entite; ?></td>
             <td><?php echo $personne->id_pole; ?></td>
             <td><?php echo $personne->id_fonction; ?></td>
@@ -93,22 +116,23 @@
             <td><?php echo $personne->pourcent; ?></td>
             <td><?php echo $personne->stage; ?></td>
         <td>
-                <a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'edit', 'id' => $personne->id), 'default', true); ?>">Edit</a>
+              <a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'edit', 'id' => $personne->id), 'default', true); ?>"><i  class="icon-pencil"></i></a>
             </td>
            <td>
-                <a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'delete', 'id' => $personne->id), 'default', true); ?>">Delete</a>
+                <!-- <a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'index', 'act' =>'delete','id' => $personne->id, 'page' => $this->page), 'default', true); ?>">Delete</a>  --><i class="icon-remove" id= "<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'delete',), 'default', true); ?>"></i>
             </td>
 
         </tr>
         <?php endforeach; ?></tbody>
     </table>
     <?php
-    //nous affichons, � la suite du tableau (apr�s la balise </table>), notre template qui permettra de g�rer la pagination
+    //nous affichons, � la suite du tableau (aprés la balise </table>), notre template qui permettra de g�rer la pagination
     //la méthode pginationControl() prend, ici, 3 arguments:
     //  - l'instane paginator
     //  - le style de défilement
     //  - le template de pagination
     echo $this->paginationControl($this->personneArray, 'Sliding', 'common/my_paginator_control.phtml');
 	?>
+	
 	</div>
 </div>

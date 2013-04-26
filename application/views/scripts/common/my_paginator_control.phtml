@@ -9,9 +9,9 @@
 <?php endif; ?>
 <?php foreach ($this->pagesInRange as $page): ?>
  <?php if ($page != $this->current): ?>
-<li><a href="<?php echo $this->url(array('page' => $page)); ?>"><?php echo $page; ?></a></li>
+<li ><a href="<?php echo $this->url(array('page' => $page)); ?>"><?php echo $page; ?></a></li>
 <?php else: ?>
-<li><a style="font-size:16px;" href="#"><?php echo $page; ?> </a></li>
+<li class="active"><a style="font-size:16px;" href="#"><?php echo $page; ?> </a></li>
 <?php endif; ?>
 <?php endforeach; ?>
 <?php if (isset($this->next)): ?>

@@ -148,8 +148,8 @@ class Default_Model_Proposition
 		$jours_feries_maroc = new Zend_Session_Namespace('TEST',false);
         $jours_feries_maroc->jfm = $utils->jours_feries_maroc($annee);
 		
-		$this->_nombre_jours = $utils->calculer_jours_conges($date_debut, $date_fin,$debut_midi,$fin_midi,true);
-
+        $this->_nombre_jours = $utils->calculer_jours_conges($date_debut, $date_fin,$debut_midi,$fin_midi,true);
+        
 		return $this;
 	}
 	public function  getNombre_jours()

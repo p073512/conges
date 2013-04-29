@@ -86,8 +86,7 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 			(    $dimanche_paques  //  $dimanche_paques
 			,    date("Y-m-d", strtotime("$dimanche_paques + 1 day"))  //  $lundi_paques($annee)
 			,    date("Y-m-d", strtotime("$dimanche_paques + 39 day"))  //  $jeudi_ascension($annee)
-			,    date("Y-m-d", strtotime("$dimanche_paques + 50 day"))   //  $lundi_pentecote
-			
+			,    date("Y-m-d", strtotime("$dimanche_paques + 50 day"))   //  $lundi_pentecote	
 			,    "$annee-01-01"        //    Nouvel an
 			,    "$annee-05-01"        //    Fête du travail
 			,    "$annee-05-08"        //    Armistice 1945
@@ -179,7 +178,7 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
 	return $nombre_jours_conges;
 }
 
-*/
+
 
 
 
@@ -317,7 +316,7 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
         }
        return false;
      }
-        
+*/        
         public function verifierSolde ($id_personne,$debut_annee_reference, $fin_annee_reference,$annee_reference,$nombre_jours)
         {
         	$conge = new Default_Model_Conge();
@@ -613,12 +612,11 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
 
 		$ferie = new Default_Model_Ferie();
 		$jours_feries_csm = $ferie->fetchAll("annee_reference = '".$annee."'");
-		foreach ($jours_feries_csm as $j) {
-			$jours_feries_csm_dates[] = $j->getDate_debut();
+		foreach ($jours_feries_csm as $k=>$j) 
+		{
+			$jours_feries_csm_dates[$k] = $j->getDate_debut();
 		}
 
-		//	$logger->log($jours_feries_csm[0]->getDate_debut(), Zend_Log::INFO);
-		 
 		return $jours_feries_csm_dates;
 	}
 

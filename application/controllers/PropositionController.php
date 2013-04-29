@@ -1,10 +1,10 @@
+
 <?php
 class PropositionController extends Zend_Controller_Action
 {
 	
      public function preDispatch() /* MTA : Mohamed khalil Takafi */
     {
-		
     	    $doctypeHelper = new Zend_View_Helper_Doctype();
             $doctypeHelper->doctype('HTML5');
     		$this->_helper->layout->setLayout('mylayout');
@@ -54,6 +54,7 @@ class PropositionController extends Zend_Controller_Action
 		$this->view->propositionArray = $paginator;*/
 	}
 
+
 	//:::::::::::::// ACTION CREATEPROPOSITION //::::::::::::://
 	public function createpropositionAction()   /* MTA : Mohamed khalil Takafi */
 	{
@@ -85,13 +86,13 @@ class PropositionController extends Zend_Controller_Action
 			$data = $this->_request->getPost();
             
 			//vérifie que les données répondent aux conditions des validateurs
-			if($form->isValid($data))  
+			if($form->isValid($data))  // form valide 
 			{
-				if($data['NomPrenom'] === 'x')
+				if($data['NomPrenom'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
 				{
 				   $this->view->error = "Veuillez selectionner une ressource !";
 				}
-				else
+				else       
 				{ 
 				//création et initialisation d'un objet Default_Model_Proposition
 				//qui sera enregistré dans la base de données
@@ -104,29 +105,27 @@ class PropositionController extends Zend_Controller_Action
 					$proposition->setMi_fin_journee($data['FinMidi']);
 					$proposition->setNombre_jours();
 					$proposition->setEtat('NC');
-
+					
+					
 				/*
 				 * Gestion du chevauchement
 				 * on appelle le helper pour verifierl'existance des proposition avant 
 				 * l'enregistrement dans la base
 				 */
-				
-				//if($this->_helper->validation->verifierConges($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi'],1,1)) //&& $this->_helper->validation->verifierPropositions($data['NomPrenom'],$data['date_debut'],$data['date_fin'],$data['DebutMidi'],$data['FinMidi']))
-				//{ 
-					$proposition->save();
-					$this->_helper->redirector('affichercsm');
-				//}
-				//else   /* MTA : Mohamed khalil Takafi */ 
-				//{
-					$form->populate($data);
+					
+					$form->populate($data);  
 					if ($data['date_debut'] > $data['date_fin'])
 					// MTA : modification du message echo "......."
 					$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";
-			
-				//}
-			  }
+					else
+					{
+					 $proposition->save();
+		   			 $this->_helper->redirector('affichercsm');
+					}
+
+			        }
 			}
-			else 
+			else  // form invalide 
 			{
 				$form->populate($data);
 				$this->view->error = "Formulaire invalide !";
@@ -139,6 +138,7 @@ class PropositionController extends Zend_Controller_Action
 			//envoyées précédemment
 			
 			$form->populate($data);
+			
 		}
 		
 }
@@ -162,10 +162,7 @@ class PropositionController extends Zend_Controller_Action
 		
 		//récupération des données envoyées par le formulaire
 		$data_id =  $this->getRequest()->getParams();
-  
-		
-		
-		
+
         // recuperer des données a charger dans le formulaire 
          $proposition = new Default_Model_Proposition();
          $personne = new Default_Model_Personne();
@@ -189,11 +186,7 @@ class PropositionController extends Zend_Controller_Action
 	     $data['_mi_debut_journee'] = $form->getElement('DebutMidi')->getValue();
 	     $data['_date_fin'] = $form->getElement('date_fin')->getValue();
 	     $data['_mi_fin_journee'] = $form->getElement('FinMidi')->getValue();
-	     
-	     
-	    
-		 
-	            
+
 	     // remplie le select avec le  nom et prenom de la personne ayant id personne  
 	     $where = array('id = ?' => $id_personne);
 		 $form->setDbOptions('NomPrenom',new Default_Model_Personne(),'getId','getNomPrenom',$where);
@@ -260,9 +253,7 @@ class PropositionController extends Zend_Controller_Action
 		}
 	}
 	
-	
-// /* MOHAMED KHALIL TAKAFI*/	
-// MTA : EN COURS DE TRAITEMENT !
+
 	//:::::::::::::// ACTION DELETE //::::::::::::://
 	public function deleteAction()
 	{
@@ -281,6 +272,7 @@ class PropositionController extends Zend_Controller_Action
 			$proposition = new Default_Model_Proposition();
 			//appel de la fcontion de suppression avec en argument,
 			//la clause where qui sera appliquée
+
 			$result = $proposition->delete("id=$id");
 
 			//redirection
@@ -292,26 +284,105 @@ class PropositionController extends Zend_Controller_Action
 		}
 	}
 		/*
-		 * cette fonction permet é l'admin de valiser les propositions et les enregistré dans 
+		 * cette fonction permet é l'admin de valider les propositions et les enregistré dans 
 		 * la table :conge
 		 */
 	//:::::::::::::// ACTION ACCEPTER //::::::::::::://
 	public function accepterAction()
 	{
-		//récupére les paramétres de la requéte
-		
+		//récupére les paramétres de la requéte	
 		$params = $this->getRequest()->getParams();
-		//vérifie que le paramétre id existe
-		
-		
+        
+		$personne = new Default_Model_Personne();
+		$proposition = new Default_Model_Proposition();
+		$result = $proposition->find($params['id']);
+        $personne->find($proposition->getId_personne());
+        
+
+     
+        if(isset($params['id']))
+		{   
+
+		        // si c'est une proposition " CSM " on ne verifie pas le solde    	
+		    	if($personne->getCentre_service() == '1')
+		    	{ 
+		    			$conge = new Default_Model_Conge();
+		    			    	
+				    	// sauvegarder les données recus de la requete 
+				    	$id_proposition = $proposition->getId(); 
+				    	$id_personne = $proposition->getId_personne(); 
+				    	$date_debut =$proposition->getDate_debut(); 
+				    	$date_fin = $proposition->getDate_fin();
+				    	$debut_midi = $proposition->getMi_debut_journee();
+				    	$fin_midi = $proposition->getMi_fin_journee();
+				    	
+				    	// mettre l'etat de la proposition à OK
+				    	$etat = $proposition->setEtat("OK")->save();  
+			            
+				    	// extraire l'année de reference depuis la date de debut 
+				    	$time = strtotime($date_debut);
+		                $annee_ref = date('Y',$time);
+				        
+		                $id_type_conge = '1';
+		                $ferme = '1';
+
+	                    
+		                // verification si le conge existe ou pas !
+						$cong = new Default_Model_Conge();
+   	                    $r = $cong->fetchAll(NULL);
+
+   	                    for($i=0;$i<count($r);$i++)
+                        {
+                             if ( $r[$i]->getId_proposition() == $proposition->getId() )
+   	                    	        $conge->setId($r[$i]->getId()); //  si le conge exite Update   	   
+                        }
+																	// sinon insert 
+							// remplir l'objet conge avec les informations necessaires 
+						
+							$conge->setId_proposition($id_proposition);
+			                $conge->setId_personne($id_personne);
+			                $conge->setDate_debut($date_debut);
+			                $conge->setDate_fin($date_fin);
+			                $conge->setMi_debut_journee($debut_midi);
+			                $conge->setMi_fin_journee($fin_midi);
+			                $conge->setNombre_jours();
+			                $conge->setAnnee_reference($annee_ref);
+			                $conge->setId_type_conge( $id_type_conge);
+			                $conge->setFerme($ferme); 	
+			                // sauvgarder la proposition en conge				
+							$conge->save();  
+
+			
+	
+				    	//redirection
+				        $this->_helper->redirector('affichercsm');
+
+		    	}
+		    	// si c'est un conge " France " on verifie le solde  	  //// pas encore terminé !!! 
+                elseif($personne->getCentre_service() == '0')
+                {
+                
+                		if($params['solde'] == 2  || $params['solde'] == 1 )
+						{
+                	          
+						}
+						elseif($params['solde'] == 0)
+						{
+							
+						}
+                	
+		    	}
+	  
+		 }  
+    }
+	
+/*
 	if(isset($params['id']))
 	{
 			$id = $params['id'];
-		
+
 		if ($params['solde']== 2)
 		{
-			
-			
 			$proposition = new Default_Model_Proposition();
 			$result = $proposition->find($id);
 			$nombre_jours = $result->getNombre_jours();
@@ -325,15 +396,16 @@ class PropositionController extends Zend_Controller_Action
 			{
 				$parametres = array('id'=>3);
 				//$this->_helper->redirector('message','proposition',$parametres=array('id'=>3));
-				
 				$url = '/proposition/message/id/'.$id;
         		$this->_helper->redirector->gotoUrl($url);
 			}
-		
-		
 		}
+		
+		
+		
+		
 			
-	if($params['solde']==2  || $params['solde']==1 )
+			if($params['solde']==2  || $params['solde']==1 )
 			{
 				
 				$id = $params['id'];
@@ -368,28 +440,19 @@ class PropositionController extends Zend_Controller_Action
 				{
 					$conge->save();
 				}
-				
-				
+
 				//redirection
 				$this->_helper->redirector('afficheradmin');
 		}
 		if($params['solde']==0 )
-		{
-			
+		{		
 			$url = '/proposition/edit/id/'.$id;
-        	$this->_helper->redirector->gotoUrl($url);
-			
-		}
-		
+        	$this->_helper->redirector->gotoUrl($url);			
+		}	
 	}
-	
-	
-		
-	
-	
 
 }
-	
+	*/
 	public function refuserAction()
 	{
 		//récupére les paramétres de la requéte

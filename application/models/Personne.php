@@ -284,7 +284,7 @@ class Default_Model_Personne
 	//permet la suppression
 	public function delete($id)
 	{
-		$this->getMapper()->delete($id);
+		return $this->getMapper()->delete($id);
 	}
 	// cherche le nombre de ressources existant de la table conge
 	public function obtenirColonnes($debut_mois,$fin_mois)

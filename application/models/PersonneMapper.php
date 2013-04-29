@@ -147,6 +147,7 @@ class Default_Model_PersonneMapper
 	public function delete($id)
 	{
 		$result = $this->getDbTable()->delete($id);
+		return $result;
 	}
 	public function obtenirColonnes($debut_mois,$fin_mois)
 	{

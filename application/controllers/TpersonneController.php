@@ -9,29 +9,37 @@ class TpersonneController extends Zend_Controller_Action
     	    $doctypeHelper = new Zend_View_Helper_Doctype();
             $doctypeHelper->doctype('HTML5');
     
-    	$this->_helper->layout->setLayout('mylayout');
-	}
-	
-	public function indexAction()
-		{
-			//création d'un d'une instance Default_Model_Personne
+        	$this->_helper->layout->setLayout('mylayout');
+    	
+    	    //création d'un d'une instance Default_Model_Personne
 			$personne = new Default_Model_Personne();
-			
-	
 			
 	
 			//création de notre objet Paginator avec comme paramètre la méthode
 			//récupérant toutes les entrées dans notre base de données
 			$paginator = Zend_Paginator::factory($personne->fetchAll($str =array()));
+			
 			//indique le nombre déléments à afficher par page
 			$paginator->setItemCountPerPage(20);
+			
 			//récupère le numéro de la page à afficher
 			$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
-	
-			//$this->view permet d'accéder à la vue qui sera utilisée par l'action
-			//on initialise la valeur usersArray de la vue
-			//(cf. application/views/scripts/users/index.phtml)
+			
 			$this->view->personneArray = $paginator;
+			// instanciation de la session
+	    
+    	
+	}
+	
+	public function indexAction()
+		{  
+		
+			
+			
+			
+			
+			
+			
 		}
 		
     public function createpAction()
@@ -62,12 +70,12 @@ class TpersonneController extends Zend_Controller_Action
             	{
             	$personne->setNom($data['Nom']);
             	$personne->setPrenom($data['Prenom']);
-            	$personne->setDate_entree($data['date_entree']);
+            	$personne->setDate_entree(date('Y-m-d',strtotime($data['date_entree'])));
             	$personne->setId_pole($data['pole']);
             	$personne->setId_fonction($data['fonction']);
             	$personne->setPourcent($data['pourcentage']);
             	$personne->setStage($data['Stage']);
-            	$personne->setDate_debut($data['date_debut']);
+            	$personne->setDate_debut(date('Y-m-d',strtotime($data['date_debut'])));
             	$personne->setDate_fin('00/00/0000');
             	
             	/*
@@ -149,7 +157,7 @@ class TpersonneController extends Zend_Controller_Action
 	            	{
 	            	$personne->setNom($data['Nom']);
 	            	$personne->setPrenom($data['Prenom']);
-	            	$personne->setDate_entree($data['date_entree']);
+	            	$personne->setDate_entree(date('Y-m-d',strtotime($data['date_entree'])));
 		             $entite = $personne->getEntite()->find((int) $data['entite']);
 		               $personne->setId_entite($entite->getId());
 		               $personne->setCentre_service($entite->getCs());
@@ -158,7 +166,7 @@ class TpersonneController extends Zend_Controller_Action
 	            	$personne->setId_fonction($data['fonction']);
 	            	$personne->setPourcent($data['pourcentage']);
 	            	$personne->setStage($data['Stage']);
-	            	$personne->setDate_debut($data['date_debut']);
+	            	$personne->setDate_debut(date('Y-m-d',strtotime($data['date_debut'])));
 	            	$personne->setDate_fin('00/00/0000');
 	            	
 	            	
@@ -261,12 +269,12 @@ class TpersonneController extends Zend_Controller_Action
 			               {
 		                            $personne->setNom($data['Nom']);
 					            	$personne->setPrenom($data['Prenom']);
-					            	$personne->setDate_entree($data['date_entree']);
+					            	$personne->setDate_entree(date('Y-m-d',strtotime($data['date_entree'])));
 					            	$personne->setId_pole($data['pole']);
 					            	$personne->setId_fonction($data['fonction']);
 					            	$personne->setPourcent($data['pourcentage']);
 					            	$personne->setStage($data['Stage']);
-					            	$personne->setDate_debut($data['date_debut']);
+					            	$personne->setDate_debut(date('Y-m-d',strtotime($data['date_debut'])));
 					            	$personne->setDate_fin('00/00/0000');
 		            	
 					            	/*
@@ -376,7 +384,7 @@ class TpersonneController extends Zend_Controller_Action
 				               {
 			                        $personne->setNom($data['Nom']);
 					            	$personne->setPrenom($data['Prenom']);
-					            	$personne->setDate_entree($data['date_entree']);
+					            	$personne->setDate_entree(date('Y-m-d',strtotime($data['date_entree'])));
 						             $entite = $personne->getEntite()->find((int) $data['entite']);
 						               $personne->setId_entite($entite->getId());
 						               $personne->setCentre_service($entite->getCs());
@@ -385,7 +393,7 @@ class TpersonneController extends Zend_Controller_Action
 					            	$personne->setId_fonction($data['fonction']);
 					            	$personne->setPourcent($data['pourcentage']);
 					            	$personne->setStage($data['Stage']);
-					            	$personne->setDate_debut($data['date_debut']);
+					            	$personne->setDate_debut(date('Y-m-d',strtotime($data['date_debut'])));
 					            	$personne->setDate_fin('00/00/0000');
 	            	
 	            	
@@ -431,37 +439,49 @@ class TpersonneController extends Zend_Controller_Action
 		}// fin entité française
 
 		}
-		public function deleteAction()
+		public function deleteAction() {
+			
+			//à la reception d'une requête ajax
+		
+			if($this->getRequest()->isXmlHttpRequest())
 			{
-				//récupére les paramètres de la requête
-				$params = $this->getRequest()->getParams();
-		
-				//vérifie que le paramètre id existe
-				if(isset($params['id']))
-				{
-					$id = $params['id'];
-		
-					//création du modèle pour la suppression
-					$personne = new Default_Model_Personne();
+				//récupération des données envoyé par ajax
+				$data = $this->getRequest()->getPost();
+				$id = $data['id'];
+				
+				$personne = new Default_Model_Personne();
 					//appel de la fcontion de suppression avec en argument,
 					//la clause where qui sera appliquée
 					try {
-					$result = $personne->delete("id=$id");
-					}
+					      $result = $personne->delete("id=$id");
+					      
+				    	}
 					catch (Zend_Db_Exception $e)
-					{
-					
-						
-					//redirection
-					
-				}
-				$this->view->success = 'La suppression de la ressource a été bien effectuée !';
-				$this->_helper->redirector('index');
-				}
-				else
-				{
-					$this->view->error = 'Suppression impossible id manquant !';
-				$this->_helper->redirector('index');			}
+					   {
+					    // en cas d'erreur envoi de reponse avec code erreur [500]
+					       $content = array("status"=>"500","result"=> $result);
+       					  $this->view->error= "Erreur";
+       				      $this->_helper->json($content);
+       				      
+       				       echo $content;
+			        	}
+			        	//en cas de succés envoie de reponse avec code succés [200]
+				         $this->view->success = "Suppression a été effectué";
+			        	 $content = array("status"=>"200","result"=> "1");
+       					
+                        // envoi de reponse en format Json
+       		       		$this->_helper->json($content);
+       
+                         
+        
+       
+        
+				
 			}
+			
+			
+		}
+		
+			
 }
 #endregion MBA

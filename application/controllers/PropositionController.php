@@ -69,7 +69,7 @@ class PropositionController extends Zend_Controller_Action
 		$this->view->title = "Creer une Proposition";
 	
 	
-        $where = array('centre_service = ?' => '1');
+        $where = array('id_entite= ?' => '2');
 	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
 
 	    

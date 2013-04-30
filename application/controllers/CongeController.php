@@ -54,7 +54,7 @@ class CongeController extends Zend_Controller_Action
 		$data = array();
 
 		// remplir le select par les ressources front 
-        $where = array('centre_service = ?' => '0');
+        $where = array('id_entite <> ?' => '2');
 	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
 		
 	    

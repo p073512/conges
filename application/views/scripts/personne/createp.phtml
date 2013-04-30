@@ -6,11 +6,7 @@
 		$this->JQuery()->addStyleSheet($this->baseUrl() . '/js/jquery/themes/smoothness/jquery-ui-1.8.23.custom.css');
 		// MBA : indique le fichier de script javascript à utliser avec jQuery UI
 		$this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
-		
-		
-		$this->Jquery()->addJavascriptFile($this->baseUrl() . 'js/jquery/ui/i18n/jquery.ui.datepicker-fr.js');
-		$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/jquery.ui.datepicker.js')
-		->addOnLoad("$.datepicker.setDefaults($.extend({showMonthAfterYear: false}, $.datepicker.regional['fr']));");
+		$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/i18n/jquery.ui.datepicker-fr.js');
         
       
 		

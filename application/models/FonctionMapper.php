@@ -1,5 +1,5 @@
 <?php
-//"Default" est le namespace défini dans le bootstrap
+//"Default" est le namespace dï¿½fini dans le bootstrap
 class Default_Model_FonctionMapper
 {
 
@@ -27,19 +27,19 @@ class Default_Model_FonctionMapper
 		return $this->_dbTable;
 	}
 
-	//sauve une nouvelle entrée dans la table
+	//sauve une nouvelle entrï¿½e dans la table
 	public function save(Default_Model_Fonction $fonction)
 	{
-		//récupération dans un tableau des données de l'objet $fonction
-		//les noms des clés du tableau correspondent aux noms des champs de la table
+		//rï¿½cupï¿½ration dans un tableau des donnï¿½es de l'objet $fonction
+		//les noms des clï¿½s du tableau correspondent aux noms des champs de la table
 		$data = array(
                	'id' => $fonction->getId(),
 				'libelle' => $fonction->getLibelle()		
 		);
 
-		//on vérifie si un l'objet $fonction contient un id
+		//on vï¿½rifie si un l'objet $fonction contient un id
 		//si ce n'est pas le cas, il s'agit d'un nouvel enregistrement
-		//sinon, c'est une mise à jour d'une entrée à effectuer
+		//sinon, c'est une mise ï¿½ jour d'une entrï¿½e ï¿½ effectuer
 		if(null === ($id = $fonction->getId()))
 		{
 			unset($data['id']);
@@ -51,7 +51,7 @@ class Default_Model_FonctionMapper
 		}
 	}
 
-	//récupére une entrée dans la table
+	//rï¿½cupï¿½re une entrï¿½e dans la table
 	public function find($id, Default_Model_Fonction $fonction)
 	{
 		$result = $this->getDbTable()->find($id);
@@ -59,22 +59,22 @@ class Default_Model_FonctionMapper
 			return;
 		}
 
-		//initialisation de la variable $row avec l'entrée récupérée
+		//initialisation de la variable $row avec l'entrï¿½e rï¿½cupï¿½rï¿½e
 		$row = $result->current();
 
-		//setting des valeurs dans notre objet $users passé en argument
+		//setting des valeurs dans notre objet $users passï¿½ en argument
 		$fonction->setId($row->id);
-		$fonction->setLiblle($row->libelle);
+		$fonction->setLibelle($row->libelle);
 	}
 
-	//récupére toutes les entrées de la table
+	//rÃ©cupÃ©re toutes les entrï¿½es de la table
 	public function fetchAll($str)
 	{
-		//récupération dans la variable $resultSet de toutes les entrées de notre table
+		//rÃ©cupÃ©ration dans la variable $resultSet de toutes les entrÃ©es de notre table
 		$resultSet = $this->getDbTable()->fetchAll($str);
 
-		//chaque entrée est représentée par un objet Default_Model_Fonction
-		//qui est ajouté dans un tableau
+		//chaque entrï¿½e est reprï¿½sentï¿½e par un objet Default_Model_Fonction
+		//qui est ajoutÃ© dans un tableau
 		$entries = array();
 		foreach($resultSet as $row)
 		{
@@ -89,7 +89,7 @@ class Default_Model_FonctionMapper
 	}
 
 	//permet de supprimer un utilisateur,
-	//reçoit la condition de suppression (le plus souvent basé sur l'id)
+	//reï¿½oit la condition de suppression (le plus souvent basï¿½ sur l'id)
 	public function delete($id)
 	{
 		$result = $this->getDbTable()->delete($id);

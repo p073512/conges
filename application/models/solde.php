@@ -3,11 +3,15 @@
 class Default_Model_Solde
 {
 	//variables correspondant à chacun des champs de notre table users
-	protected  $_id_personne;
+	protected  $personne;
 	protected  $_total_q1;
 	protected  $_total_q2;
 	protected  $_total_cp;
 	protected  $_annee_reference;
+	
+	protected $_referenceMap =array('SoldeConge'=>array('columns' => 'id_personne',
+	                                                'refTableClass' => 'Default_Model_DbTable_Personne',
+	                                                'refColumns'=>'id'));
 	
 	
 	//le mapper va nous fournir les méthodes pour interagir avec notre table (objet de type Default_Model_PersonneMapper)
@@ -18,6 +22,7 @@ class Default_Model_Solde
 	//pour l'initialisation de l'objet
 	public function __construct(array $options = null)
 	{
+		$this->personne = new Default_Model_Personne();
 		if (is_array($options)) {
 			$this->setOptions($options);
 		}
@@ -61,15 +66,23 @@ class Default_Model_Solde
 	}
 
 	//gettors and settors d'accès aux variables
-	public function setId_personne($id_personne)
+	public function setPersonne($personne)
 	{
-		$this->_id_personne = (int)$id_personne;
-		return $this;
+		if($personne instanceof Default_Model_Personne)
+			{
+				$this->personne = $personne;
+			}
+			else 
+			{
+				$this->personne = $this->personne->find((int) $personne);
+			}
+		
+	   return $this;
 	}
 
-	public function getId_personne()
+	public function getPersonne()
 	{
-		return $this->_id_personne ;
+		return $this->personne ;
 	}
 
 	public function setTotal_q1($modalite)
@@ -145,14 +158,14 @@ class Default_Model_Solde
 	}
 
 	//récupère une entrée particulière
-	public function find($id_personne,$annee_reference)
+	public function find($annee_reference)
 	{
-		$this->getMapper()->find($id_personne,$annee_reference, $this);
+		$this->getMapper()->find($annee_reference, $this);
 		return $this;
 	}
-	public function find2($id_personne,$annee_reference)
+	public function find2($annee_reference)
 	{
-		$this->getMapper()->find2($id_personne,$annee_reference, $this);
+		$this->getMapper()->find2($annee_reference, $this);
 		return $this;
 	}
 
@@ -245,8 +258,8 @@ class Default_Model_Solde
 	$jours_ouvres_de_annee_ref = $conge->joursOuvresDuMois($debut_mois,$fin_mois);
 	$nbr_heurs_ouvrees_annee = ($jours_ouvres_de_annee_ref -14) *7.4;
 	$personne = new Default_Model_Personne();
-	$id_entite =1;
-	$personne = $personne->fetchall('id_entite ='.$id_entite. '&&'. 'id ='.$this->getId_personne());
+	$id_entite =1; // MBA : pourquoi entite 1 pour personne? 
+	$personne = $personne->fetchall('id_entite ='.$id_entite. '&&'. 'id ='.$this->getPersonne()->getId());
 	//var_dump($personne);
 	if (null!==$personne)
 	

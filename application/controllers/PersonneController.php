@@ -1,285 +1,450 @@
 <?php
+#region MBA
 class PersonneController extends Zend_Controller_Action
 {
-	//action par dÈfaut
-	public function indexAction()
-	{
-		//crÈation d'un d'une instance Default_Model_Personne
-		$personne = new Default_Model_Personne();
+    // indexAction() ici ...
+ 
+	public function preDispatch(){
 		
-
-		//$this->view permet d'accÈder ‡ la vue qui sera utilisÈe par l'action
-		//on initialise la valeur usersArray de la vue
-		//(cf. application/views/scripts/users/index.phtml)
-		//la valeur correspond ‡ un tableau d'objets de type Default_Model_Personne rÈcupÈrÈs par la mÈthode fetchAll()
-		//$this->view->usersArray = $personne->fetchAll();
-
-		//crÈation de notre objet Paginator avec comme paramËtre la mÈthode
-		//rÈcupÈrant toutes les entrÈes dans notre base de donnÈes
-		$paginator = Zend_Paginator::factory($personne->fetchAll($str =array()));
-		//indique le nombre dÈlÈments ‡ afficher par page
-		$paginator->setItemCountPerPage(20);
-		//rÈcupËre le numÈro de la page ‡ afficher
-		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
-
-		//$this->view permet d'accÈder ‡ la vue qui sera utilisÈe par l'action
-		//on initialise la valeur usersArray de la vue
-		//(cf. application/views/scripts/users/index.phtml)
-		$this->view->personneArray = $paginator;
+    	    $doctypeHelper = new Zend_View_Helper_Doctype();
+            $doctypeHelper->doctype('HTML5');
+    
+        	$this->_helper->layout->setLayout('mylayout');
+    	
+    	   
+    	
 	}
-
-	public function createAction()
-	{
-		//initialisation tableau d'erreur
-		//$error = array();
-		
-		//crÈation du fomulaire
-		$form = new Default_Form_Personne();
-		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'personne', 'action' => 'create'), 'default', true));
-		$form->submit_pr->setLabel('Ajouter');
-
-		//assigne le formulaire ‡ la vue
-		$this->view->form = $form;
-		$this->view->title = "Ajouter Une Ressource";
-		//si la page est POSTÈe = formulaire envoyÈ
-		if($this->_request->isPost())
-		{
-			//rÈcupÈration des donnÈes envoyÈes par le formulaire
-			$data = $this->_request->getPost();
-
-			//vÈrifie que les donnÈes rÈpondent aux conditions des validateurs
-			if($form->isValid($data))
-			{
-				//crÈation et initialisation d'un objet Default_Model_Personne
-				//qui sera enregistrÈ dans la base de donnÈes
-				$personne = new Default_Model_Personne();
-				$personne->setNom($form->getValue('nom_pr'));
-				$personne->setPrenom($form->getValue('prenom_pr'));
-				$personne->setDate_entree($form->getValue('date_entree_pr'));
-				$personne->setId_pole($form->getValue('id_pole_pr'));
-				$personne->setDate_debut('0000-00-00');
-				$personne->setDate_fin('0000-00-00');
-				
-				//$personne->setId_entite($form->getValue('id_entite_pr'));
-				
-				//MBA : rÈcupÈration de l'entitÈ a partir de l'id entitÈ.
-				$entite = $personne->getEntite()->find((int)$form->getValue('id_entite_pr'));
-				$personne->setEntite($entite);
-				
-			
-				$personne->setId_modalite($form->getValue('id_modalite_pr'));
-				$personne->setId_fonction($form->getValue('id_fonction_pr'));
-				
-				//MBA : rÈcupÈration de la valeur centre de service ‡ partir de l'Entit associÈ ‡ Personne
-				$personne->setCentre_service($personne->getEntite()->getCs());
-				$personne->setPourcent($form->getValue('pourcent_pr'));
-				
-				$personne->setStage($form->getValue('stage_pr'));
-                /*
-                 * MBA: vÈrification pour bloquer l'insertion d'un centre de service avec une modalitÈ diffÈrente que 'Aucune ModalitÈ'
-                 */
-               
-				#region MBA
-				
-				if(7 != $form->getElement('id_modalite_pr')->getValue() &&  "1" === $personne->getEntite()->getCs() ) 
-				{
-					echo "la modalitÈ est non compatible avec le centre cservice";
-					
-					$form->populate($data);
-				}
-			
-				/*
-				if($form->getValue('id_modalite_pr')!= 7 && $form->getValue('centre_service_pr') ==1) 
-				{
-					echo "la modalitÈ est no compatible avec le centre cservice";
-					
-					$form->populate($data);
-				}*/
-				#endregion MBA
-				else
-				{
-					
-					$personne->save();
-					/* initialisation du solde conge de la personne cree*/		
-					$resul = $personne ->find ($personne->maxid());
-					$solde= new Default_Model_Solde();
-					$solde ->setId_personne($resul->getId());
-					$solde ->setTotal_cp($form->getValue('date_entree_pr'));
-					
-					    if ($personne->getEntite()->getCs() == 1) //test avec la valeur de cs de l'EntitÈ de Personne au lieu de $form->getValue('centre_service_pr') == 1)
-					{
-						//$solde ->setTotal_q1(0);
-						$solde ->setTotal_q2(0);// a revoir
-					}
-					else 
-					{
-						//$solde ->setTotal_q1($form->getValue('id_modalite_pr'));
-						$solde ->setTotal_q2(1);
-					}
-					$solde ->setTotal_q1($form->getValue('id_modalite_pr'));
-					$solde ->setAnnee_reference();
-					$solde->save();
 	
-					//redirection
-					$this->_helper->redirector('index');
-				}
-			}
-			else
-			{           /*les messages d'erreur retournÈs , un sytËme de redirection de message d'erreur
-				         est ‡ prÈvoir */ 
-				
-		                #region MBA
-				        
-						$errorsMessages =$form->getMessages();
-						// Pour afficher le tableau des erreurs => print_r($errorsMessages);
-						 
-						echo"<em><span style='background-color:rgb(255,0,0)'>";
-						/*
-						// affiche messagge d'erreur si valeur n'est pas entre 0 et 100
-						if(isset($errorsMessages['pourcent_pr']['notBetween']))
-						echo $errorsMessages['pourcent_pr']['notBetween']."<br/>";
-						if(isset($errorsMessages['pourcent_pr']['notDigits']))
-						// affiche messagge d'erreur si valeur n'est pas numÈrique
-						echo $errorsMessages['pourcent_pr']['notDigits']."<br/>";
-						*/
-						if(isset($errorsMessages['pourcent_pr']['regexNotMatch']))
-						echo $errorsMessages['pourcent_pr']['regexNotMatch']."<br/>";
-						echo"</span></em>";
-						echo"</span></em></strong>";
-					//	$this->view->error = $data = array("0"=>'this is an error');
-						
-						
-						#endregion #MBA
-
-
-
-				
-				$form->populate($data);
-			}
-		}
-	}
-
-	public function editAction()
-	{
-		//crÈation du fomulaire
-		$form = new Default_Form_Personne();
-		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'personne', 'action' => 'edit'), 'default', true));
-		$form->submit->setLabel('Modifier');
-
-		//assigne le formulaire ‡ la vue
-		$this->view->form = $form;
-		$this->view->title = "Modifier les donnees d'Une Ressource";
-		//si la page est POSTÈe = formulaire envoyÈ
-		if($this->getRequest()->isPost())
-		{
-			//rÈcupÈration des donnÈes envoyÈes par le formulaire
-			$data = $this->getRequest()->getPost();
-
-			//vÈrifie que les donnÈes rÈpondent aux conditions des validateurs
-			if($form->isValid($data))
-			{
-				//crÈation et initialisation d'un objet Default_Model_Personne
-				//qui sera enregistrÈ dans la base de donnÈes
-				$personne = new Default_Model_Personne();
-				$personne->setId($form->getValue('id'));
-				$personne->setNom($form->getValue('nom_pr'));
-				$personne->setPrenom($form->getValue('prenom_pr'));
-				$personne->setDate_debut('0000-00-00');
-				$personne->setDate_fin('0000-00-00');
-				$personne->setId_pole($form->getValue('id_pole_pr'));
-				$personne->setId_entite($form->getValue('id_entite_pr'));
-				$personne->setId_fonction($form->getValue('id_fonction_pr'));
-				$personne->setCentre_service($form->getValue('centre_service_pr'));
-				$personne->setPourcent($form->getValue('pourcent_pr'));
-				$personne->setStage($form->getValue('stage_pr'));
-				$personne_vant_modif = new default_model_Personne();
-				$personne_vant_modif  = $personne_vant_modif ->find($form->getValue('id'));
-				$date_entree1 = $personne_vant_modif ->getDate_entree();
-				$modalite_base =  $personne_vant_modif ->getId_modalite();
-				$date_entree_base=$form->getValue('date_entree_pr');
-				$modalite = $form->getValue('id_modalite_pr');
-				if ($date_entree1 !=$date_entree_base || $modalite_base != $modalite )
-				{
-					$solde= new Default_Model_Solde();
-					$solde->delete($form->getValue('id'));
-					$solde->setId_personne($form->getValue('id'));
-					$solde ->setTotal_cp($date_entree_base);
-					$solde ->setTotal_q1($modalite);
-					$solde ->setTotal_q2(2);
-					$solde ->setAnnee_reference();
-					$solde->save();
-				}
-				$personne->setDate_entree($date_entree_base);
-				$personne->setId_modalite($modalite);
-				$personne->save();
-
-			
-				//redirection
-				$this->_helper->redirector('index');
-			}
-			else
-			{
-				//si erreur rencontrÈe, le formulaire est rempli avec les donnÈes
-				//envoyÈes prÈcÈdemment
-				$form->populate($data);
-			}
-		}
-		else
-		{
-			//rÈcupÈration de l'id passÈ en paramËtre
-			$id = $this->_getParam('id', 0);
-
-			if($id > 0)
-			{
-				//rÈcupÈration de l'entrÈe
-				$personne = new Default_Model_Personne();
-				$personne = $personne->find($id);
-
-				//assignation des valeurs de l'entrÈe dans un tableau
-				//tableau utilisÈ pour la mÈthode populate() qui va remplir le champs du formulaire
-				//avec les valeurs du tableau
-				$data[] = array();
-				$data['id'] = $personne->getId();
-				$data['nom'] = $personne->getNom();
-				$data['prenom'] = $personne->getPrenom();
-				$data['date_entree'] = $personne->getDate_entree();
-				$data['pole'] = $personne->getId_pole();
-				$data['entite'] = $personne->getId_entite();
-				$data['modalite'] = $personne->getId_modalite();
-				$data['fonction'] = $personne->getId_fonction();
-				$data['centre_service'] = $personne->getCentre_service();
-				$data['pourcent'] = $personne->getPourcent();
-				$data['stage'] = $personne->getStage();
-				$form->populate($data);
-			}
-		}
-	}
-
-	public function deleteAction()
-	{
-		//rÈcupÈre les paramËtres de la requÍte
-		$params = $this->getRequest()->getParams();
-
-		//vÈrifie que le paramËtre id existe
-		if(isset($params['id']))
-		{
-			$id = $params['id'];
-
-			//crÈation du modËle pour la suppression
+	public function indexAction()
+		{  
+		
+			 //cr√©ation d'un d'une instance Default_Model_Personne
 			$personne = new Default_Model_Personne();
-			//appel de la fcontion de suppression avec en argument,
-			//la clause where qui sera appliquÈe
-			$result = $personne->delete("id=$id");
-
-			//redirection
-			$this->_helper->redirector('index');
+			
+	
+			//cr√©ation de notre objet Paginator avec comme param√®tre la m√©thode
+			//r√©cup√©rant toutes les entr√©es dans notre base de donn√©es
+			$paginator = Zend_Paginator::factory($personne->fetchAll($str =array()));
+			
+			//indique le nombre d√©l√©ments √† afficher par page
+			$paginator->setItemCountPerPage(20);
+			
+			//r√©cup√®re le num√©ro de la page √† afficher
+			$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
+			
+			$this->view->personneArray = $paginator;
+			// instanciation de la session
+			
 		}
-		else
+		
+    public function createpAction()
+    {
+    	$this->view->title ='Ajout ressources Marocaines';
+        $request = $this->getRequest();
+        $form    = new Default_Form_PersonneMa();
+        
+        //MBA : Peupl√© les listes d√©roulantes √† partir de la Base de donn√©e
+        $form->setDbOptions('fonction',new Default_Model_Fonction());
+        $form->setDbOptions('pole', new Default_Model_Pole());
+       
+	
+		
+        if ($this->getRequest()->isPost()) {
+        	
+            $data = $request->getPost();
+        	if ($form->isValid($request->getPost())) {
+            	
+            	$personne = new Default_Model_Personne();
+            	
+            	$IsExist = $personne->IsExist($data['Nom'], $data['Prenom']);
+            	if($IsExist>0)
+            	{
+            		$this->view->error = " " . $data['Nom']." ".$data['Prenom']." existe d√©j√† !";
+            	}
+            	else 
+            	{
+            		
+            	$data['date_entree'] = date('Y-m-d',strtotime($data['date_entree']));
+                $data['date_debut'] = date('Y-m-d',strtotime($data['date_debut']));
+                $data['date_fin'] = date('Y-m-d',strtotime('00/00/0000'));
+	               
+	            $personne = new Default_Model_Personne($data);
+            	
+            	/*
+            	 * centre de service,modalit√© et entit√© fig√©s pour le csm
+            	 */
+            	
+            	$personne->setEntite("2");
+            	$personne->setModalite("7");
+            	
+            	
+            	try {
+            			$personne->save();
+            			
+            	}
+                catch (Zend_Db_Exception $e){
+                	  if($form->getElement('fonction')->getValue() == 'x') 
+                      $form->getElement('fonction')->addError("erreur");
+
+                      if($form->getElement('pole')->getValue() == 'x') 
+                      $form->getElement('pole')->addError("erreur");
+				        $this->view->error = "Erreur d'insertion : ".$e->getMessage();
+				     	$form->populate($data); 
+                     
+                }
+                
+            	 $this->view->success = $data['Nom'] . " a √©t√© bien cr√©√© <a href='".$this->_helper->url->url(array('controller' => 'personne', 'action' => 'index'), 'default', true)."'>Afficher la table Personnels </a>";
+            
+                }
+        	}
+            else {
+            	
+            
+            	$form->populate($data); 
+            }  
+        }
+     
+        $this->view->form = $form;
+    }
+    
+	public function createpfAction()
+	    {
+	    	$this->view->title ='Ajout ressources Fran√ßaises';
+	        $request = $this->getRequest();
+	        $form    = new Default_Form_PersonneFr();
+	        
+	        //MBA : Peupl√© les listes d√©roulantes √† partir de la Base de donn√©e
+	        $form->setDbOptions('fonction',new Default_Model_Fonction());
+	        $form->setDbOptions('pole', new Default_Model_Pole());
+	        
+	        // condition sur le champ modalit√© pour ne pas affich√© aucune modalit√© (propore au csm)
+	        $where = array(
+	        'libelle <> ?' => 'Aucune modalite');
+	        $form->setDbOptions('modalite', new Default_Model_Modalite(),'getId','getLibelle',$where);
+	
+	        // condition sur le champ cs pour n'affich√© que les entit√© non cs .
+	        $where = array(
+	        'cs = ?' => 0);
+	        $form->setDbOptions('entite', new Default_Model_Entite(),'getId','getLibelle',$where);
+	        $personne = new Default_Model_Personne();
+	       
+	      
+	       
+			//$form->getElement('fonctions')->setOptions(array('MultiOptions' => Default_Model_Fonction::getFonctions(new Default_Model_Pole()) ));
+			
+	        if ($this->getRequest()->isPost()) {
+	        	
+	            $data = $request->getPost();
+	        	if ($form->isValid($request->getPost())) {
+	            	
+	        	$IsExist = $personne->IsExist($data['Nom'], $data['Prenom']);
+	            	if($IsExist  > 0)
+	            	{
+	            		$this->view->error = " ".$data['Nom']." ".$data['Prenom']." existe d√©j√† !";
+	            	}
+	            	else 
+	            	{
+	            		
+	                $data['date_entree'] = date('Y-m-d',strtotime($data['date_entree']));
+	                $data['date_debut'] = date('Y-m-d',strtotime($data['date_debut']));
+	                $data['date_fin'] = date('Y-m-d',strtotime('00/00/0000'));
+	                $personne = new Default_Model_Personne($data);
+	                
+	            	
+	            	
+	            	try {
+	            			$personne->save();
+	            	}
+	                catch (Zend_Db_Exception $e){
+	                	  if($form->getElement('fonction')->getValue() == 'x') 
+	                      $form->getElement('fonction')->addError("erreur");
+	                      
+	                       if($form->getElement('modalite')->getValue() == 'x') 
+	                      $form->getElement('modalite')->addError("erreur");
+	                      
+	                	  if($form->getElement('entite')->getValue() == 'x') 
+	                      $form->getElement('entite')->addError("erreur");
+	                      
+	                      if($form->getElement('pole')->getValue() == 'x')
+	                      $form->getElement('pole')->addError("erreur");
+	                      
+					        $this->view->error = "Erreur d'insertion : ".$e->getMessage();
+					     	$form->populate($data); 
+	                      var_dump($data);
+	                }
+	                 
+	            	 $this->view->success = $data['Nom'] . " a √©t√© bien cr√©√© <a href='".$this->_helper->url->url(array('controller' => 'personne', 'action' => 'index'), 'default', true)."'>Afficher la table Personnels </a>";
+	            
+	            
+	        	    }
+	        	}
+	            else {
+	            	
+	            	var_dump($data);
+	            	$form->populate($data); 
+	            }  
+	        }
+	      $this->_helper->viewRenderer('createp');
+	        $this->view->form = $form;
+	    }
+    
+	public function editAction()
 		{
-			$this->view->form = 'Impossible delete: id missing !';
-		}
-	}
+			$id = $this->_getParam('id');
+			$personne = new Default_Model_Personne();
+			$personne = $personne->find($id);
+			
+			
+			/*
+			 * G√©n√©ration de formulaire ressource Marocaine
+			 */
+			if( $personne->getEntite()->getCs() == "1")
+			  {//If entit√© marocaine
+				
+			  	$form    = new Default_Form_PersonneMa();
+				//MBA : Peupl√© les listes d√©roulantes √† partir de la Base de donn√©e
+		        $form->setDbOptions('fonction',new Default_Model_Fonction());
+		        $form->setDbOptions('pole', new Default_Model_Pole());
+				$this->view->title ='Modification ressource Marocaine';
+				
+				$PreData['Nom'] = $personne->getNom();
+				$PreData['Prenom'] = $personne->getPrenom();
+				$PreData['fonction']=  intval($personne->getFonction()->getId());
+				$PreData['pole'] = intval($personne->getPole()->getId());
+				$PreData['date_debut'] = date('Y-m-d',strtotime($personne->getDate_debut()));
+				$PreData['date_entree'] = date('Y-m-d',strtotime($personne->getDate_entree()));
+			    $PreData['pourcent'] = intval($personne->getPourcent());
+				$PreData['Stage'] = $personne->getStage();
+				
+				$form->populate($PreData);
+				
+				$this->_helper->viewRenderer('createp');
+				$this->view->form = $form;
+				
+				if($this->getRequest()->isPost())
+		        {
+				//r√©cup√©ration des donn√©es envoy√©es par le formulaire
+				     $data = $this->getRequest()->getPost();
+	              //v√©rifie que les donn√©es r√©pondent aux conditions des validateurs
+				     if($form->isValid($data))
+					 {
+					  	    $isArrayEquals = true;
+					   // v√©rifie si les donn√©es ont subit une modification
+					        foreach($PreData as $k=>$v)
+					        {
+					        	if((string)$PreData[$k] != (string)$data[$k])
+					        	{
+					        		
+					        		$isArrayEquals = false ;
+					        	}
+					        	
+					        }
+					      	
+					    if($isArrayEquals == true)
+			        	   {
+			        	 	$this->view->info = "Vous n'avez modifi√© aucun champ";
+			        	    
+			         	   }
+			         	else 
+			               {
+			               	
+			               	 $data['id'] = $personne->getId();
+			               	 $data['date_entree'] = date('Y-m-d',strtotime($data['date_entree']));
+				             $data['date_debut'] = date('Y-m-d',strtotime($data['date_debut']));
+				             $data['date_fin'] = date('Y-m-d',strtotime('00/00/0000'));
+				             $data['entite'] = $personne->getEntite();
+				             $data['modalite'] = $personne->getModalite();
+				            
+				              $personne = new Default_Model_Personne($data);
+			               	
+		                           
+		
+					            	try {
+						            			$personne->save();
+						            			
+						            	}
+						                catch (Zend_Db_Exception $e){
+						                	  if($form->getElement('fonction')->getValue() == 'x') 
+						                      $form->getElement('fonction')->addError("erreur");
+						
+						                      if($form->getElement('pole')->getValue() == 'x') 
+						                      $form->getElement('pole')->addError("erreur");
+										        $this->view->error = "Erreur d'insertion : ".$e->getMessage();
+										     	$form->populate($data); 
+						                     
+						                }
+						                
+						            	 $this->view->success = $data['Nom'] . " a √©t√© bien modifi√© <a href='".$this->_helper->url->url(array('controller' => 'personne', 'action' => 'index'), 'default', true)."'>Afficher la table Personnels </a>";
+									
+								  } // fin modification personne
+		            } // fin formulaire valide
+		            else
+		            {
+		            	$form->populate($data); 
+		            	
+		            }
+				
+				
+				$this->_helper->viewRenderer('createp');
+				$this->view->form = $form;
+				
+		        	}// fin formulaire envoy√©
+			  } // fin if entit√© marocaine
+			elseif( $personne->getEntite()->getCs() == "0")
+			{
+				
+				$form    = new Default_Form_PersonneFr();
 
+				//MBA : Peupl√© les listes d√©roulantes √† partir de la Base de donn√©e
+			        $form->setDbOptions('fonction',new Default_Model_Fonction());
+			        $form->setDbOptions('pole', new Default_Model_Pole());
+			        
+			        // condition sur le champ modalit√© pour ne pas affich√© aucune modalit√© (propore au csm)
+			        $where = array(
+			        'libelle <> ?' => 'Aucune modalite');
+			        $form->setDbOptions('modalite', new Default_Model_Modalite(),'getId','getLibelle',$where);
+			
+			        // condition sur le champ cs pour n'affich√© que les entit√© non cs .
+			        $where = array(
+			        'cs = ?' => 0);
+			        $form->setDbOptions('entite', new Default_Model_Entite(),'getId','getLibelle',$where);
+	        
+				$this->view->title ='Modification ressource Fran√ßaise';
+				
+					$PreData['Nom'] = $personne->getNom();
+					$PreData['Prenom'] = $personne->getPrenom();
+					$PreData['fonction']= $personne->getFonction()->getId();
+					$PreData['pole'] = $personne->getPole()->getId();
+					$PreData['modalite'] = $personne->getModalite()->getId();
+					$PreData['entite'] = $personne->getEntite()->getId();
+					$PreData['date_debut'] = date('Y-m-d',strtotime($personne->getDate_debut()));
+					$PreData['date_entree'] = date('Y-m-d',strtotime($personne->getDate_entree()));
+					$PreData['pourcent'] = $personne->getPourcent();
+					$PreData['Stage'] = $personne->getStage();
+				
+				$form->populate($PreData);
+				$this->_helper->viewRenderer('createp');
+				$this->view->form = $form;
+				
+			if($this->getRequest()->isPost())
+		        	{
+				//r√©cup√©ration des donn√©es envoy√©es par le formulaire
+				     $data = $this->getRequest()->getPost();
+	              //v√©rifie que les donn√©es r√©pondent aux conditions des validateurs
+				     if($form->isValid($data))
+				      {
+					       $isArrayEquals = true;
+					   // v√©rifie si les donn√©es ont subit une modification
+					        foreach($PreData as $k=>$v)
+					        {
+					        	if((string)$PreData[$k] != (string)$data[$k])
+					        	{
+					        		$isArrayEquals = false;
+					        	}
+					        	
+					        }
+					      	
+						     if($isArrayEquals == true)
+				        	   {
+				        	 	$this->view->info = "Vous n'avez modifi√© aucun champ";
+				        	   
+				         	   }
+				         	else 
+				               {
+				               	
+				                    $data['id'] = $personne->getId();
+					               	$data['date_entree'] = date('Y-m-d',strtotime($data['date_entree']));
+					                $data['date_debut'] = date('Y-m-d',strtotime($data['date_debut']));
+					                $data['date_fin'] = date('Y-m-d',strtotime('00/00/0000'));
+					            
+					                $personne = new Default_Model_Personne($data);
+					          
+	            	
+				            	try {
+				            			$personne->save();
+				            	    }
+				                catch (Zend_Db_Exception $e)
+				                {
+				                	  if($form->getElement('fonction')->getValue() == 'x') 
+				                      $form->getElement('fonction')->addError("erreur");
+				                      
+				                       if($form->getElement('modalite')->getValue() == 'x') 
+				                      $form->getElement('modalite')->addError("erreur");
+				                      
+				                	  if($form->getElement('entite')->getValue() == 'x') 
+				                      $form->getElement('entite')->addError("erreur");
+				                      
+				                      if($form->getElement('pole')->getValue() == 'x')
+				                      $form->getElement('pole')->addError("erreur");
+				                      
+								        $this->view->error = "Erreur d'insertion : ".$e->getMessage();
+								     	$form->populate($data); 
+				                      var_dump($data);
+				                }
+	                 
+	                    $this->view->success = $data['Nom']. " a √©t√© bien modifi√© <a href='".$this->_helper->url->url(array('controller' => 'personne', 'action' => 'index'), 'default', true)."'>Afficher la table Personnels </a>";
+						
+						
+					     	  }// fin modification personne
+		          
+				
+			}// fin formulaire valide
+			else 
+			{
+				$form->populate($data); 
+			}
+				
+				
+				$this->_helper->viewRenderer('createp');
+				$this->view->form = $form;
+			} // fin formulaire envoy√©
+			
+		}// fin entit√© fran√ßaise
+
+		}
+		public function deleteAction() {
+			
+			//√† la reception d'une requ√™te ajax
+		
+			if($this->getRequest()->isXmlHttpRequest())
+			{
+				//r√©cup√©ration des donn√©es envoy√© par ajax
+				$data = $this->getRequest()->getPost();
+				$id = $data['id'];
+				
+				$personne = new Default_Model_Personne();
+					//appel de la fcontion de suppression avec en argument,
+					//la clause where qui sera appliqu√©e
+					try {
+					      $result = $personne->delete("id=$id");
+					      
+				    	}
+					catch (Zend_Db_Exception $e)
+					   {
+					    // en cas d'erreur envoi de reponse avec code erreur [500]
+					       $content = array("status"=>"500","result"=> $result);
+       					  $this->view->error= "Erreur";
+       				      $this->_helper->json($content);
+       				      
+       				       echo $content;
+			        	}
+			        	//en cas de succ√©s envoie de reponse avec code succ√©s [200]
+				         $this->view->success = "Suppression a √©t√© effectu√©";
+			        	 $content = array("status"=>"200","result"=> "1");
+       					
+                        // envoi de reponse en format Json
+       		       		$this->_helper->json($content);
+       
+                         
+        
+       
+        
+				
+			}
+			
+			
+		}
+		
+			
 }
+#endregion MBA

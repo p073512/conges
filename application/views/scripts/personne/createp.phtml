@@ -6,8 +6,18 @@
 		$this->JQuery()->addStyleSheet($this->baseUrl() . '/js/jquery/themes/smoothness/jquery-ui-1.8.23.custom.css');
 		// MBA : indique le fichier de script javascript à utliser avec jQuery UI
 		$this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
-		$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/jquery.ui.datepicker.js');
-				   
+		
+		
+		$this->Jquery()->addJavascriptFile($this->baseUrl() . 'js/jquery/ui/i18n/jquery.ui.datepicker-fr.js');
+		$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/jquery.ui.datepicker.js')
+		->addOnLoad("$.datepicker.setDefaults($.extend({showMonthAfterYear: false}, $.datepicker.regional['fr']));");
+        
+      
+		
+		
+		?>
+				  
+				   <?php 
 	  echo $this->jQuery(); 
 	  ?> 
  
@@ -21,13 +31,13 @@
                   </a>
                   
                    <ul class="dropdown-menu">
-                        <li><a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'index'), 'default', true) ?>">Afficher Personnels</a></li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'index'), 'default', true) ?>">Afficher Personnels</a></li>
                         <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'create'), 'default', true) ?>">Initialiser les soldes</a></li>
                         <li class="nav-header">France</li>
-                        <li><a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'createpf'), 'default', true) ?>">Ajouter Personne</a></li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'createpf'), 'default', true) ?>">Ajouter Personne</a></li>
                         <li class="divider"></li>
                         <li class="nav-header">CSM</li>
-                        <li><a href="<?php echo $this->url(array('controller' => 'tpersonne', 'action' => 'createp'), 'default', true) ?>">Ajouter Personne</a></li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'createp'), 'default', true) ?>">Ajouter Personne</a></li>
                         <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'create'), 'default', true) ?>">Declarer jours feries CSM</a></li>
                         <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'index'), 'default', true) ?>">Afficher jours feries CSM</a></li>
                   </ul>
@@ -53,20 +63,14 @@
 	<div class="container">
 		<div class="well row-fluid">
 					
-	<?php
-	/*
-	 * Si erreurs de traitements* renvoyé depuis le controlleur 
-	 * traitemets : logique, ajout BD, Exception ...
-	 */
-
-	if(isset($this->error)){ 
+	<?php 	if(!empty($this->error)){ 
 	?>
-	
+
       <!-- afficage alerte avec message d'erreur -->
 			<div class="alert">
 				<button type="button" class="close " data-dismiss="alert"></button>
 				<strong>Alerte!</strong>  <?php //Message d'erreur
-                                         echo "error :".$this->error; ?>
+                                         echo "Erreur :".$this->error; ?>
 			</div>
 
 	<?php }
@@ -75,15 +79,26 @@
 	 * traitemets : logique, ajout BD, Exception ...
 	 */
 	
-	else if(isset($this->success)){
+	 if(!empty($this->info)){
 	?>
 	
 	<!-- afficage message succés  -->
             <div class="alert alert-info">
 				<button type="button" class="close " data-dismiss="alert"></button>
-				<strong>Succes!</strong> <?php //Message succes
-	                                      echo $this->success ."' a été bien créé <a href='".$this->url(array('controller' => 'tpersonne', 'action' => 'index'), 'default', true)."'>Afficher la table Personnels </a>"; ?>
+				<strong>info :</strong> <?php //Message succes
+	                                      echo $this->info; ?>
 			</div>
+			
+	<?php } if(!empty($this->success)){?>
+	
+	
+	<!-- afficage message succés  -->
+            <div class="alert alert-success">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>success :</strong> <?php //Message succes
+	                                      echo $this->success; ?>
+			</div>
+			
 	<?php }?>
 	
 		<!-- ICI L'AFFICHAGE DU FORMULAIRE -->

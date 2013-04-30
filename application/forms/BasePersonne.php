@@ -1,6 +1,6 @@
 <?php
 #region MBA
-// application/forms/TPersonne.php
+// application/forms/Personne.php
  
 class Default_Form_BasePersonne extends Default_Form_MyForm
 {   
@@ -180,7 +180,7 @@ public function init()
          *          StringTags (supprime les balises html et php)
          */
 		
-		 $this->iPourcentage = $this->createElement('text','pourcentage',array(
+		 $this->iPourcentage = $this->createElement('text','pourcent',array(
 		 'label' => 'Pourcentage',
 		 'value' => '100',
 		 'required' => true,

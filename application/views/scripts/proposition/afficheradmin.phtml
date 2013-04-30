@@ -95,10 +95,7 @@
         <?php endforeach; ?>
        
     </table>
-
-</div>
-    </br>    <!--  MTA / Mohamed khalil Takafi  -->
-    <?php
+ <?php
     //nous affichons, à la suite du tableau (après la balise </table>), notre template qui permettra de gérer la pagination
     //la méthode pginationControl() prend, ici, 3 arguments:
     //  - l'instane paginator
@@ -106,4 +103,7 @@
     //  - le template de pagination
     echo $this->paginationControl($this->propositionArray, 'Sliding', 'common/my_paginator_control.phtml');
 	?>
+</div>
+    </br>    <!--  MTA / Mohamed khalil Takafi  -->
+   
 </div>

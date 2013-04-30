@@ -612,9 +612,9 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
 
 		$ferie = new Default_Model_Ferie();
 		$jours_feries_csm = $ferie->fetchAll("annee_reference = '".$annee."'");
-		foreach ($jours_feries_csm as $k=>$j) 
+		foreach ($jours_feries_csm as $j) 
 		{
-			$jours_feries_csm_dates[$k] = $j->getDate_debut();
+			$jours_feries_csm_dates[] = $j->getDate_debut();
 		}
 
 		return $jours_feries_csm_dates;

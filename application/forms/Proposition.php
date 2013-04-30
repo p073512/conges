@@ -15,33 +15,15 @@ class Default_Form_Proposition extends Default_Form_MyForm
      	 $this->setName('Create_Proposition');
      	 // Method par défaut du form
          $this->setMethod('post');
-		
-		
-		
-	   	 /*
-         * Champ input type text Nom Prenom 
-         * Validation : requis,
-         */
-		
-         /*
-          * 
-          * $roomSelect->setMultiOptions($roomsTab);
-			$roomSelect->setLabel($this->getTranslator()->translate("Salle :"));
-			$roomSelect->setRequired(true);
-			$roomSelect->addValidator(new Zend_Validate_Int());
-			$this->addElement($roomSelect);
-          * 
-         */
-         
-   
-        
-       
-		$iNomPrenom = $this->createElement('select', 'NomPrenom', array(
-			  															'label'  => 'Nom Prenom',
-			  															'name' => 'NomPrenom',
+
+         $iRessource = $this->createElement('select', 'Ressource', array(
+			  															'label'  => 'Ressource ',
+			  															'name' => 'Ressource',
 		                                                                'required'   => 'true',
+         															    
 																		) 
 	         							   ); 
+       
 	
 
 	         							   
@@ -50,39 +32,41 @@ class Default_Form_Proposition extends Default_Form_MyForm
          * 
          */
 		
-		$iDateDebut = new ZendX_JQuery_Form_Element_DatePicker('date_debut');
-		$iDateDebut->setJQueryParam('dateFormat', 'yy-mm-dd');
-		$iDateDebut->setLabel("Date debut");
-		$iDateDebut->addValidator('date',true,array('date' => 'yy-MM-dd'));
-		$iDateDebut->addDecorator('Ftextinput', array('label'));  
-		$iDateDebut->setRequired(true);   
-		$iDateDebut->setErrorMessages(array("Champs vide !"));
+		$iDebut = new ZendX_JQuery_Form_Element_DatePicker('Debut');
+		$iDebut->setJQueryParam('dateFormat', 'yy-mm-dd');
+		$iDebut->setLabel('Debut ');
+		$iDebut->addValidator('date',true,array('date' => 'yy-MM-dd'));
+		$iDebut->addDecorator('Ftextinput', array('label'));  
+		$iDebut->setRequired(true);   
+		$iDebut->setErrorMessages(array("Date Debut invalide !"));
+
+		
 		/*
          * Debut midi type checkbox 
          * 
          */
 
-		 $iDebutMidi =   new Zend_Form_Element_Checkbox( 'DebutMidi',array('label' => 'Debut Midi'));
+		 $iDebutMidi =   new Zend_Form_Element_Checkbox( 'DebutMidi',array('label' => 'Debut Midi '));
 		
 	    /*
          * Date fin type jquery_x datepicker
          * 
          */
 		
-		$iDateFin = new ZendX_JQuery_Form_Element_DatePicker('date_fin');
-		$iDateFin->setJQueryParam('dateFormat', 'yy-mm-dd');
-		$iDateFin->setLabel("Date fin");
-		$iDateFin->addValidator('date',true,array('date' => 'yy-MM-dd'));
-		$iDateFin->addDecorator('Ftextinput', array('label'));
-        $iDateFin->setRequired(true); 
-        $iDateFin->setErrorMessages(array("Champs vide !"));
+		$iFin = new ZendX_JQuery_Form_Element_DatePicker('Fin');
+		$iFin->setJQueryParam('dateFormat', 'yy-mm-dd');
+		$iFin->setLabel('Fin ');
+		$iFin->addValidator('date',true,array('date' => 'yy-MM-dd'));
+		$iFin->addDecorator('Ftextinput', array('label'));
+        $iFin->setRequired(true); 
+        $iFin->setErrorMessages(array("Date Fin invalide !"));
 		
 		/*
          * Debut midi type checkbox 
          * 
          */
 
-		  $iFinMidi =   new Zend_Form_Element_Checkbox( 'FinMidi',array('label' => 'Fin Midi'));
+		  $iFinMidi =   new Zend_Form_Element_Checkbox( 'FinMidi',array('label' => 'Fin Midi '));
 		
 		/*
          * Debut midi type checkbox 
@@ -96,10 +80,10 @@ class Default_Form_Proposition extends Default_Form_MyForm
 		   
 		//ajout des éléments au formulaire
 		$this->addElements(array(
-								 $iNomPrenom,
-								 $iDateDebut,
+								 $iRessource,
+								 $iDebut,
 								 $iDebutMidi,
-								 $iDateFin,
+								 $iFin,
 								 $iFinMidi,
 								 $iSubmit 
 								 )

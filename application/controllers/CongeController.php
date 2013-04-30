@@ -1,27 +1,34 @@
 <?php
 class CongeController extends Zend_Controller_Action
 {
-	//action par d�faut
+  public function preDispatch() /* MTA : Mohamed khalil Takafi */
+  {
+    	    $doctypeHelper = new Zend_View_Helper_Doctype();
+            $doctypeHelper->doctype('HTML5');
+    		$this->_helper->layout->setLayout('mylayout');
+  }
+	
+	//:::::::::::::// ACTION INDEX //::::::::::::://
 	public function indexAction()
 	{
-		//cr�ation d'un d'une instance Default_Model_Users
+		//création d'un d'une instance Default_Model_Users
 		$conge = new Default_Model_Conge();
 
-		//$this->view permet d'acc�der � la vue qui sera utilis�e par l'action
+		//$this->view permet d'accéder à la vue qui sera utilisée par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
-		//la valeur correspond � un tableau d'objets de type Default_Model_Users r�cup�r�s par la m�thode fetchAll()
+		//la valeur correspond à un tableau d'objets de type Default_Model_Users récupérés par la méthode fetchAll()
 		//$this->view->usersArray = $users->fetchAll();
 
-		//cr�ation de notre objet Paginator avec comme param�tre la m�thode
-		//r�cup�rant toutes les entr�es dans notre base de donn�es
+		//création de notre objet Paginator avec comme paramétre la méthode
+		//récupérant toutes les entrées dans notre base de données
 		$paginator = Zend_Paginator::factory($conge->fetchAll($str =array()));
-		//indique le nombre d�l�ments � afficher par page
+		//indique le nombre déléments à afficher par page
 		$paginator->setItemCountPerPage(20);
-		//r�cup�re le num�ro de la page � afficher
+		//récupére le numéro de la page à afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 
-		//$this->view permet d'acc�der � la vue qui sera utilis�e par l'action
+		//$this->view permet d'accéder à la vue qui sera utilisée par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
 		
@@ -29,17 +36,18 @@ class CongeController extends Zend_Controller_Action
 		$this->view->congeArray = $paginator;
 		
 	}
-
+    
+	//:::::::::::::// ACTION CREATE //::::::::::::://
+	//MTA : OK 
 	public function createcongeAction()
 	{
-		
-		
-		//cr�ation du fomulaire
+
+		//création du fomulaire
 		$form = new Default_Form_Conge();
 		//indique l'action qui va traiter le formulaire
 		//$form->setAction($this->view->url(array('controller' => 'conge', 'action' => 'create'), 'default', true));
 
-        //assigne le formulaire � la vue
+        //assigne le formulaire é la vue
 		$this->view->form = $form;
 		$this->view->title = "Deposer un conge";
 		//$this->view->headLink()->appendStylesheet($this->view->baseUrl().'/css/page2.css');
@@ -61,11 +69,9 @@ class CongeController extends Zend_Controller_Action
 		if($this->_request->isPost())   
 		{
 			
-				// récupération des données envoyés par le formulaire
-				$data = $this->_request->getPost();
-	
-			
-				
+			// récupération des données envoyés par le formulaire
+			$data = $this->_request->getPost();
+
 			//Vérifie si les données répondent aux conditions de validateurs 
 			
 			if($form->isValid($data)) // formulaire valide 
@@ -84,28 +90,37 @@ class CongeController extends Zend_Controller_Action
 				   $this->view->error = "l'annee de reference doit être non nulle !";
 				}
 				elseif ($data['Debut'] > $data['Fin'])
-				{	// MTA : modification du message echo "......."
+				{	
 					$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";	//création et initialisation d'un objet Default_Model_Users
 				}
 				else 
 				{
+			
 				    //qui sera enregistré dans la base de données
 					$conge = new Default_Model_Conge();
-					$conge->setId_personne($form->getValue($data['Ressource']));
-					$conge->setId_type_conge($form->getValue($data['TypeConge']));
-					$conge->setDate_debut($form->getValue($data['Debut']));
-					$conge->setDate_fin($form->getValue($data['Fin']));
-					$conge->setMi_debut_journee($form->getValue($data['DebutMidi']));
-					$conge->setMi_fin_journee($form->getValue($data['FinMidi']));
+					$conge->setId_personne($data['Ressource']);
+					$conge->setId_type_conge($data['TypeConge']);
+					$conge->setDate_debut($data['Debut']);
+					$conge->setDate_fin($data['Fin']);
+					$conge->setMi_debut_journee($data['DebutMidi']);
+					$conge->setMi_fin_journee($data['FinMidi']);
 					$conge->setNombre_jours();
-					$conge->setAnnee_reference($form->getValue($data['AnneeRef']));
-					$conge->setFerme($form->getValue($data['Ferme']));
+					$conge->setAnnee_reference($data['AnneeRef']);
+					$conge->setFerme($data['Ferme']);
+                    
+					try 
+					{
+						$conge->save();
+						//redirection
+						$this->_helper->redirector('afficherconge');
 
-					  $form->populate($data);  
+					} 
+					catch (Exception $e) 
+					{
+						$this->view->error = $e->getMessage();
+					}
 					
-					//$conge->save();
-					//redirection
-					//$this->_helper->redirector('index');
+					
 				}	
 
 
@@ -140,35 +155,39 @@ class CongeController extends Zend_Controller_Action
 				   $this->view->error = "l'annee de reference doit être non nulle !";
 				}
 
-	        $form->populate($data);
+	               $form->populate($data);
 	      
 	      }
 	      
 		}
 	}
+	
+	
+	//:::::::::::::// ACTION EDIT //::::::::::::://
+	//MTA  : KO
 	public function editAction()
 	{
-		//cr�ation du fomulaire
+		//création du fomulaire
 		$form = new Default_Form_Conge();
 		//indique l'action qui va traiter le formulaire
 		$form->setAction($this->view->url(array('controller' => 'conge', 'action' => 'edit'), 'default', true));
 		$form->submit->setLabel('Modifier');
 		$this->view->title = "Modification du conge";
-		//assigne le formulaire � la vue
+		//assigne le formulaire à la vue
 		$this->view->form = $form;
 
-		//si la page est POST�e = formulaire envoy�
+		//si la page est POSTée = formulaire envoyé
 		if($this->getRequest()->isPost())
 		{
-			//r�cup�ration des donn�es envoy�es par le formulaire
+			//récupération des données envoyées par le formulaire
 			$data = $this->getRequest()->getPost();
 
-			//v�rifie que les donn�es r�pondent aux conditions des validateurs
+			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))
 			{
 				
-				//cr�ation et initialisation d'un objet Default_Model_Conge
-				//qui sera enregistr� dans la base de donn�es
+				//création et initialisation d'un objet Default_Model_Conge
+				//qui sera enregistré dans la base de données
 				$conge = new Default_Model_Conge();
 				$conge->setId($form->getValue('id'));
 				$conge->setId_personne($form->getValue('id_personne'));
@@ -198,24 +217,24 @@ class CongeController extends Zend_Controller_Action
 			}
 			else
 			{
-				//si erreur rencontr�e, le formulaire est rempli avec les donn�es
-				//envoy�es pr�c�demment
+				//si erreur rencontrée, le formulaire est rempli avec les données
+				//envoyées précédemment
 				$form->populate($data);
 			}
 		}
 		else
 		{
-			//r�cup�ration de l'id pass� en param�tre
+			//récupération de l'id passé en paramétre
 			$id = $this->_getParam('id', 0);
 
 			if($id > 0)
 			{
-				//r�cup�ration de l'entr�e
+				//récupération de l'entrée
 				$conge = new Default_Model_Conge();
 				$conge = $conge->find($id);
 
-				//assignation des valeurs de l'entr�e dans un tableau
-				//tableau utilis� pour la m�thode populate() qui va remplir le champs du formulaire
+				//assignation des valeurs de l'entrée dans un tableau
+				//tableau utilisé pour la méthode populate() qui va remplir le champs du formulaire
 				//avec les valeurs du tableau
 				$data[] = array();
 				$data['id'] = $conge->getId();
@@ -239,35 +258,46 @@ class CongeController extends Zend_Controller_Action
 		}
 	}
 
+	
+	//:::::::::::::// ACTION DELETE //::::::::::::://
+	// MTA : OK 
 	public function deleteAction()
 	{
-		//r�cup�re les param�tres de la requ�te
+		//récupére les paramétres de la requéte
 		$params = $this->getRequest()->getParams();
 
-		//v�rifie que le param�tre id existe
+		//vérifie que le paramétre id existe
 		if(isset($params['id']))
 		{
 			$id = $params['id'];
 
-			//cr�ation du mod�le pour la suppression
+			//création du modéle pour la suppression
 			$conge = new Default_Model_Conge();
 			//appel de la fcontion de suppression avec en argument,
-			//la clause where qui sera appliqu�e
+			//la clause where qui sera appliquée
 			$result = $conge->delete("id=$id");
 
 			//redirection
-			$this->_helper->redirector('index');
+			$this->_helper->redirector('afficherconge');
 		}
 		else
 		{
 			$this->view->form = 'Impossible delete: id missing !';
 		}
 	}
-	public function rederigerversindexAction ()
+/*	public function rederigerversindexAction ()
 	{
 	   $this->_helper->redirector('index');
 		
 	}
-
-	
+*/
+	public function affichercongeAction()
+	{
+		$conge = new Default_Model_Conge();
+		$paginator = Zend_Paginator::factory($conge->fetchAll($str = array()));
+		$paginator->setItemCountPerPage(10);
+		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
+		$this->view->congeArray = $paginator;
+     		
+	}	
 }

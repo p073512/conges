@@ -405,10 +405,10 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
 						$calendrier[$j][$t]['nom']=$reponse2[0]['nom'];
 						$calendrier[$j][$t]['id']=$reponse2[0]['id'];
 						$calendrier[$j][$t]['prenom']=$reponse2[0]['prenom'];
-						$calendrier[$j][$t]['centre_service']=$reponse2[0]['centre_service'];
+						$calendrier[$j][$t]['centre_service']=$personne->setEntite($reponse2[0]['id_entite'])->getEntite()->getCs();
 						$calendrier[$j][$t]['date_debut']=new Zend_Date($reponse2[0]['date_debut']);
 						$calendrier[$j][$t]['date_fin']=new Zend_Date($reponse2[0]['date_fin']);
-						$calendrier[$j][$t]['nombre_jours']=$this->calculNombreJour(1,$calendrier[$j][$t]['date_debut'],$calendrier[$j][$t]['date_fin'],$reponse2[0]['centre_service'],$reponse2[0]['nombre_jours']);
+						$calendrier[$j][$t]['nombre_jours']=$this->calculNombreJour(1,$calendrier[$j][$t]['date_debut'],$calendrier[$j][$t]['date_fin'],$personne->setEntite($reponse2[0]['id_entite'])->getEntite()->getCs(),$reponse2[0]['nombre_jours']);
 						$calendrier[$j][$t]['id_type_conge']=$tableau_types[$reponse2[0]['id_type_conge']];
 						$calendrier[$j][$t]['mi_debut_journee']=$reponse2[0]['mi_debut_journee'];
 						$calendrier[$j][$t]['mi_fin_journee']=$reponse2[0]['mi_fin_journee'];
@@ -425,24 +425,24 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
 						{
 							$date_debut = new Zend_Date($reponse2[$l]['date_debut']);
 							$date_fin = new Zend_Date($reponse2[$l]['date_fin']);
-							$somme[$l] = $this->calculNombreJour(0,$date_debut,$date_fin,$reponse2[$l]['centre_service'],$reponse2[$l]['nombre_jours']);
+							$somme[$l] = $this->calculNombreJour(0,$date_debut,$date_fin,$personne->setEntite($reponse2[$l]['id_entite'])->getEntite()->getCs(),$reponse2[$l]['nombre_jours']);
 							$totaljours = $totaljours + $somme[$l];
 								
 						}
 						
 					 	
-						if ($reponse2[$i]['centre_service'] ==1) 
+						if ($personne->setEntite($reponse2[$i]['id_entite'])->getEntite()->getCs() ==1) 
 						{
 							$totaljours = $totaljours -  $nb_jr_ouv_mois_ma;
 						}
-						elseif($reponse2[$i]['centre_service'] ==0) 
+						elseif($personne->setEntite($reponse2[$i]['id_entite'])->getEntite()->getCs() ==0) 
 						{
 							$totaljours = $totaljours - $nb_jr_ouv_mois_fr; 
 						}
 						$calendrier[$j][$i]['nom']=$reponse2[$i]['nom'];
 						$calendrier[$j][$i]['id']=$reponse2[$i]['id'];
 						$calendrier[$j][$i]['prenom']=$reponse2[$i]['prenom'];
-						$calendrier[$j][$i]['centre_service']=$reponse2[$i]['centre_service'];
+						$calendrier[$j][$i]['centre_service']=$personne->setEntite($reponse2[$i]['id_entite'])->getEntite()->getCs();
 						$calendrier[$j][$i]['date_debut']=new Zend_Date($reponse2[$i]['date_debut']);
 						$calendrier[$j][$i]['date_fin']=new Zend_Date($reponse2[$i]['date_fin']);
 						$resu =$conge->RecupererLeNombreConge( $tableau_non_doublon[$j],$reponse2[$i]['date_debut']);

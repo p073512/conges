@@ -63,11 +63,11 @@ class SoldeController extends Zend_Controller_Action
 					$personne = $personne->fetchall($str =array());
 					foreach ($personne as $p)
 					{
-						$id_personne = $p->getId();
-						$date_entree = $p->getDate_entree();
-						$modalite = $p->getId_modalite();
 						
-						$solde->setId_personne($id_personne);
+						$date_entree = $p->getDate_entree();
+						$modalite = $p->getModalite()->getId();
+						
+						$solde->setPersonne($p);
 						$solde->setTotal_cp($date_entree);
 						$solde->setTotal_q1($modalite);
 						$solde->setTotal_q2(0);

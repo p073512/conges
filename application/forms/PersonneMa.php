@@ -1,6 +1,6 @@
 <?php
 #region MBA
-// application/forms/TPersonne.php
+// application/forms/Personne.php
  
 class Default_Form_PersonneMa extends Default_Form_BasePersonne
 {

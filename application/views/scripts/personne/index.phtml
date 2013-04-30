@@ -1,6 +1,96 @@
-<div>
-    <table border="1">
-        <tr>
+<?php 
+$this->headScript()->appendFile( $this->baseUrl() .'/js/myScriptPers.js');
+echo $this->headScript();
+?>
+
+<!-- Modal Pour confirmation de suppression -->
+ <div id="myModal" class="modal message hide fade" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" style="display: none;">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+		<h3 id="myModalLabel">Confirmer la suppression</h3>
+	</div>
+	<div class="modal-body">
+		<p></p>
+	</div>
+	<div class="modal-footer">
+		<button class="btn" data-dismiss="modal" aria-hidden="true" id="annulSupp">Annuler</button>
+		<button class="btn  btn-info" id="suppButton">Confirmer</button>
+	</div>
+</div>
+
+<div class="row-fluid offset1">
+		<div id="header-container">
+            
+			<div class="dropdown">
+                  <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
+                     Personnes
+                     <b class="caret"></b>
+                  </a>
+                  
+                   <ul class="dropdown-menu">
+                        <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'index'), 'default', true) ?>">Afficher Personnels</a></li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'create'), 'default', true) ?>">Initialiser les soldes</a></li>
+                        <li class="nav-header">France</li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'createpf'), 'default', true) ?>">Ajouter Personne</a></li>
+                        <li class="divider"></li>
+                        <li class="nav-header">CSM</li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'createp'), 'default', true) ?>">Ajouter Personne</a></li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'create'), 'default', true) ?>">Declarer jours feries CSM</a></li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'index'), 'default', true) ?>">Afficher jours feries CSM</a></li>
+                  </ul>
+              
+			</div><!--MBA : fermeture dropdown -->
+          
+		</div><!-- MBA : fermeture div="header-container" -->
+	</div><!-- MBA : fermeture div="row-fluid -->
+         <br/>
+
+<div class="container">
+	
+		<div class="well row-fluid">
+		<h2>Liste des Ressources :</h2><br/>
+		<div id="msgstate">
+	<?php 	if(!empty($this->error)){ 
+	?>
+
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Alerte!</strong>  <?php //Message d'erreur
+                                         echo "Erreur :".$this->error; ?>
+			</div>
+
+	<?php }
+    /*
+	 * Si erreurs de traitements* renvoyÃ© depuis le controlleur 
+	 * traitemets : logique, ajout BD, Exception ...
+	 */
+	
+	 if(!empty($this->info)){
+	?>
+	
+	<!-- afficage message succÃ©s  -->
+            <div class="alert alert-info">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>info :</strong> <?php //Message succes
+	                                      echo $this->info; ?>
+			</div>
+			
+	<?php } if(!empty($this->success)){?>
+	
+	
+	<!-- afficage message succÃ©s  -->
+            <div class="alert alert-success">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>success :</strong> <?php //Message succes
+	                                      echo $this->success; ?>
+			</div>
+			
+	<?php }?>
+	</div>
+    <table class="table table-hover ">
+       <thead> 
+       <tr>
            
             <th>Nom</th>
             <th>Prenom</th>
@@ -8,49 +98,51 @@
             <th>Entite</th>
             <th>Pole</th>
             <th>Fonction</th>
-            <th>Centre Service</th>
             <th>Modalite</th>
             <th>Pourcent</th>
             <th>Stage</th>
-            <th> Modifier </th>
-            <th> Supprimer </th>
+            <th>Modifier </th>
+            <th>Supprimer </th>
 
         </tr>
+        </thead>
         <?php
-            //$this->usersArray est une variable qui peut être garnie par le controller
+        
+            //$this->usersArray est une variable qui peut ï¿½tre garnie par le controller
             //elle doit recevoir un tableau contenant des objets de type Default_Model_Proposition
-            //le tableau est parcouru par foreach pour afficher les propiétés des objets contenus dans le tableau
+            //le tableau est parcouru par foreach pour afficher les propiï¿½tï¿½s des objets contenus dans le tableau
             foreach ($this->personneArray as $personne) :
 
         ?>
-        <tr>
-            
+       <tbody> <tr id="<?php echo $personne->id; ?>">
+           
             <td><?php echo $personne->nom; ?></td>
             <td><?php echo $personne->prenom; ?></td>
-            <td><?php echo $personne->date_entree; ?></td>
-            <td><?php echo $personne->id_entite; ?></td>
-            <td><?php echo $personne->id_pole; ?></td>
-            <td><?php echo $personne->id_fonction; ?></td>
-            <td><?php echo $personne->centre_service; ?></td>
-            <td><?php echo $personne->id_modalite; ?></td>
+            <td><?php echo date('d/m/Y',strtotime($personne->date_entree)); ?></td>
+            <td><?php echo $personne->getEntite()->getLibelle(); ?></td>
+            <td><?php echo $personne->getPole()->getLibelle(); ?></td>
+            <td><?php echo $personne->getFonction()->getLibelle(); ?></td>
+            <td><?php echo $personne->getModalite()->getLibelle(); ?></td>
             <td><?php echo $personne->pourcent; ?></td>
             <td><?php echo $personne->stage; ?></td>
         <td>
-                <a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'edit', 'id' => $personne->id), 'default', true); ?>">Edit</a>
+              <a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'edit', 'id' => $personne->id), 'default', true); ?>"><i  class="icon-pencil"></i></a>
             </td>
            <td>
-                <a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'delete', 'id' => $personne->id), 'default', true); ?>">Delete</a>
+                <!-- <a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'index', 'act' =>'delete','id' => $personne->id, 'page' => $this->page), 'default', true); ?>">Delete</a>  --><i class="icon-remove" id= "<?php echo $this->url(array('controller' => 'personne', 'action' => 'delete',), 'default', true); ?>"></i>
             </td>
 
         </tr>
-        <?php endforeach; ?>
+        <?php endforeach; ?></tbody>
     </table>
     <?php
-    //nous affichons, à la suite du tableau (après la balise </table>), notre template qui permettra de gérer la pagination
-    //la méthode pginationControl() prend, ici, 3 arguments:
+    //nous affichons, ï¿½ la suite du tableau (aprÃ©s la balise </table>), notre template qui permettra de gï¿½rer la pagination
+    //la mÃ©thode pginationControl() prend, ici, 3 arguments:
     //  - l'instane paginator
-    //  - le style de défilement
+    //  - le style de dÃ©filement
     //  - le template de pagination
     echo $this->paginationControl($this->personneArray, 'Sliding', 'common/my_paginator_control.phtml');
 	?>
+	
+	</div>
 </div>

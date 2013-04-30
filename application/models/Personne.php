@@ -1,40 +1,47 @@
 <?php
-//"Default" correspond au namespace que nous avons défini dans le bootstrap
+//"Default" correspond au namespace que nous avons dï¿½fini dans le bootstrap
 class Default_Model_Personne
 {
-	//variables correspondant à chacun des champs de notre table users
-	protected  $_id;
+	//variables correspondant Ã  chacun des champs de notre table users
+	protected  $id;
 	protected  $_nom;
 	protected  $_prenom;
 	protected  $_date_entree;
 	protected  $_date_debut;
 	protected  $_date_fin;
-	protected  $_id_entite;
-	protected  $_id_pole;
-	protected  $_id_modalite;
-	protected  $_id_fonction;
-	protected  $_pourcent;
-	protected  $_centre_service;
-	protected  $_stage;
 	protected  $entite;
+	protected  $pole;
+	protected  $modalite;
+    protected  $fonction;
+	protected  $_pourcent;
+	protected  $_stage;
+	
 
 	
 	
-	//le mapper va nous fournir les méthodes pour interagir avec notre table (objet de type Default_Model_PersonneMapper)
+	//le mapper va nous fournir les mï¿½thodes pour interagir avec notre table (objet de type Default_Model_PersonneMapper)
 	protected $_mapper;
 
 	//constructeur
-	//le tableau d'options peut contenir les valeurs des champs à utiliser
+	//le tableau d'options peut contenir les valeurs des champs ï¿½ utiliser
 	//pour l'initialisation de l'objet
 	public function __construct(array $options = null)
 	{
+		
+		$this->entite = new Default_Model_Entite();
+		$this->modalite = new Default_Model_Modalite();
+		$this->fonction = new Default_Model_Fonction();
+		$this->pole = new Default_Model_Pole();
+		
 		if (is_array($options)) {
 			$this->setOptions($options);
 		}
-		$this->entite = new Default_Model_Entite();
+		
+		
+		
 	}
 
-	//cette méthode permet d'appeler n'importe quel settor en fonction
+	//cette mÃ©thode permet d'appeler n'importe quel settor en fonction
 	//des arguments
 	public function __set($name, $value)
 	{
@@ -45,8 +52,8 @@ class Default_Model_Personne
 		$this->$method($value);
 	}
 
-	//cette méthode permet d'appeler n'importe quel gettor en fonction
-	//du nom passé en argument
+	//cette mÃ©thode permet d'appeler n'importe quel gettor en fonction
+	//du nom passÃ© en argument
 	public function __get($name)
 	{
 		$method = 'get' . $name;
@@ -56,8 +63,8 @@ class Default_Model_Personne
 		return $this->$method();
 	}
 
-	//permet de gérer un tableau d'options passé en argument au constructeur
-	//ce tabelau d'options peut contenir la valeur des champs à utiliser
+	//permet de gÃ©rer un tableau d'options passï¿½ en argument au constructeur
+	//ce tabelau d'options peut contenir la valeur des champs ï¿½ utiliser
 	//pour l'initialisation de l'objet
 	public function setOptions(array $options)
 	{
@@ -71,19 +78,19 @@ class Default_Model_Personne
 		return $this;
 	}
 
-	//gettors and settors d'accès aux variables
+	//gettors and settors d'accÃ©s aux variables
 	public function setId($id)
 	{
-		$this->_id = (int)$id;
+		$this->id = (int)$id;
 		return $this;
 	}
 
 	public function getId()
 	{
-		return $this->_id;
+		return $this->id;
 	}
 
-	// MTA : fonction retourne le nom et prenom concatené 
+	// MTA : fonction retourne le nom et prenom concatenÃ© 
 	public function getNomPrenom()
 	{
 	
@@ -144,64 +151,97 @@ class Default_Model_Personne
 	{
 		return $this->_date_fin;
 	}
-	public function setId_entite($id_entite)
-	{
-		$this->_id_entite = (int)$id_entite;
-		return $this;
-	}
-	public function  getId_entite()
-	{
-		return $this->_id_entite;
-	}
-	/*
-	 * getters et setters de l'objet entité
-	 */
+	
+	
 	#region MBA 
+	/*
+	 * getters et setters de l'objet entitÃ©
+	 */
     public function setEntite($entite)
 	{
-		$this->entite = $entite;
+		if($entite instanceof Default_Model_Entite)
+		{
+			$this->entite = $entite;
+		}
+		else 
+		{
+			$this->entite = $this->entite->find((int) $entite);
+		}
+		
+		
 		return $this;
 	}
 	public function  getEntite()
 	{
 		return $this->entite;
 	}
+	
+	/*
+	 * getters et setters de l'objet modalitï¿½
+	 */
+	public function setModalite($modalite)
+	{
+		if($modalite instanceof Default_Model_Modalite)
+		{
+			$this->modalite = $modalite;
+		}
+		else
+		{
+			$this->modalite = $this->modalite->find((int) $modalite);
+		}
+		
+		return $this;
+	}
+	public function getModalite()
+	{
+		return $this->modalite;
+	}
+	
+	/*
+	 * getters et setters de l'objet fonction
+	 */
+	public function setFonction($fonction)
+	{
+		if($fonction instanceof Default_Model_Fonction)
+		{
+			$this->fonction = $fonction;
+		}
+		else
+		{
+			$this->fonction = $this->fonction->find((int) $fonction);
+		}
+		
+		return $this;
+	}
+	public function getFonction()
+	{
+		return $this->fonction;
+	}
+	
+	/*
+	 * getters et setters de l'objet pole
+	 */
+	public function setPole($pole)
+	{
+		if($pole instanceof Default_Model_Pole)
+		{
+			$this->pole = $pole;
+		}
+		else
+		{
+			$this->pole = $this->pole->find((int) $pole);
+		}
+		
+		return $this;
+	}
+	public function getPole()
+	{
+		return $this->pole;
+	}
+	
+	
     #endregion MBA
-	public function setId_pole($id_pole)
-	{
-		$this->_id_pole = (int)$id_pole;
-		return $this;
-	}
 	
-
-	public function  getId_pole()
-	{
-		return $this->_id_pole;
-	}
-
-	public function setId_modalite($id_modalite)
-	{
-		$this->_id_modalite = (int)$id_modalite;
-		return $this;
-	}
-
-	public function  getId_modalite()
-	{
-		return $this->_id_modalite;
-	}
-	
-	
-	public function setId_fonction($id_fonction)
-	{
-		$this->_id_fonction = (int)$id_fonction;
-		return $this;
-	}
-
-	public function  getId_fonction()
-	{
-		return $this->_id_fonction;
-	}
-
 	
 	public function setPourcent($pourcent)
 	{
@@ -216,17 +256,7 @@ class Default_Model_Personne
 	
 	
 	
-	public function setCentre_service($centre_service)
-	{
-		$this->_centre_service = $centre_service;
-		return $this;
-	}
 
-	public function  getCentre_service()
-	{
-		return $this->_centre_service;
-	}
-	
 	
 	public function setStage($stage)
 	{
@@ -246,7 +276,7 @@ class Default_Model_Personne
 	}
 	public function getMapper()
 	{
-		//si la valeur $_mapper n'est pas initialisée, on l'initialise (
+		//si la valeur $_mapper n'est pas initialisï¿½e, on l'initialise (
 		if(null == $this->_mapper){
 			$this->setMapper(new Default_Model_PersonneMapper());
 		}
@@ -254,28 +284,28 @@ class Default_Model_Personne
 		return $this->_mapper;
 	}
 
-	//méthodes de classe utilisant les méthodes du mapper
-	//crée ou met à jour une entrée dans la table
+	//mï¿½thodes de classe utilisant les mï¿½thodes du mapper
+	//crï¿½e ou met ï¿½ jour une entrï¿½e dans la table
 	public function save()
 	{
 		$this->getMapper()->save($this);
 	}
 
-	//récupère une entrée particulière
+	//rï¿½cupï¿½re une entrï¿½e particuliï¿½re
 	public function find($id)
 	{
 		$this->getMapper()->find($id, $this);
 		return $this;
 	}
 
-	// vérifie si personne exist par nom et prenom
+	// vï¿½rifie si personne exist par nom et prenom
 	public function IsExist($nom,$prenom)
 	{
 		return $this->getMapper()->IsExist($nom,$prenom);
 	}
 	
 	
-	//récupère toutes les entrées de la table
+	//rï¿½cupï¿½re toutes les entrï¿½es de la table
 	public function fetchAll($str,$where = null)
 	{
 		return $this->getMapper()->fetchAll($where,$str);

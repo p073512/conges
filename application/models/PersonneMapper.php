@@ -1,8 +1,8 @@
 <?php
-//"Default" est le namespace défini dans le bootstrap
+//"Default" est le namespace dï¿½fini dans le bootstrap
 class Default_Model_PersonneMapper
 {
-	//$_dbTable va faire référence à un objet Zend_Db_Table_Abstract
+	//$_dbTable va faire rÃ©fÃ©rence Ã  un objet Zend_Db_Table_Abstract
 	//dans notre cas la classe Default_Model_DbTable_Personne
 	//du fichier application/models/DbTable/Personne.php
 	protected $_dbTable;
@@ -29,11 +29,11 @@ class Default_Model_PersonneMapper
 		return $this->_dbTable;
 	}
 
-	//sauve une nouvelle entrée dans la table
+	//sauve une nouvelle entrÃ©e dans la table
 	public function save(Default_Model_Personne $personne)
 	{
-		//récupération dans un tableau des données de l'objet $Personne
-		//les noms des clés du tableau correspondent aux noms des champs de la table
+		//rÃ©cupuration dans un tableau des donnÃ©es de l'objet $Personne
+		//les noms des clÃ©s du tableau correspondent aux noms des champs de la table
 		$data = array(
                	'id' => $personne->getId(),
                	'nom' => $personne->getNom(),
@@ -42,18 +42,17 @@ class Default_Model_PersonneMapper
 				'date_debut' => $personne->getDate_debut(),
 				'date_fin' => $personne->getDate_fin(),
 				'id_entite' => $personne->getEntite()->getId(),
-				'id_pole' => $personne->getId_pole(),
-				'id_modalite' => $personne->getId_modalite(),
-				'id_fonction' => $personne->getId_fonction(),
+				'id_pole' => $personne->getPole()->getId(),
+				'id_modalite' => $personne->getModalite()->getId(),
+				'id_fonction' => $personne->getFonction()->getId(),
 				'pourcent' => $personne->getPourcent(),
-				'centre_service' => $personne->getCentre_service(),
 				'stage' => $personne->getStage(),
 		);
 		
 
-		//on vérifie si un l'objet $conge contient un id
+		//on vï¿½rifie si un l'objet $conge contient un id
 		//si ce n'est pas le cas, il s'agit d'un nouvel enregistrement
-		//sinon, c'est une mise à jour d'une entrée à effectuer
+		//sinon, c'est une mise Ã  jour d'une entrÃ©e Ã  effectuer
 		if(null === ($id = $personne->getId()))
 		{
 			unset($data['id']);
@@ -65,31 +64,40 @@ class Default_Model_PersonneMapper
 		}
 	}
 
-	//récupére une entrée dans la table
+	//rï¿½cupï¿½re une entrï¿½e dans la table
 	public function find($id, Default_Model_Personne $personne)
 	{
+		
 		$result = $this->getDbTable()->find($id);
 		if (0 == count($result)) 
 		{
 			return;
 		}
 
-		//initialisation de la variable $row avec l'entrée récupérée
+		//initialisation de la variable $row avec l'entrÃ©e rÃ©cupÃ©rÃ©e
 		$row = $result->current();
-
-		//setting des valeurs dans notre objet $Personne passé en argument
+		$RowEntite = $row->findParentRow('Default_Model_DbTable_Entite');
+        $Entite = new Default_Model_Entite($RowEntite->toArray());
+        $RowModalite = $row->findParentRow('Default_Model_DbTable_Modalite');
+        $Modalite = new Default_Model_Modalite($RowModalite->toArray());
+        $RowFonction = $row->findParentRow('Default_Model_DbTable_Fonction');
+        $Fonction = new Default_Model_Fonction($RowFonction->toArray());
+        $RowPole = $row->findParentRow('Default_Model_DbTable_Pole');
+        $Pole = new Default_Model_Pole($RowPole->toArray());
+        
+        
+		//setting des valeurs dans notre objet $Personne passï¿½ en argument
 			$personne->setId($row->id);
 			$personne->setNom($row->nom);
 			$personne->setPrenom($row->prenom);
 			$personne->setDate_entree($row->date_entree);
 			$personne->setDate_debut($row->date_debut);
 			$personne->setDate_fin($row->date_fin);
-			$personne->setId_entite($row->id_entite);
-			$personne->setId_pole($row->id_pole);
-			$personne->setId_modalite($row->id_modalite);
-			$personne->setId_fonction($row->id_fonction);
-			$personne->setPourcent($row->pourcent);
-			$personne->setCentre_service($row->centre_service);
+			$personne->setEntite($Entite);
+			$personne->setModalite($Modalite);
+			$personne->setFonction($Fonction);
+			$personne->setPole($Pole);
+		    $personne->setPourcent($row->pourcent);
 			$personne->setStage($row->stage);
 	}
 	
@@ -109,14 +117,14 @@ class Default_Model_PersonneMapper
                
 	}
 
-	//récupére toutes les entrées de la table
+	//rï¿½cupï¿½re toutes les entrï¿½es de la table
 	public function fetchAll($str,$where = null)
 	{
-		//récupération dans la variable $resultSet de toutes les entrées de notre table
+		//rï¿½cupï¿½ration dans la variable $resultSet de toutes les entrï¿½es de notre table
 		$resultSet = $this->getDbTable()->fetchAll($where,$str);
 
-		//chaque entrée est représentée par un objet Default_Model_Personne
-		//qui est ajouté dans un tableau
+		//chaque entrï¿½e est reprï¿½sentï¿½e par un objet Default_Model_Personne
+		//qui est ajoutï¿½ dans un tableau
 		$entries = array();
 		foreach($resultSet as $row)
 		{
@@ -127,12 +135,11 @@ class Default_Model_PersonneMapper
 			$entry->setDate_entree($row->date_entree);
 			$entry->setDate_debut($row->date_debut);
 			$entry->setDate_fin($row->date_fin);
-			$entry->setId_entite($row->id_entite);
-			$entry->setId_pole($row->id_pole);
-			$entry->setId_modalite($row->id_modalite);
-			$entry->setId_fonction($row->id_fonction);
+			$entry->setEntite($row->id_entite);
+			$entry->setPole($row->id_pole);
+			$entry->setModalite($row->id_modalite);
+			$entry->setFonction($row->id_fonction);
 			$entry->setPourcent($row->pourcent);
-			$entry->setCentre_service($row->centre_service);
 			$entry->setStage($row->stage);
 			$entry->setMapper($this);
 
@@ -143,7 +150,7 @@ class Default_Model_PersonneMapper
 	}
 
 	//permet de supprimer un utilisateur,
-	//reçoit la condition de suppression (le plus souvent basé sur l'id)
+	//reÃ§oit la condition de suppression (le plus souvent basÃ© sur l'id)
 	public function delete($id)
 	{
 		$result = $this->getDbTable()->delete($id);

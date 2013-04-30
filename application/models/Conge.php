@@ -166,9 +166,9 @@ class Default_Model_Conge
         //MTA :  verifié si c'est un CSM ou France     
         $personne = new Default_Model_Personne();
         $per = $personne->find($this->getId_personne());
-        $per->getCentre_service();
+       
         
-        if ($per->getCentre_service() == 1) 
+        if ($per->getEntite()->getCs() == 1) 
         {
 		 $maroc = true;     // maroc 
         }

@@ -27,7 +27,7 @@
 
 	<?php }
     /*
-	 * Si erreurs de traitements* renvoy� depuis le controlleur 
+	 * Si erreurs de traitements* renvoyés depuis le controlleur 
 	 * traitemets : logique, ajout BD, Exception ...
 	 */
 	
@@ -54,8 +54,8 @@
             <th>Fin Journee</th>
             <th>Nombre Jours</th>
             <th>Ferme</th>
-            <th>Edit</th>
-            <th>Delete</th>
+            <th>Modifier</th>
+            <th>Supprimer</th>
         </tr>
         <?php
 
@@ -81,10 +81,10 @@
             <td><?php echo $conge->nombre_jours; ?></td>
             <td><?php echo $conge->ferme; ?></td>
             <td>
-                <a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'edit', 'id' => $conge->id), 'default', true); ?>">Edit</a>
+                <a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'modifier', 'id' => $conge->id), 'default', true); ?>">Modifier</a>
             </td>
            <td>
-                <a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'delete', 'id' => $conge->id), 'default', true); ?>">Delete</a>
+                <a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'Supprimer', 'id' => $conge->id), 'default', true); ?>">Supprimer</a>
             </td>
         </tr>
         <?php endforeach; ?>

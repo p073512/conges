@@ -38,10 +38,10 @@
             <td><?php echo $conge->nombre_jours; ?></td>
             <td><?php echo $conge->ferme; ?></td>
             <td>
-                <a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'edit', 'id' => $conge->id), 'default', true); ?>">Edit</a>
+                <a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'modifier', 'id' => $conge->id), 'default', true); ?>">Modifier</a>
             </td>
            <td>
-                <a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'delete', 'id' => $conge->id), 'default', true); ?>">Delete</a>
+                <a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'supprimer', 'id' => $conge->id), 'default', true); ?>">Supprimer</a>
             </td>
         </tr>
         <?php endforeach; ?>

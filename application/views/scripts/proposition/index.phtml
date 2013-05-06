@@ -11,7 +11,7 @@
                   
                  	 
                    <ul class="dropdown-menu">
-                       <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'createproposition'), 'default', true) ?>">Créer</a></li>
+                       <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'creer'), 'default', true) ?>">Créer</a></li>
                        <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'affichercsm'), 'default', true) ?>">Afficher / Modifier</a></li>
                        <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'afficheradmin'), 'default', true) ?>">Valider / Refuser</a></li>                         
                    </ul>
@@ -87,10 +87,10 @@
             <td><?php echo $proposition->nombre_jours; ?></td>
             <td><?php echo $proposition->etat; ?></td>
             <td>
-                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'edit', 'id' => $proposition->id), 'default', true); ?>">Edit</a>
+                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'modifier', 'id' => $proposition->id), 'default', true); ?>">Modifier</a>
             </td>
            <td>
-                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'delete', 'id' => $proposition->id), 'default', true); ?>">Delete</a>
+                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'supprimer', 'id' => $proposition->id), 'default', true); ?>">Supprimer</a>
             </td>
 
         </tr>

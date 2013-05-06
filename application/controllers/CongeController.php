@@ -1,12 +1,12 @@
 <?php
 class CongeController extends Zend_Controller_Action
 {
-  public function preDispatch() /* MTA : Mohamed khalil Takafi */
-  {
-    	    $doctypeHelper = new Zend_View_Helper_Doctype();
-            $doctypeHelper->doctype('HTML5');
-    		$this->_helper->layout->setLayout('mylayout');
-  }
+	  public function preDispatch() 
+	  {
+	    	    $doctypeHelper = new Zend_View_Helper_Doctype();
+	            $doctypeHelper->doctype('HTML5');
+	    		$this->_helper->layout->setLayout('mylayout');
+	  }
 	
 	//:::::::::::::// ACTION INDEX //::::::::::::://
 	public function indexAction()
@@ -37,21 +37,21 @@ class CongeController extends Zend_Controller_Action
 		
 	}
     
-	//:::::::::::::// ACTION CREATE //::::::::::::://
+	//:::::::::::::// ACTION CREER //::::::::::::://
 	//MTA : OK 
-	public function createcongeAction()
+	public function creerAction()
 	{
 
 		//création du fomulaire
 		$form = new Default_Form_Conge();
 		//indique l'action qui va traiter le formulaire
-		//$form->setAction($this->view->url(array('controller' => 'conge', 'action' => 'create'), 'default', true));
+		//$form->setAction($this->view->url(array('controller' => 'conge', 'action' => 'creer'), 'default', true));
 
         //assigne le formulaire é la vue
 		$this->view->form = $form;
 		$this->view->title = "Deposer un conge";
-		//$this->view->headLink()->appendStylesheet($this->view->baseUrl().'/css/page2.css');
-		$data = array();
+		
+		
 
 		// remplir le select par les ressources front 
         $where = array('centre_service = ?' => '0');
@@ -61,9 +61,10 @@ class CongeController extends Zend_Controller_Action
 	    // remplir le type de conge  
 	    $form->setDbOptions('TypeConge',new Default_Model_TypeConge(),'getId','getCode');
 	    
-	    $this->_helper->viewRenderer('create-conge');
-	    $this->view->form = $form;
-	    
+	  
+		 $this->_helper->viewRenderer('creer');  // creer proposition
+	   
+	    $data = array();   // tableau temporaire 
 	    
 	    // requete POST 
 		if($this->_request->isPost())   
@@ -112,8 +113,7 @@ class CongeController extends Zend_Controller_Action
 					{
 						$conge->save();
 						//redirection
-						$this->_helper->redirector('afficherconge');
-
+                        $this->_helper->Redirector('afficher');  // afficher conge
 					} 
 					catch (Exception $e) 
 					{
@@ -163,105 +163,146 @@ class CongeController extends Zend_Controller_Action
 	}
 	
 	
-	//:::::::::::::// ACTION EDIT //::::::::::::://
-	//MTA  : KO
-	public function editAction()
+	//:::::::::::::// ACTION MODIFIER //::::::::::::://
+	//MTA  : OK
+	public function modifierAction()
 	{
+		$this->_helper->viewRenderer('creer'); // creer conge
 		//création du fomulaire
 		$form = new Default_Form_Conge();
 		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'conge', 'action' => 'edit'), 'default', true));
-		$form->submit->setLabel('Modifier');
-		$this->view->title = "Modification du conge";
+		$form->Valider->setLabel('Modifier');
 		//assigne le formulaire à la vue
 		$this->view->form = $form;
+		$this->view->title = "Modifier Conge"; //MTA
 
-		//si la page est POSTée = formulaire envoyé
+
+		//récupération des données envoyées par le formulaire
+		 $data_id =  $this->getRequest()->getParams();
+
+		// recuperer des données a charger dans le formulaire 
+         $conge = new Default_Model_Conge();
+         $personne = new Default_Model_Personne();
+          
+        // recupere l'id personne qui a posé le conge
+         $cong = $conge->find($data_id['id']);
+	     $id_personne =  $cong->getId_personne();  // id personne 
+
+	     $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
+	          
+ 		 $id_type_conge = $cong->getId_type_conge(); // id_conge
+         
+ 		 // stocker les anciennes valeurs du formulaire 
+		 $PreData['Debut']=  $conge->getDate_debut();
+		 $PreData['DebutMidi'] = $conge->getMi_debut_journee();
+		 $PreData['Fin'] = $conge->getDate_fin();
+		 $PreData['FinMidi'] = $conge->getMi_fin_journee();    
+		 $PreData['AnneeRef'] = $conge->getAnnee_reference();
+		 $PreData['TypeConge'] = $conge->getId_type_conge();
+		 $PreData['Ferme'] = $conge->getFerme(); 
+
+		 
+		 // stocker les nouvelles valeurs du formulaire 
+	     $data = array();
+	     $data['_date_debut'] = $form->getElement('Debut')->getValue();
+	     $data['_mi_debut_journee'] = $form->getElement('DebutMidi')->getValue();
+	     $data['_date_fin'] = $form->getElement('Fin')->getValue();
+	     $data['_mi_fin_journee'] = $form->getElement('FinMidi')->getValue();
+	     $data['_annee_reference'] = $form->getElement('AnneeRef')->getValue();
+	      $data['_id_type_conge'] = $form->getElement('TypeConge')->getValue();
+	     $data['_ferme'] = $form->getElement('Ferme')->getValue();
+		 
+	      // remplie le select avec les types de conge qui existent
+		  $form->setDbOptions('TypeConge',new Default_Model_TypeConge(),'getId','getCode');
+	     
+	     
+		 // remplie le select avec le  nom et prenom de la personne ayant id personne  
+	     $where = array('id = ?' => $id_personne);
+		 $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
+
+		  
+		 		 
+		 // remplir le formulaire par les données recupérer 
+		 $form->getElement('Ressource')->setValue($id_personne);
+		 $form->getElement('Debut')->setValue($PreData['Debut']);
+		 $form->getElement('Fin')->setValue($PreData['Fin']);
+		 $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);
+		 $form->getElement('FinMidi')->setValue($PreData['FinMidi']);
+		 $form->getElement('AnneeRef')->setValue($PreData['AnneeRef']);
+		 $form->getElement('TypeConge')->setValue($id_type_conge); 
+		 $form->getElement('Ferme')->setValue($PreData['Ferme']);
+
+
+	    //si la page est POSTée = formulaire envoyé
 		if($this->getRequest()->isPost())
-		{
+		{ 
 			//récupération des données envoyées par le formulaire
-			$data = $this->getRequest()->getPost();
+		    $data = $this->_request->getPost();
 
 			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))
 			{
-				
-				//création et initialisation d'un objet Default_Model_Conge
-				//qui sera enregistré dans la base de données
-				$conge = new Default_Model_Conge();
-				$conge->setId($form->getValue('id'));
-				$conge->setId_personne($form->getValue('id_personne'));
-				
-				//$date_debut = new Zend_Date;
-				//$date_debut->set($form->getValue('date_debut'),'yy-mm-dd');
-				$conge->setDate_debut($form->getValue('date_debut'),'yy-mm-dd');
-				$conge->setDate_fin($form->getValue('date_fin'),'yy-mm-dd');
-				$conge->setMi_debut_journee($form->getValue('mi_debut_journee'));
-				$conge->setMi_fin_journee($form->getValue('mi_fin_journee'));
-				$conge->setNombre_jours();
-				$conge->setId_type_conge($form->getValue('id_type_conge'));
-				$conge->setAnnee_reference($form->getValue('annee_reference'));
-				$conge->setFerme($form->getValue('ferme'));
-				if($this->_helper->validation->verifierConges($form->getValue('id_personne'),$form->getValue('date_debut'),$form->getValue('date_fin'),$form->getValue('mi_debut_journee'),$form->getValue('mi_fin_journee')))
-				{
-					$proposition->save();
-					//redirection
-					$this->_helper->redirector('index');
-					
-				}
-				else 
-				{
-					$form->populate($data);
-					$this->view->title = "<strong><em><span style='background-color:rgb(255,0,0)'> proposition ou conge deja demande</span></em></strong>";
-				}
-			}
-			else
-			{
-				//si erreur rencontrée, le formulaire est rempli avec les données
-				//envoyées précédemment
-				$form->populate($data);
-			}
-		}
-		else
-		{
-			//récupération de l'id passé en paramétre
-			$id = $this->_getParam('id', 0);
-
-			if($id > 0)
-			{
-				//récupération de l'entrée
-				$conge = new Default_Model_Conge();
-				$conge = $conge->find($id);
-
-				//assignation des valeurs de l'entrée dans un tableau
-				//tableau utilisé pour la méthode populate() qui va remplir le champs du formulaire
-				//avec les valeurs du tableau
-				$data[] = array();
-				$data['id'] = $conge->getId();
-				$data['id_personne'] = $conge->getId_personne();
-				$data['date_debut'] = $conge->getDate_debut();
-				$data['mi_debut_journee'] = $conge->getMi_debut_journee();
-				$data['date_fin'] = $conge->getDate_fin();
-				$data['mi_fin_journee'] = $conge->getMi_fin_journee();
-				$data['nombre_jours'] = $conge->getNombre_jours();
-				$data['id_type_conge'] = $conge->getId_type_conge();
-				$data['annee_reference'] = $conge->getAnnee_reference();
-				$data['ferme'] = $conge->getFerme();
-				$personne = new Default_Model_Personne();
-				$result_set_personnes = $personne->find($id);
-				$this->view->title = "Modification de la proposition de Mr/Mme : ".$result_set_personnes->getNom()." ".$result_set_personnes->getPrenom();
-				$form->populate($data);
+				           
+				     $i = 1;
+					// vérifie si les données ont subit une modification
+					 foreach($PreData as $k=>$v)
+					 {
+					     if((string)$PreData[$k] != (string)$data[$k])
+					     {
+					        $i*=0;
+					     }
+					        	
+					 }
+					 if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
+					{
+						$this->view->error = "pas de ressource selectionné !";
+					}
+					elseif($data['TypeConge'] === 'x')     // si on a pas selectionné un type conge  id = 'x'
+					{
+						$this->view->error = "pas de type congé selectionné !";
+					}
+					elseif($i == 1)
+				    {
+				        $this->view->error = "Vous n'avez modifié aucun champ !";
+				    }
+					elseif ($data['Debut'] > $data['Fin'])
+						$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";
+				    else 
+			        {       
 			
-				
-				
+				        // remplir l'objet conge par les valeurs modifiées     
+			            $conge ->setId($data_id['id']);
+			            $conge->setId_proposition($cong->getId_proposition());
+			            $conge->setId_personne($id_personne);
+			            $conge->setDate_debut($data['Debut']);
+					    $conge->setDate_fin($data['Fin']);
+					    $conge->setMi_debut_journee($data['DebutMidi']);
+					    $conge->setMi_fin_journee($data['FinMidi']);
+					    $conge->setAnnee_reference($data['AnneeRef']);
+					    $conge->setNombre_jours();
+					    $conge->setId_type_conge($data['TypeConge']);
+					    $conge->setFerme($data['Ferme']);
+					             
+					    $this->view->title = "Modification du congé de Mr/Mme : ".$pers->getNomPrenom();	
+
+						$conge->save();  // insérer dans la base 
+									
+						//redirection vers afficher congés  	
+						$this->_helper->redirector('afficher');
+
+			             }
+
 			}
+			
+			
+	
 		}
 	}
 
 	
-	//:::::::::::::// ACTION DELETE //::::::::::::://
+	//:::::::::::::// ACTION SUPPRIMER //::::::::::::://
 	// MTA : OK 
-	public function deleteAction()
+	public function supprimerAction()
 	{
 		//récupére les paramétres de la requéte
 		$params = $this->getRequest()->getParams();
@@ -278,20 +319,15 @@ class CongeController extends Zend_Controller_Action
 			$result = $conge->delete("id=$id");
 
 			//redirection
-			$this->_helper->redirector('afficherconge');
+			$this->_helper->redirector('afficher');
 		}
 		else
 		{
 			$this->view->form = 'Impossible delete: id missing !';
 		}
 	}
-/*	public function rederigerversindexAction ()
-	{
-	   $this->_helper->redirector('index');
-		
-	}
-*/
-	public function affichercongeAction()
+
+	public function afficherAction()
 	{
 		$conge = new Default_Model_Conge();
 		$paginator = Zend_Paginator::factory($conge->fetchAll($str = array()));

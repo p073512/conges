@@ -33,7 +33,7 @@ class Default_Form_Conge extends Default_Form_MyForm
          * Type de conge type select
          */
 	    $iTypeConge = $this->createElement('select', 'TypeConge', array(
-			  															'label'  => 'Type de conge',
+			  															'label'  => 'Type de conge ',
 			  															'name' => 'TypeConge',
 		                                                                'required'   => 'true',
 																		) 

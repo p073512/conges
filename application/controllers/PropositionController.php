@@ -3,7 +3,7 @@
 class PropositionController extends Zend_Controller_Action
 {
 	
-     public function preDispatch() /* MTA : Mohamed khalil Takafi */
+     public function preDispatch() 
     {
     	    $doctypeHelper = new Zend_View_Helper_Doctype();
             $doctypeHelper->doctype('HTML5');
@@ -55,14 +55,14 @@ class PropositionController extends Zend_Controller_Action
 	}
 
 
-	//:::::::::::::// ACTION CREATEPROPOSITION //::::::::::::://
-	public function createpropositionAction()   
+	//:::::::::::::// ACTION CREER//::::::::::::://
+	public function creerAction()   
 	{
 		//création du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
 		//$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'create'), 'default', true));
-		
+
 		$data = array();
 		//assigne le formulaire é la vue
 		$this->view->form = $form;
@@ -74,7 +74,7 @@ class PropositionController extends Zend_Controller_Action
 
 	    
 
-		 $this->_helper->viewRenderer('create-proposition');
+		 $this->_helper->viewRenderer('creer');  // creer proposition
 	     $this->view->form = $form;
 
 		//si la page est POSTée = formulaire envoyé
@@ -110,8 +110,7 @@ class PropositionController extends Zend_Controller_Action
 					$proposition->setEtat('NC');
 
 					$proposition->save();
-		   			$this->_helper->redirector('affichercsm');
-
+                    $this->_helper->redirector('affichercsm');
 					}
 
 			}
@@ -130,7 +129,7 @@ class PropositionController extends Zend_Controller_Action
 					  	 	$this->view->error = "Veuillez saisir une date de fin !";
 				}
 				elseif ($data['Debut'] > $data['Fin'])
-					// MTA : modification du message echo "......."
+					
 					$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";
 				else
 				
@@ -150,14 +149,11 @@ class PropositionController extends Zend_Controller_Action
 		
 }
 
-	
-	
-// /* MOHAMED KHALIL TAKAFI*/	
 
-//:::::::::::::// ACTION EDIT //::::::::::::://
-	public function editAction()
+//:::::::::::::// ACTION MODIFIER //::::::::::::://
+	public function modifierAction()
 	{
-        $this->_helper->viewRenderer('create-proposition');
+        $this->_helper->viewRenderer('creer'); // creer proposition
 		//création du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
@@ -182,10 +178,10 @@ class PropositionController extends Zend_Controller_Action
 	     
 	     
 	    // stocker les anciennes valeurs du formulaire 
-		$PreData['Debut']=  $proposition->getDate_debut();
-		$PreData['DebutMidi'] = $proposition->getMi_debut_journee();
-		$PreData['Fin'] = $proposition->getDate_fin();
-		$PreData['FinMidi'] = $proposition->getMi_fin_journee();
+		 $PreData['Debut']=  $proposition->getDate_debut();
+		 $PreData['DebutMidi'] = $proposition->getMi_debut_journee();
+		 $PreData['Fin'] = $proposition->getDate_fin();
+		 $PreData['FinMidi'] = $proposition->getMi_fin_journee();
 	     
 	     // stocker les nouvelles valeurs du formulaire 
 	     $data = array();
@@ -256,7 +252,7 @@ class PropositionController extends Zend_Controller_Action
 								 $proposition->save();  // insérer dans la base 
 									
 								 //redirection vers afficher csm 	
-								 $this->_helper->redirector('affichercsm');
+								$this->_helper->redirector('affichercsm');
 
 			                }
 
@@ -267,7 +263,7 @@ class PropositionController extends Zend_Controller_Action
 	
 
 	//:::::::::::::// ACTION DELETE //::::::::::::://
-	public function deleteAction()
+	public function supprimerAction()
 	{
 		//récupére les paramétres de la requéte
 		
@@ -299,6 +295,8 @@ class PropositionController extends Zend_Controller_Action
 		 * cette fonction permet é l'admin de valider les propositions et les enregistré dans 
 		 * la table :conge
 		 */
+	
+	
 	//:::::::::::::// ACTION ACCEPTER //::::::::::::://
 	public function accepterAction()
 	{
@@ -364,6 +362,7 @@ class PropositionController extends Zend_Controller_Action
 		 }  
  }
 
+ 	//:::::::::::::// ACTION REFUSER //::::::::::::://
 	public function refuserAction()
 	{
 		//récupére les paramétres de la requéte
@@ -380,6 +379,7 @@ class PropositionController extends Zend_Controller_Action
 			$result->setEtat("KO")->save();
 			//redirection
 			$this->_helper->redirector('affichercsm');
+			
 		}
 		
 		else
@@ -388,6 +388,8 @@ class PropositionController extends Zend_Controller_Action
 		}
 	}
 	
+	
+    //:::::::::::::// ACTION AFFICHERADMIN //::::::::::::://
 	public function afficheradminAction ()
 	{
 		$proposition = new Default_Model_Proposition;
@@ -398,7 +400,7 @@ class PropositionController extends Zend_Controller_Action
 		//on initialise la valeur PropositionArray de la vue
 		$this->view->propositionArray = $paginator;
 	}
-	
+	//:::::::::::::// ACTION AFFICHERCSM //::::::::::::://
 	public function affichercsmAction ()
 	{
 		$proposition = new Default_Model_Proposition;
@@ -408,11 +410,17 @@ class PropositionController extends Zend_Controller_Action
 		$this->view->propositionArray = $paginator;
      		
 	}
+	
+	
+    //:::::::::::::// ACTION REDIRIGERVERSINDEX //::::::::::::://
 	public function rederigerversindexAction ()
 	{
 	   $this->_helper->redirector('index');
 		
 	}
+	
+	
+	//:::::::::::::// ACTION MESSAGE //::::::::::::://
 	public function messageAction()
 	{
 		$parame = $this->getRequest()->getParams();

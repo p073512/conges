@@ -11,7 +11,7 @@
                   
                  	 
                    <ul class="dropdown-menu">
-                       <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'createproposition'), 'default', true) ?>">Créer</a></li>
+                       <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'creer'), 'default', true) ?>">Créer</a></li>
                        <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'affichercsm'), 'default', true) ?>">Afficher / Modifier</a></li>
                        <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'afficheradmin'), 'default', true) ?>">Valider / Refuser</a></li>                         
                    </ul>
@@ -41,7 +41,8 @@
 	 * traitemets : logique, ajout BD, Exception ...
 	 */
 	
-	else if(isset($this->success)){
+	else if(isset($this->success))
+	{
 	?>
 	
 	<!-- afficage message succ�s  -->
@@ -93,10 +94,10 @@
             <td><?php echo $proposition->etat; ?></td>
             <td>
 
-                 <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'edit', 'id' => $proposition->id), 'default', true); ?>">Edit</a>
+                 <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'modifier', 'id' => $proposition->id), 'default', true); ?>">Modifier</a>
             </td>
            <td>
-               <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'delete', 'id' => $proposition->id), 'default', true); ?>">Delete</a>
+               <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'supprimer', 'id' => $proposition->id), 'default', true); ?>">Supprimer</a>
             </td>
 
         </tr>
@@ -112,6 +113,7 @@
     echo $this->paginationControl($this->propositionArray, 'Sliding', 'common/my_paginator_control.phtml');
 	?>
     </div>
-    </br> <!--  MTA / Mohamed khalil Takafi  -->
+    <br>
+    <!--  MTA / Mohamed khalil Takafi  -->
    
 </div>

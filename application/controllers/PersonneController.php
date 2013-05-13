@@ -402,7 +402,8 @@ class PersonneController extends Zend_Controller_Action
 		}// fin entité française
 
 		}
-		public function deleteAction() {
+		public function deleteAction() 
+		{
 			
 			//à la reception d'une requête ajax
 		
@@ -434,11 +435,7 @@ class PersonneController extends Zend_Controller_Action
        					
                         // envoi de reponse en format Json
        		       		$this->_helper->json($content);
-       
-                         
-        
-       
-        
+
 				
 			}
 			

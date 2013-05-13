@@ -46,37 +46,54 @@
 	 * traitemets : logique, ajout BD, Exception ...
 	 */
 
-	if(isset($this->error)){ 
+	if(isset($this->error))
+	{ 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert alert-error">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Erreur :</strong>  <?php //Message d'erreur
+                                         echo "   ".$this->error; ?>
+			</div>
+
+	<?php } ?>
+
+	<?php
+	
+	/*
+	 * Gestion des messages warnings 
+	 */
+
+	if(isset($this->warning)){ 
 	?>
 	
       <!-- afficage alerte avec message d'erreur -->
 			<div class="alert">
 				<button type="button" class="close " data-dismiss="alert"></button>
-				<strong>Alerte!</strong>  <?php //Message d'erreur
-                                         echo "    error : ".$this->error; ?>
+				<strong>Alerte :</strong>  <?php //Message warning
+                                         echo "   ".$this->warning; ?>
 			</div>
-
-	<?php }
-
+	
+	<?php } 
+	 
 	
 	
-	
-    /*
-	 * Si erreurs de traitements* renvoyé depuis le controlleur 
-	 * traitemets : logique, ajout BD, Exception ...
+ 	/*
+	 * Gestion des messages succès 
 	 */
 	
-	else if(isset($this->success)){
+	else if(isset($this->success))
+	{
 	?>
 	
 	<!-- afficage message succés  -->
-            <div class="alert alert-info">
+            <div class="alert alert-success">
 				<button type="button" class="close " data-dismiss="alert"></button>
-				<strong>Succes!</strong> <?php //Message succes
-	                                      echo $this->success; ?>
+				<strong>Succes :</strong> <?php //Message succes
+	                                      echo "   ".$this->success ;?>
 			</div>
 	<?php }?>
-	
 		<!-- ICI L'AFFICHAGE DU FORMULAIRE -->
 			
 		<fieldset>

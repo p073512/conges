@@ -104,6 +104,7 @@ class Default_Model_Profil
 		return $this->_mapper;
 	}
 
+
 	//méthodes de classe utilisant les méthodes du mapper
 	//crée ou met à jour une entrée dans la table
 	public function save()

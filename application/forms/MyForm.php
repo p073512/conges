@@ -13,7 +13,9 @@ class Default_Form_MyForm extends Zend_Form
 	private $eDecorator =array('Zend_Form_Element_Text'=>'Ftextinput', 
                                  'Zend_Form_Element_Select'=>'Fselect',
 									'Zend_Form_Element_Checkbox' =>'label',
-	                                    'Zend_Form_Element_Submit'=>'label');
+	                                    'Zend_Form_Element_Submit'=>'label',
+											'Zend_Form_Element_Password'=>'Fpassinput'
+											);
 	
 	
 	

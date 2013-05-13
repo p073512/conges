@@ -51,6 +51,7 @@ class Default_Form_Conge extends Default_Form_MyForm
 		$iDebut->addDecorator('Ftextinput', array('label'));    
 		$iDebut->setRequired(true); 
 		$iDebut->setErrorMessages(array("Date D&eacute;but invalide !"));
+		$iDebut->setAttrib('placeholder', 'choisir une date debut ...');
 	
 	
 		
@@ -73,6 +74,7 @@ class Default_Form_Conge extends Default_Form_MyForm
 		$iFin->addDecorator('Ftextinput', array('label'));
         $iFin->setRequired(true); 
         $iFin->setErrorMessages(array("Date Fin invalide !"));
+        $iFin->setAttrib('placeholder', 'choisir une date fin ...');
 		
 		/*
          * Debut midi type checkbox 
@@ -94,14 +96,21 @@ class Default_Form_Conge extends Default_Form_MyForm
          * Annee de reference type textbox 
          * 
          */
-
+		
+		$iAnneeRef = $this->createElement('select', 'AnneeRef', array(
+			  															'label'  => 'Annee de reference ',
+			  															'name' => 'AnneeRef',
+		                                                                'required'   => 'true',
+																		) 
+	         							   ); 
+		  
+         /*
 		  $iAnneeRef =   new Zend_Form_Element_Text('AnneeRef',array('label' => 'Annee de reference'));	
 		  $iAnneeRef->addValidator('regex',true,array('/^[0-9]{4}$/'));     
 		  $iAnneeRef->addDecorator('Ftextinput', array('label'));
           $iAnneeRef->setRequired(true); 
-          $iAnneeRef->setAllowEmpty(false);
           $iAnneeRef->setErrorMessages(array("Ann&eacute;e de reference invalide !"));
-		  
+		  */
 		  
 		/*
          * Submit type button 

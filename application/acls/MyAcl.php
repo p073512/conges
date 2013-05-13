@@ -73,17 +73,22 @@ class Default_Acl_MyAcl extends Zend_Acl
 		//le second argument permet d'indiquer les contrôleurs
 		//le troisième indique les actions du contrôleur
 		//à noter qu'il aussi possible de refuser un accès grâce à la fonction deny()
-//		$this->allow('guest', null,null);
+
+
+		// Profil  :: GUEST :: 
 		$this->allow('guest','connexion');
+		
+		// Profil  :: EQUIPE :: 
 		$this->allow('equipe','calendrier');
-		$this->allow('equipe','proposition', 'affichercsm');
-		$this->allow('equipe','conge', 'rederigerversindex');
-//		$this->allow('equipe','calendrier', 'calendriermensuel');
+		$this->allow('equipe','conge',array('afficher'));
+
+		// Profil  :: CSM :: 
 		$this->allow('csm','personne', array('create','edit','delete'));
-		$this->allow('csm','proposition', array('create','edit','delete','index'));
-//		$this->allow('admin');
-//		$this->allow('equipe');
-//		$this->allow('csm');
+		$this->allow('csm','proposition', array('creer','modifier','supprimer','valider','refuser','affichercsm','afficheradmin','index'));
+		$this->allow('csm','conge', array('afficher'));
+		
+
+        // Profil :: ADMIN ::  
 		$this->allow('admin');
 	}
 }

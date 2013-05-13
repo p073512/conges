@@ -1,4 +1,21 @@
-
+<?php 
+$this->headScript()->appendFile( $this->baseUrl() .'/js/myScriptCong.js');
+echo $this->headScript();
+?>
+<!-- Modal Pour confirmation de suppression -->
+ <div id="myModal" class="modal message hide fade" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" style="display: none;">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+		<h3 id="myModalLabel">Confirmer la suppression</h3>
+	</div>
+	<div class="modal-body">
+		<p></p>
+	</div>
+	<div class="modal-footer">
+		<button class="btn" data-dismiss="modal" aria-hidden="true" id="annulSupp">Annuler</button>
+		<button class="btn  btn-info" id="suppButton">Confirmer</button>
+	</div>
+</div>
 <div class="row-fluid offset1">
 		<div id="header-container">
             
@@ -15,34 +32,63 @@
 <div class="container">
 		<div class="well row-fluid">
 		<h2>Liste des Conges :</h2><br/>
-	<?php 	if(isset($this->error)){ 
+<?php
+	/*
+	 * Si erreurs de traitements* renvoyé depuis le controlleur 
+	 * traitemets : logique, ajout BD, Exception ...
+	 */
+
+	if(isset($this->error))
+	{ 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert alert-error">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Erreur :</strong>  <?php //Message d'erreur
+                                         echo "   ".$this->error; ?>
+			</div>
+
+	<?php } ?>
+
+	<?php
+	
+	/*
+	 * Gestion des messages warnings 
+	 */
+
+	if(isset($this->warning)){ 
 	?>
 	
       <!-- afficage alerte avec message d'erreur -->
 			<div class="alert">
 				<button type="button" class="close " data-dismiss="alert"></button>
-				<strong>Alerte!</strong>  <?php //Message d'erreur
-                                         echo "Erreur :".$this->error; ?>
+				<strong>Alerte :</strong>  <?php //Message warning
+                                         echo "   ".$this->warning; ?>
 			</div>
-
-	<?php }
-    /*
-	 * Si erreurs de traitements* renvoyés depuis le controlleur 
-	 * traitemets : logique, ajout BD, Exception ...
+	
+	<?php } 
+	 
+	
+	
+ 	/*
+	 * Gestion des messages succès 
 	 */
 	
-	else if(isset($this->success)){
+	else if(isset($this->success))
+	{
 	?>
 	
-	<!-- afficage message succ�s  -->
-            <div class="alert alert-info">
+	<!-- afficage message succés  -->
+            <div class="alert alert-success">
 				<button type="button" class="close " data-dismiss="alert"></button>
-				<strong>Succes!</strong> <?php //Message succes
-	                                      echo $this->success; ?>
+				<strong>Succes :</strong> <?php //Message succes
+	                                      echo "   ".$this->success ;?>
 			</div>
 	<?php }?>
 <div>
     <table  class="table table-hover ">
+        <thead> 
         <tr>
             <th>Id</th>
             <th>Nom Prenom</th>
@@ -54,9 +100,22 @@
             <th>Fin Journee</th>
             <th>Nombre Jours</th>
             <th>Ferme</th>
-            <th>Modifier</th>
-            <th>Supprimer</th>
+            <?php 
+               $profil = substr_replace($this->LoggedProfil(),"",0,31);
+               $profil = str_replace("Deconnexion","", $profil);
+               $profil = str_replace(" ","",$profil);
+               $profil  = strip_tags($profil);
+            
+               if($profil == 'admin')
+            {
+            	echo "<th>Modifier</th>";
+                echo "<th>Supprimer</th>";
+            
+            } 
+            ?>
+ 
         </tr>
+         </thead> 
         <?php
 
             //$this->usersArray est une variable qui peut être garnie par le controller
@@ -69,7 +128,8 @@
 			$result_set_types = $type->find($conge->id_type_conge);
          
          ?>
-        <tr>
+        <tbody> 
+        <tr id="<?php echo $conge->id; ?>">
             <td><?php echo $conge->id_personne; ?></td>
             <td><?php echo $result_set_personnes->getNom().'  '.$result_set_personnes->getPrenom(); ?></td>  
             <td><?php echo $result_set_types->getCode(); ?></td>
@@ -80,13 +140,21 @@
             <td><?php echo $conge->mi_fin_journee; ?></td>
             <td><?php echo $conge->nombre_jours; ?></td>
             <td><?php echo $conge->ferme; ?></td>
-            <td>
-                <a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'modifier', 'id' => $conge->id), 'default', true); ?>">Modifier</a>
-            </td>
-           <td>
-                <a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'Supprimer', 'id' => $conge->id), 'default', true); ?>">Supprimer</a>
-            </td>
+            <?php 
+            if($profil === 'admin')
+            {
+            ?>
+             <td>
+                <a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'modifier', 'id' => $conge->id), 'default', true); ?>"><i  class="icon-pencil"></i></a>
+             </td>
+             <td>
+                <i class="icon-remove" id="<?php echo $this->url(array('controller' => 'conge', 'action' => 'supprimer'), 'default', true); ?>"></i>
+             </td>
+             <?php  
+            }
+             ?>
         </tr>
+        </tbody>
         <?php endforeach; ?>
     </table>
     <?php

@@ -5,18 +5,20 @@ $(document).ready(function()
 
 
 	// Changer la forme du curseur quand il est pointé sur l'icone corbeille
-	$(".icon-remove").hover(function() {
+	$(".icon-remove").hover(function() 
+	{
 	    $(this).css('cursor','pointer');
-	}, function() {
-	    $(this).css('cursor','auto');
-	});
+	},  function() 
+		{
+		    $(this).css('cursor','auto');
+		});
 	
   $('.icon-remove').live('click',function(){
 	 
 	id = $(this).parent().parent().attr('id');
     url = $(this).attr('id');
      $('#myModal').modal();
-     $('.modal-body p').html("Voulez vous réellement supprimer la ressource : "+ $('tr[id='+id+'] > td').eq('0').text());
+     $('.modal-body p').html("Voulez vous r&eacute;ellement supprimer le conge ?");
 
  	 $('#suppButton').live('click',function(){
  		 $('#myModal').modal('hide');
@@ -38,22 +40,22 @@ $(document).ready(function()
 		                  
 		                   if(data.result == "1")
 		                   {
-		                       $("#msgstate").html('<div class="alert alert-info"><button type="button" class="close " data-dismiss="alert"></button><strong>Succes!</strong> La suppression a été bien effectuée</div>');
+		                       $("#msgstate").html('<div class="alert alert-info"><button type="button" class="close " data-dismiss="alert"></button><strong>Succes :</strong> La suppression a �t� bien effectu�e</div>');
 		                   }
 		                   else if(data.result == "0")
 		                   {
-		                	   $("#msgstate").html('<div class="alert alert-info"><button type="button" class="close " data-dismiss="alert"></button><strong>Succes!</strong> Aucune ligne affectée (vérifiez id)</div>');
+		                	   $("#msgstate").html('<div class="alert alert-info"><button type="button" class="close " data-dismiss="alert"></button><strong>Succes :</strong> Aucune ligne affect�e (v�rifier id conge)</div>');
 		                   }
 		                  }
 		               else if(data.status == "500")
 		                 {
-		            	   $("#msgstate").html('<div class="alert"><button type="button" class="close " data-dismiss="alert"></button><strong>Alerte!</strong> Erreur lors de la suppression</div>');
+		            	   $("#msgstate").html('<div class="alert"><button type="button" class="close " data-dismiss="alert"></button><strong>Alerte :</strong> Erreur lors de la suppression</div>');
 		                 }
 		                      
 		
 		                 },
 		        error: function(){
-		        	$("#msgstate").html('<div class="alert"><button type="button" class="close " data-dismiss="alert"></button><strong>Alerte!</strong> Erreur lors de la suppression</div>');
+		        	$("#msgstate").html('<div class="alert"><button type="button" class="close " data-dismiss="alert"></button><strong>Alerte :</strong> Erreur lors de la suppression</div>');
 		        } });
 
 

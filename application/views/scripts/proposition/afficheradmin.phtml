@@ -62,7 +62,7 @@
             <th>date_fin</th>
             <th>nombre_jours</th>
             <th>etat</th>
-            <th>Accepter</th>
+            <th>Valider</th>
             <th>Refuser</th>
             
        </tr>
@@ -75,9 +75,9 @@
             $personne = new Default_Model_Personne();
 			$result_set_personnes = $personne->find($proposition->id_personne);
         ?>
-        <tr>
-        		
-           
+     <tbody>   
+     <tr>
+ 
             <td><?php echo$result_set_personnes->getNom().'  '.$result_set_personnes->getPrenom(); ?></td>
             <td><?php echo $proposition->date_debut; ?></td>
             <td><?php echo $proposition->date_fin; ?></td>
@@ -85,13 +85,14 @@
             <td><?php echo $proposition->etat; ?></td>
 
              <td>
-                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'accepter', 'id' => $proposition->id,'solde'=>2), 'default', true); ?>">Accepter</a>
+                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'valider', 'id' => $proposition->id,'solde'=>2), 'default', true); ?>"><i  class="icon-checkmark"></i></a>
             </td>
             <td>
-                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'refuser', 'id' => $proposition->id), 'default', true); ?>">Refuser</a>
+                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'refuser', 'id' => $proposition->id), 'default', true); ?>"><i  class="icon-cancel-2"></i></a>
             </td>
 
-        </tr>
+        </tr> 
+        </tbody>
         <?php endforeach; ?>
        
     </table>

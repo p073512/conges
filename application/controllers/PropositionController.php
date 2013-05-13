@@ -1,18 +1,21 @@
 
 <?php
 class PropositionController extends Zend_Controller_Action
-{
+{   
+     
 	
      public function preDispatch() 
     {
     	    $doctypeHelper = new Zend_View_Helper_Doctype();
             $doctypeHelper->doctype('HTML5');
     		$this->_helper->layout->setLayout('mylayout');
+    	
 	}
  
 	//:::::::::::::// ACTION INDEX //::::::::::::://
 	public function indexAction()
-	{
+	{ 
+	  
 		// on ajoute le filtre sur la vue des propositions
 		
 		$proposition = new Default_Model_Proposition;
@@ -57,7 +60,7 @@ class PropositionController extends Zend_Controller_Action
 
 	//:::::::::::::// ACTION CREER//::::::::::::://
 	public function creerAction()   
-	{
+	{   
 		//création du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
@@ -84,7 +87,11 @@ class PropositionController extends Zend_Controller_Action
 			//récupération des données envoyées par le formulaire
 			
 			$data = $this->_request->getPost();
-            
+			
+            $personne = new Default_Model_Personne();
+			$id_personne = $data['Ressource']; // id personne 
+	        $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
+			
 			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))  // form valide 
 			{
@@ -108,9 +115,31 @@ class PropositionController extends Zend_Controller_Action
 					$proposition->setMi_fin_journee($data['FinMidi']);
 					$proposition->setNombre_jours();
 					$proposition->setEtat('NC');
-
-					$proposition->save();
-                    $this->_helper->redirector('affichercsm');
+                    	
+					try 
+					{	
+						$proposition->save();
+           
+						$this->view->success = "Création de la proposition pour Mr/Mme : ".$pers->getNomPrenom();	
+						// vider le formulaire pour crée une autre proposition 
+						$form->getElement('Ressource')->setValue('');
+						$form->getElement('Debut')->setValue('');
+						$form->getElement('Fin')->setValue('');
+						$form->getElement('DebutMidi')->setValue('');
+						$form->getElement('FinMidi')->setValue('');
+						
+					
+						//redirection vers afficher csm 	
+						//$this->_helper->redirector('affichercsm');
+							 
+				
+					} 
+					catch (Exception $e) 
+					{
+						//$this->view->error = $e->getMessage();
+						 $this->view->error = "Création de la proposition pour Mr/Mme : ".$pers->getNomPrenom()." à échoué !";	
+					}
+					
 					}
 
 			}
@@ -166,7 +195,6 @@ class PropositionController extends Zend_Controller_Action
 		//récupération des données envoyées par le formulaire
 		$data_id =  $this->getRequest()->getParams();
 
-        // recuperer des données a charger dans le formulaire 
          $proposition = new Default_Model_Proposition();
          $personne = new Default_Model_Personne();
          
@@ -194,7 +222,11 @@ class PropositionController extends Zend_Controller_Action
 	     $where = array('id = ?' => $id_personne);
 		 $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
 
-
+		 
+		 // placeholder 
+		 $form->getElement('Debut')->setAttrib('placeholder', 'Saisissez une date debut ...');
+		 $form->getElement('Fin')->setAttrib('placeholder', 'Saisissez une date fin ...');
+		 
 		 
 		// remplir le formulaire par les données recupérer 
 		$form->getElement('Ressource')->setValue($id_personne);
@@ -226,11 +258,11 @@ class PropositionController extends Zend_Controller_Action
 					        }
 							if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
 							{
-							   $this->view->error = "pas de ressource selectionné !";
+							   $this->view->error = "Veuillez selectionner une ressource !";
 							}
 							elseif($i == 1)
 				        	{
-				        	 	 $this->view->error = "Vous n'avez modifié aucun champ !";
+				        	 	 $this->view->warning = "Aucun champs n'a été modifié !";
 				         	}
 						    elseif ($data['Debut'] > $data['Fin'])
 							$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";
@@ -247,15 +279,16 @@ class PropositionController extends Zend_Controller_Action
 					             $proposition->setNombre_jours();
 					             $proposition->setEtat('NC');
 					             
-					             $this->view->title = "Modification de la proposition de Mr/Mme : ".$pers->getNomPrenom();	
+					             $this->view->title = "Modification de la proposition";
+					             //$this->view->title = "Modification de la proposition de Mr/Mme : ".$pers->getNomPrenom();	
 
 								 $proposition->save();  // insérer dans la base 
-									
+							     $this->view->success = " La proposition a été modifié avec succès !";
+							
 								 //redirection vers afficher csm 	
-								$this->_helper->redirector('affichercsm');
-
+								 // $this->_helper->redirector('affichercsm');
+							     
 			                }
-
 			}
 
 		}
@@ -265,40 +298,53 @@ class PropositionController extends Zend_Controller_Action
 	//:::::::::::::// ACTION DELETE //::::::::::::://
 	public function supprimerAction()
 	{
-		//récupére les paramétres de la requéte
 		
-		$params = $this->getRequest()->getParams();
-
-	
-
-		//vérifie que le paramétre id existe
-		if(isset($params['id']))
-		{
-			
-			$id = $params['id'];
+		
+		 if($this->getRequest()->isXmlHttpRequest())
+		 {     
+		 	
+		 	   //récupére les paramétres de la requéte Ajax 
+		 	$data = $this->getRequest()->getPost();
+			$id = $data['id'];   
+		        
 			//création du modéle pour la suppression
 			$proposition = new Default_Model_Proposition();
-			//appel de la fcontion de suppression avec en argument,
-			//la clause where qui sera appliquée
 
-			$result = $proposition->delete("id=$id");
+			try 
+			{     //appel de la fcontion de suppression avec en argument,
+				  //la clause where qui sera appliquée
+				  $result = $proposition->delete("id=$id");   
+			}
+			catch (Zend_Db_Exception $e)
+			{
+					// en cas d'erreur envoi de reponse avec code erreur [500]
+					$content = array("status"=>"500","result"=> $result);
+	       			$this->view->error= "Erreur";
+	       		    $this->_helper->json($content);
+	       				      
+	       			echo $content;
+			}
+				        	 //en cas de succès envoie de reponse avec code succès [200]
+					         $this->view->success = "La proposition a bien été supprimer !";
+				        	 $content = array("status"=>"200","result"=> "1");
+	       					
+	                         // envoi de reponse en format Json
+	       		       		 $this->_helper->json($content);
 
-			//redirection
-			$this->_helper->redirector('affichercsm');
+				//redirection
+				//$this->_helper->viewRenderer('affichercsm');
+
 		}
-		else
-		{
-			$this->view->form = 'Impossible delete: id missing !';
-		}
-	}
+
+}
 		/*
 		 * cette fonction permet é l'admin de valider les propositions et les enregistré dans 
 		 * la table :conge
 		 */
 	
 	
-	//:::::::::::::// ACTION ACCEPTER //::::::::::::://
-	public function accepterAction()
+	//:::::::::::::// ACTION Valider //::::::::::::://
+	public function validerAction()
 	{
 		//récupére les paramétres de la requéte	
 		$params = $this->getRequest()->getParams();

@@ -39,6 +39,7 @@ class Default_Form_Proposition extends Default_Form_MyForm
 		$iDebut->addDecorator('Ftextinput', array('label'));  
 		$iDebut->setRequired(true);   
 		$iDebut->setErrorMessages(array("Date Debut invalide !"));
+		$iDebut->setAttrib('placeholder', 'choisir une date debut ...');
 
 		
 		/*
@@ -60,6 +61,7 @@ class Default_Form_Proposition extends Default_Form_MyForm
 		$iFin->addDecorator('Ftextinput', array('label'));
         $iFin->setRequired(true); 
         $iFin->setErrorMessages(array("Date Fin invalide !"));
+        $iFin->setAttrib('placeholder', 'choisir une date fin ...');
 		
 		/*
          * Debut midi type checkbox 

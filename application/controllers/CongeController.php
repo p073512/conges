@@ -60,10 +60,6 @@ class CongeController extends Zend_Controller_Action
 	    $list_annee = array((string)$annee-1=>(string)$annee-1,$annee=>$annee,(string)$annee+1=>(string)$annee+1);
 		$anneeref = $form->getElement('AnneeRef');
 		$anneeref->setMultiOptions($list_annee);
-		
-								
-					
-					
 
 		// remplir le select par les ressources front 
         $where = array('id_entite <> ?' => '2');
@@ -111,7 +107,7 @@ class CongeController extends Zend_Controller_Action
 				{	
 					$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";	//création et initialisation d'un objet Default_Model_Users
 				}
-				else 
+				else   /* Gestion des chevauchements */
 				{   
 				    //qui sera enregistré dans la base de données
 					$conge = new Default_Model_Conge();
@@ -124,13 +120,40 @@ class CongeController extends Zend_Controller_Action
 					$conge->setNombre_jours();
 					$conge->setAnnee_reference($data['AnneeRef']);
 					$conge->setFerme($data['Ferme']);
-
+                    
+				    $cong = $conge->fetchAll(null);  // recuperer tt les conges 
+					
+				    $flagc = 0;   $i=0;	 
+				
+					 // verifier dans les conges
+					 foreach ($cong as $v) 
+		               {  
+		               	  if(($cong[$i]->getId_personne() == $data['Ressource']) && (
+		               	     ($data['Debut'] >= $cong[$i]->getDate_debut()  &&   $data['Fin']<= $cong[$i]->getDate_fin()) ||
+		               	     ($data['Debut'] < $cong[$i]->getDate_debut()  &&   $data['Fin']>= $cong[$i]->getDate_debut()) || 
+		               	     ($data['Debut'] < $cong[$i]->getDate_fin()  &&   $data['Fin']>= $cong[$i]->getDate_fin())))
+		               	  {
+		          	      $flagc = 1; 
+		          	      break;
+		               	  }
+		                  $i++;
+		               } 
+					 
+					 
+					 
 					try 
 					{
-						$conge->save();
-						
-						$this->view->success = "Création du congé pour Mr/Mme : ".$pers->getNomPrenom();	
-						
+						 if($flagc == 0)
+	                    {
+							$conge->save();
+							$this->view->success = "Création du congé pour Mr/Mme : ".$pers->getNomPrenom();	
+	                    }
+						else 
+						{
+                          	if($flagc == 1)
+                         	$this->view->warning = "Mr/Mme ".$pers->getNomPrenom()." à déja posé un congé du : ".$data['Debut']."  au :".$data['Fin'];
+						}
+							
 						// vider le formulaire pour crée un autre congé
 						$form->getElement('Ressource')->setValue('');
 						$form->getElement('TypeConge')->setValue('');
@@ -141,10 +164,8 @@ class CongeController extends Zend_Controller_Action
 						$form->getElement('AnneeRef')->setValue('');
 						$form->getElement('Ferme')->setValue('');
 						
-						
-						
 						//redirection
-                       // $this->_helper->Redirector('afficher');  // afficher conge
+                        //$this->_helper->Redirector('afficher');  // afficher conge
 				
 					} 
 					catch (Exception $e) 

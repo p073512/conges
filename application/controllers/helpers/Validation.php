@@ -1,7 +1,7 @@
 <?php
 class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helper_Abstract
 {
-	
+ 
 /*
  *  MTA :  Fonctions utilitaires pour calculer le nombre de jours de congé 
  */
@@ -632,7 +632,7 @@ function calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,
 			,    "$annee-01-01"        //    Nouvel an
 			,    "$annee-05-01"        //    Fête du travail
 			,    "$annee-05-08"        //    Armistice 1945
-			,    "$annee-05-15"        //    Assomption
+			,    "$annee-08-15"        //    Assomption
 			,    "$annee-07-14"        //    Fête nationale
 			,    "$annee-11-11"        //    Armistice 1918
 			,    "$annee-11-01"        //    Toussaint

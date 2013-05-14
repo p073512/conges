@@ -2,20 +2,44 @@
 class TestController extends Zend_Controller_Action
 {
 	public function indexAction()
-	{
+	{ 
+	    $fileHandle = fopen("C:\\Documents and Settings\\Administrateur\\Bureau\\Template.docx", "r");
+    	$line = @fread($fileHandle, filesize($userDoc));   
+	    $lines = explode(chr(0x0D),$line);
+	    $outtext = "";
+	    foreach($lines as $thisline)
+	      {
+	        $pos = strpos($thisline, chr(0x00));
+	        if (($pos !== FALSE)||(strlen($thisline)==0))
+	          {
+	          } else {
+	            $outtext .= $thisline." ";
+	          }
+	      }
+	     $outtext = preg_replace("/[^a-zA-Z0-9\s\,\.\-\n\r\t@\/\_\(\)]/","",$outtext);
+	    return $outtext;
+	} 
+	
+
+        
+        
+        
+        
+        
+/*
 		$utils = new Default_Controller_Helpers_Validation();
 		
-		$maroc = true;
+		$maroc = false;
 		$alsacemoselle=false;
 		
-		$date_debut = new DateTime("2013-04-04");
-		$date_fin = new DateTime("2013-04-04");
+		$date_debut = new DateTime("2013-01-01");
+		$date_fin = new DateTime("2013-12-31");
 		
 		$debut_midi = true;
 		$fin_midi = true;
 		
 		$annee = "2013";
-		
+*/
         // mettre les jours fériés maroc dans session TEST 
 		//$jours_feries_maroc = new Zend_Session_Namespace('TEST',false);
         //$jours_feries_maroc->jfm = $utils->jours_feries_maroc($annee);
@@ -23,7 +47,7 @@ class TestController extends Zend_Controller_Action
 
 		
 		// $this->view->var = $utils->jours_feries($annee, $alsacemoselle, $maroc);            //OK 
-        
+
         // $this->view->var = $utils->est_ferie($date_debut, $alsacemoselle, $maroc);          //OK
         
         //  $this->view->var  = $utils->a_normaliser($date_debut, $maroc);                      //OK
@@ -37,7 +61,7 @@ class TestController extends Zend_Controller_Action
 		//  $this->view->var = $utils->calcul_nombre_jours_conges($date_debut,$date_fin,$debut_midi,$fin_midi,$maroc);
 		
 		
-	} 
+
 
 
 	public function calculJoursCongesAction()

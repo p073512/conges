@@ -127,5 +127,5 @@ class Default_Model_DbTable_Conge extends Zend_Db_Table_Abstract
        
         return $this->fetchAll($select)->toArray();
     }
-    
+
 }

@@ -128,4 +128,23 @@ class Default_Model_DbTable_Conge extends Zend_Db_Table_Abstract
         return $this->fetchAll($select)->toArray();
     }
 
+    
+    public function CongesExistant($id_personne,$date_debut,$date_fin) 
+    {
+    	
+	    $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+	    $select = new Zend_Db_Select($db);
+	    // Requête
+	    $select ->from((array('c' =>'conge')),array('c.id_personne' ,'c.date_debut','c.date_fin')); 
+	    $select->where('c.id_personne ='.$id_personne);
+        $select->where('('.$db->quoteInto('c.date_debut>=?', $date_debut).'&&'.$db->quoteInto('c.date_fin <=?', $date_fin).') OR ('.$db->quoteInto('c.date_debut<?', $date_debut).'&&'.$db->quoteInto('c.date_fin >=?', $date_debut).')OR ('.$db->quoteInto('c.date_debut<?', $date_fin).'&&'.$db->quoteInto('c.date_fin >=?', $date_fin).')');
+	    $row = $select->query()->fetchAll();
+    	return $row;
+    }
+    
+    
+    
+    
+    
+    
 }

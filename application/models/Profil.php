@@ -58,6 +58,7 @@ class Default_Model_Profil
 	}
 
 	//gettors and settors d'accès aux variables
+
 	public function setId($id)
 	{
 		$this->_id = (int)$id;

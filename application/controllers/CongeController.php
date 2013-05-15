@@ -50,8 +50,14 @@ class CongeController extends Zend_Controller_Action
 		$this->view->form = $form;
 		$this->view->title = "Deposer un conge";
 		
-	     
-								
+		
+		/*************************************/
+	    $c = new Default_Model_DbTable_Conge();
+	    $c->CongesExistant(9,'2013-05-01','2013-05-20');  // nombre de congé trouvés //MTA
+		/*************************************/			
+
+	    
+	    
 		// remplir la list Année de reference par Annee , Annee + 1 , Annee - 1
 	
 	    $date_tmp = getdate(); // recuperer date system
@@ -121,37 +127,20 @@ class CongeController extends Zend_Controller_Action
 					$conge->setAnnee_reference($data['AnneeRef']);
 					$conge->setFerme($data['Ferme']);
                     
-				    $cong = $conge->fetchAll(null);  // recuperer tt les conges 
-					
-				    $flagc = 0;   $i=0;	 
-				
-					 // verifier dans les conges
-					 foreach ($cong as $v) 
-		               {  
-		               	  if(($cong[$i]->getId_personne() == $data['Ressource']) && (
-		               	     ($data['Debut'] >= $cong[$i]->getDate_debut()  &&   $data['Fin']<= $cong[$i]->getDate_fin()) ||
-		               	     ($data['Debut'] < $cong[$i]->getDate_debut()  &&   $data['Fin']>= $cong[$i]->getDate_debut()) || 
-		               	     ($data['Debut'] < $cong[$i]->getDate_fin()  &&   $data['Fin']>= $cong[$i]->getDate_fin())))
-		               	  {
-		          	      $flagc = 1; 
-		          	      break;
-		               	  }
-		                  $i++;
-		               } 
-					 
-					 
-					 
+	                $c = new Default_Model_DbTable_Conge();
+	   				$conges = $c->CongesExistant($data['Ressource'],$data['Debut'],$data['Fin']); 
+	   			    var_dump($conges);
+	   				
 					try 
 					{
-						 if($flagc == 0)
+						 if($conges == null)
 	                    {
 							$conge->save();
-							$this->view->success = "Création du congé pour Mr/Mme : ".$pers->getNomPrenom();	
+							$this->view->success = "Création du congé pour Mr/Mme : ".$pers->getNomPrenom()."    du :    ".$data['Debut']."    au :    ".$data['Fin'];	
 	                    }
-						else 
-						{
-                          	if($flagc == 1)
-                         	$this->view->warning = "Mr/Mme ".$pers->getNomPrenom()." à déja posé un congé du : ".$data['Debut']."  au :".$data['Fin'];
+						elseif($conges <> 0)
+						{	
+                         	$this->view->warning = "Mr/Mme    ".$pers->getNomPrenom()."    à déja posé un congé du :    ".$conges['0']['date_debut']."    au :    ".$conges['0']['date_fin'];
 						}
 							
 						// vider le formulaire pour crée un autre congé

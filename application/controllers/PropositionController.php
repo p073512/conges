@@ -107,7 +107,7 @@ class PropositionController extends Zend_Controller_Action
 				//création et initialisation d'un objet Default_Model_Proposition
 				//qui sera enregistré dans la base de données
 	                $proposition = new Default_Model_Proposition();     
-					$conge = new Default_Model_Conge();
+					
 
 			    	$proposition->setId_personne($data['Ressource']);		
 					$proposition->setDate_debut($data['Debut']);
@@ -117,50 +117,30 @@ class PropositionController extends Zend_Controller_Action
 					$proposition->setNombre_jours();
 					$proposition->setEtat('NC');
                     
-				    $props = $proposition->fetchAll(null); // recuperer tt les propositions 
-				    $cong = $conge->fetchAll(null);  // recuperer tt les conges 
-	               
-				    $flagp = 0;	 	$flagc = 0;			$i = 0; 		$j = 0;
-	               
-	               // verifier dans les propositions 
-	               foreach ($props as $v) 
-	               {   
-	               	  if(($props[$i]->getId_personne() == $data['Ressource']) && (
-	               	     ($data['Debut'] >= $props[$i]->getDate_debut()  &&   $data['Fin']<= $props[$i]->getDate_fin()) ||
-	               	     ($data['Debut'] < $props[$i]->getDate_debut()  &&   $data['Fin']>= $props[$i]->getDate_debut()) || 
-	               	     ($data['Debut'] < $props[$i]->getDate_fin()  &&   $data['Fin']>= $props[$i]->getDate_fin())))
-	                 {
-		          	      $flagp = 1; 
-		          	       break;
-		             }
-		               $i++;
-	               }
-                 // verifier dans les conges
-				 foreach ($cong as $v) 
-	               {  
-	               	  if(($cong[$i]->getId_personne() == $data['Ressource']) && (
-	               	     ($data['Debut'] >= $cong[$i]->getDate_debut()  &&   $data['Fin']<= $cong[$i]->getDate_fin()) ||
-	               	     ($data['Debut'] < $cong[$i]->getDate_debut()  &&   $data['Fin']>= $cong[$i]->getDate_debut()) || 
-	               	     ($data['Debut'] < $cong[$i]->getDate_fin()  &&   $data['Fin']>= $cong[$i]->getDate_fin())))
-	                  {
-		          	      $flagc = 1; 
-		          	      break;
-		              }
-	                  $j++;
-	               }
+					$p = new Default_Model_DbTable_Proposition();
+					$c = new Default_Model_DbTable_Conge();
+					
+					
+					
+				    $props = $p->PropositionExistante($data['Ressource'], $data['Debut'], $data['Fin']); // verifier si la proposition existe ou pas  
+				    $congs = $c->CongesExistant($data['Ressource'], $data['Debut'], $data['Fin']);  // verifier si le conge existe ou pas 
+	                
+				    //$pers->find($props['0']['id_personne'])->getNomPrenom(); // recuperer le nomprenom de la ressource
+	                
+
 					try 
 					{	
-	                    if(($flagp || $flagc) == 0)
+	                    if(($props || $congs) == null)
 	                    {
 	                    	$proposition->save();
-							$this->view->success = "Création de la proposition pour Mr/Mme : ".$pers->getNomPrenom();	
+							$this->view->success = "Création de la proposition pour Mr/Mme :    ".$pers->getNomPrenom()."    du :    ".$data['Debut']."    au :    ".$data['Fin'];	
 	                    }
 						else 
-						{
-							if($flagp == 1)	
-                        		$this->view->warning =  "Mr/Mme ".$pers->getNomPrenom()." à déja posé une proposition du : ".$data['Debut']."  au :".$data['Fin'];
-                       	    elseif($flagc == 1)
-                         		$this->view->warning = " La proposition de Mr/Mme :".$pers->getNomPrenom()." est déja passé en congé !";
+						{   
+							if($props <> 0)	
+                        		$this->view->warning =  "Mr/Mme    ".$pers->getNomPrenom()."    à déja posé une proposition du :    ".$props['0']['date_debut']."    au :    ".$props['0']['date_fin'];
+                       	    elseif($congs <> 0)
+                         		$this->view->warning = " La proposition de Mr/Mme    ".$pers->getNomPrenom()."    est déja passé en congé !";
 
 						}
 					    
@@ -181,6 +161,7 @@ class PropositionController extends Zend_Controller_Action
 						 $this->view->error = "Création de la proposition pour Mr/Mme : ".$pers->getNomPrenom()." à échoué !";	
 					}
 
+				
 				}
 			}
 			else  // form invalide 
@@ -347,9 +328,11 @@ class PropositionController extends Zend_Controller_Action
 		 	$data = $this->getRequest()->getPost();
 			$id = $data['id'];   
 		        
+			
 			//création du modéle pour la suppression
 			$proposition = new Default_Model_Proposition();
-
+          
+            
 			try 
 			{     //appel de la fcontion de suppression avec en argument,
 				  //la clause where qui sera appliquée

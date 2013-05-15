@@ -23,7 +23,7 @@ class ConnexionController extends Zend_Controller_Action
 		// remplir le select par les profils
 	     $form->setDbOptions('Profil',new Default_Model_Profil(),'getLogin','getLogin');
 		//vérification si la page a bien été appelée à partir d'un formulaire
-     
+
 	     if($this->_request->isPost())
 		{   
 			
@@ -36,14 +36,12 @@ class ConnexionController extends Zend_Controller_Action
 				//Zend_Debug::dump($data, $label = "Formulaire de connexion valide", $echo = true);
 				$profil = $data['Profil'];
 				$mot_passe =  $data['Password'];
+			
 				
 				// MTA 
                 $remember_me = $data['Remember']; // recupere la valeur de checkbox remember me 
                 
-                
-            
-              
-                
+   
 				//création d'un adpatateur d'authentification utilisant une base de données
 				//le premier argument correspond à l'adptateur par défaut
 				//le second correspond à la table qui est utilisée pour l'authentification
@@ -56,8 +54,8 @@ class ConnexionController extends Zend_Controller_Action
 
 				//préparation de la requête d'authentification en indiquant l'identité et le crédit
 				$authAdapter->setIdentity($profil);
-				$authAdapter->setCredential($mot_passe);
-				
+				$authAdapter->setCredential(md5($mot_passe));
+
 
 				//exécution de la requête d'authentification et enregistrement du résultat
 				$result = $this->_auth->authenticate($authAdapter);
@@ -74,7 +72,7 @@ class ConnexionController extends Zend_Controller_Action
 					// MTA
 					if ($remember_me === '1')
 			        {   
-			           	Zend_Session::rememberMe(24*3600);   // remember me pendant = 24h
+			           	Zend_Session::rememberMe(24*3600);   // remember me pendant = 24h  
 	                }
 	
 					//permet de regénérer l'identifiant de session

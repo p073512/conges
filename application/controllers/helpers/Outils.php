@@ -804,11 +804,12 @@
 	{   
 	   $bool = false ;
 	   
-	   $obj_dd = substr($obj->getDate_debut(),0,11);
-	   $obj_df = substr($obj->getDate_fin(),0,11);
+	   $obj_dd = substr($obj->getDate_debut(),0,10);
+	   $obj_df = substr($obj->getDate_fin(),0,10);
 
 	   $personne_datefin = $this->makedate($personne->getDate_fin()); 
-
+        
+	    // date_fin    non spécifié dans le formulaire 
         if($personne_datefin  == "-" || $personne_datefin  == "01/01/1970" || $personne_datefin  == "1970-01-01" || $personne_datefin  == "0000-00-00" || $personne_datefin  == "00-00-0000")   // date_fin non mensioné   soit 01/01/1970 (date unix par default) oubien  "" chaine vide 
         {
 	            if($obj_dd >= $personne->getDate_debut())
@@ -816,10 +817,11 @@
 		            $bool = true ;
 		        }
         }
-        else                             // date_fin mentioné 
+        // date_fin spécifié dans le formulaire 
+        else                             
         {
             
-       		 if(($obj_dd <= $personne->getDate_fin() &&  $obj_df <= $personne->getDate_fin()) && ($obj_dd >= $personne->getDate_debut() &&  $obj_df >= $personne->getDate_debut()))
+       		 if(($obj_df >= $personne->getDate_debut() && $obj_df <= $personne->getDate_fin()) && ($obj_dd >= $personne->getDate_debut() && $obj_dd <= $personne->getDate_fin()))
 	        {
 	            $bool = true ;
 	        }

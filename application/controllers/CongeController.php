@@ -79,7 +79,7 @@ class CongeController extends Zend_Controller_Action
 	    // remplir le type de conge  
 	     $form->setDbOptions('TypeConge',new Default_Model_TypeConge(),'getId','getCode');
 
-		 $this->_helper->viewRenderer('creer');  // creer proposition
+		 $this->_helper->viewRenderer('creer');  // creer conge
 
 	    // requete POST 
 		if($this->_request->isPost())   
@@ -163,10 +163,7 @@ class CongeController extends Zend_Controller_Action
 										if($res == null)   // pas de chevachement de congés
 										{      
 											    $r =  $outils->authorized($pers,$conge);
-											
-												var_dump($r);
-												echo "</br>".date("Y-m-d");  
-												
+
 					                   		  	  if($r[0] == true)
 					                   		  	  {
 						                   		         // oui 
@@ -187,17 +184,17 @@ class CongeController extends Zend_Controller_Action
 												  else 
 												  {     //return array($bool,$personne->getDate_debut(),$personne_datefin,$obj_dd,$obj_df);
 									  									  	     
-												  	     if($r[3] < $r[1])    // date_debut_proposition  < date_debut_projet
+												  	     if($r[3] < $r[1])    // date_debut_conge  < date_debut_projet
 												         {
 												         	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et ne peux pas pos&eacute; un cong&eacute; avant cette date !";
 												         }
-												         elseif($r[2] > $r[4])  // date_fin_projet > date_fin_proposition 
-												         {
-													             if($r[2] < date("Y-m-d"))  // date_fin_projet  <  date_aujourdhui 
-													             {
+												          elseif($res[4] > $res[2])  // date_fin_conge  >  date_fin_projet
+									         			  {
+										             			 if($res[2] > date("Y-m-d"))  // date_fin_projet  >  date_aujourdhui 
+										                         {
 													             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."   a quitt&eacute; le projet le :  ".$pers->getDate_fin()."   impossible de lui cr&eacute;er un cong&eacute; !";
 													             }	
-													             else                        // date_fin_projet  >=  date_aujourdhui 
+													             else                        // date_fin_projet  <=  date_aujourdhui 
 													             {
 													             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  va quit&eacute; le projet le :  ".$pers->getDate_fin()."  et ne peux pas pos&eacute; un cong&eacute; du : ".$r[3]." au :".$r[4]." !";
 													             }	
@@ -462,9 +459,42 @@ class CongeController extends Zend_Controller_Action
 									
 									if($res == null)
 									{	 
-										  $conge->save();
-										  $this->view->success = " Le cong&eacute; a &eacute;t&eacute; modifi&eacute; avec succ&eacute;s !";              
-							              header("Refresh:1.5;URL=".$baseurl."/conge/afficher");   // URL dynamique 
+										 
+										  $r =  $outils->authorized($pers,$conge);
+	
+			                   		  	  if($r[0] == true)
+			                   		  	  {
+				                   		      // oui 
+											   $conge->save();
+										       $this->view->success = " Le cong&eacute; a &eacute;t&eacute; modifi&eacute; avec succ&eacute;s !";              
+							                   header("Refresh:1.5;URL=".$baseurl."/conge/afficher");   // URL dynamique 
+			                   		  	  } 
+										  else 
+										  {     					  	     
+										  	     if($r[3] < $r[1])    // date_debut_conge  < date_debut_projet
+										         {
+										         	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  aucune modification avant cette date n'est acc&eacute;pt&eacute;e ! ";
+										         }
+										          elseif($r[4] > $r[2])  // date_fin_conge  >  date_fin_projet
+										         {
+											             if($r[2] > date("Y-m-d"))  // date_fin_projet  >  date_aujourdhui 
+											             {
+											             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."   a quitt&eacute; le projet le :  ".$pers->getDate_fin()."   impossible de modifi&eacute; ce cong&eacute; !";
+											             }	
+											             else                        // date_fin_projet  >=  date_aujourdhui 
+											             {
+											             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  va quit&eacute; le projet le :  ".$pers->getDate_fin()."  et ne peux modifi&eacute; le cong&eacute; du : ".$r[3]." au :".$r[4]." !";
+											             }	
+										         }
+										         else
+										        {   
+										        	if(($r[2] == "-" || $r[2] == "01/01/1970" || $r[2] == "1970-01-01"  || $r[2] == "0000-00-00" || $r[2] == "00-00-0000"))
+										        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  aucune modification avant cette date n'est acc&eacute;pt&eacute;e !";
+										        	else
+										        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et fini le : ".$r[2]." aucune modification hors cette p&eacute;riode n'est acc&eacute;pt&eacute;e !";
+										        } 
+										  }
+    
 									}
 									else 
 									{    

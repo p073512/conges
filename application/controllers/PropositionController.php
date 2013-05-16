@@ -162,16 +162,14 @@ class PropositionController extends Zend_Controller_Action
 										   $form->getElement('FinMidi')->setValue('');	
 		                   		  	  } 
 									  else 
-									  {     
-									  	     //return array($bool,$personne->getDate_debut(),$personne_datefin,$obj_dd,$obj_df);
-									  									  	     
+									  {   				  	     
 									  	     if($res[3] < $res[1])    // date_debut_proposition  < date_debut_projet
 									         {
 									         	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et ne peux pas pos&eacute; une proposition avant cette date !";
 									         }
-									         elseif($res[2] > $res[4])  // date_fin_projet > date_fin_proposition 
+									         elseif($res[4] > $res[2])  // date_fin_proposition  >  date_fin_projet
 									         {
-										             if($res[2] < date("Y-m-d"))  // date_fin_projet  <  date_aujourdhui 
+										             if($res[2] > date("Y-m-d"))  // date_fin_projet  >  date_aujourdhui 
 										             {
 										             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."   a quitt&eacute; le projet le :  ".$pers->getDate_fin()."   impossible de lui cr&eacute;er une proposition !";
 										             }	
@@ -182,7 +180,7 @@ class PropositionController extends Zend_Controller_Action
 									         }
 									         else
 									        {   
-									        	if($res[2] == "-" || $res[2] == "01/01/1970" || $res[2] == "1970-01-01"  || $res[2] == "0000-00-00" || $res[2] == "00-00-0000")
+									        	if(($res[2] == "-" || $res[2] == "01/01/1970" || $res[2] == "1970-01-01"  || $res[2] == "0000-00-00" || $res[2] == "00-00-0000"))
 									        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  aucune proposition avant cette date n'est acc&eacute;pt&eacute;e !";
 									        	else
 									        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et fini le : ".$res[2]." aucune proposition hors cette p&eacute;riode n'est acc&eacute;pt&eacute;e !";
@@ -346,6 +344,11 @@ class PropositionController extends Zend_Controller_Action
 			//récupération des données envoyées par le formulaire
 			$data =  $this->getRequest()->getParams();
 			
+		    $requete = $this->getRequest();
+			if ($requete instanceof Zend_Controller_Request_Http)
+			{ 
+				$baseurl = $requete->getBaseUrl();
+			}
 			
             
 			//vérifie que les données répondent aux conditions des validateurs
@@ -420,10 +423,43 @@ class PropositionController extends Zend_Controller_Action
 			                   // si le congé n'existe pas 
 			                   if($res_c == null)
 			                   {   // oui 
-									 $proposition->save();
-			                   		 $this->view->success = " La proposition a &eacute;t&eacute; modifi&eacute; avec succ&eacute;s !";
-								     header("Refresh:1.5;URL=".$baseurl."/proposition/afficher");              // URL dynamique 
-                               }
+		
+		                   		      $res =  $outils->authorized($pers,$proposition);
+
+		                   		  	  if($res[0] == true)
+		                   		  	  {
+			                   		      // oui 
+										  $proposition->save();	    
+									      $this->view->success = "La proposition a &eacute;t&eacute; modifi&eacute; avec succ&eacute;s !";                   
+			                   		      header("Refresh:1.5;URL=".$baseurl."/proposition/afficher");              // URL dynamique 
+		                   		  	  } 
+									  else 
+									  {     					  	     
+									  	     if($res[3] < $res[1])    // date_debut_proposition  < date_debut_projet
+									         {
+									         	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  aucune modification avant cette date n'est acc&eacute;pt&eacute;e ! ";
+									         }
+									          elseif($res[4] > $res[2])  // date_fin_proposition  >  date_fin_projet
+									         {
+										             if($res[2] > date("Y-m-d"))  // date_fin_projet  >  date_aujourdhui 
+										             {
+										             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."   a quitt&eacute; le projet le :  ".$pers->getDate_fin()."   impossible de modifié cette proposition !";
+										             }	
+										             else                        // date_fin_projet  >=  date_aujourdhui 
+										             {
+										             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  va quit&eacute; le projet le :  ".$pers->getDate_fin()."  et ne peux modifi&eacute; la proposition du : ".$res[3]." au :".$res[4]." !";
+										             }	
+									         }
+									         else
+									        {   
+									        	if(($res[2] == "-" || $res[2] == "01/01/1970" || $res[2] == "1970-01-01"  || $res[2] == "0000-00-00" || $res[2] == "00-00-0000"))
+									        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  aucune modification avant cette date n'est acc&eacute;pt&eacute;e !";
+									        	else
+									        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et fini le : ".$res[2]." aucune modification hors cette p&eacute;riode n'est acc&eacute;pt&eacute;e !";
+									        } 
+									  }
+			                   
+			                   }
 			                   // si le congé existe 
 								elseif($res_c <> null)
 							   {   

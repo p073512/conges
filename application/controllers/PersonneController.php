@@ -703,7 +703,7 @@ class PersonneController extends Zend_Controller_Action
 										$data['date_fin'] = date('Y-m-d',strtotime($data['date_fin']));
 										$data['entite'] = $personne->getEntite();
 										$data['modalite'] = $personne->getModalite();
-				                        var_dump($data);
+				              
 										$personne = new Default_Model_Personne($data);
 				           
 										try 

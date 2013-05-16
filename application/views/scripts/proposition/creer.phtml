@@ -6,11 +6,80 @@
 		$this->JQuery()->addStyleSheet($this->baseUrl() . '/js/jquery/themes/smoothness/jquery-ui-1.8.23.custom.css');
 		// MBA : indique le fichier de script javascript à utliser avec jQuery UI
 		$this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
-				$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/i18n/jquery.ui.datepicker-fr.js');
-				   
-	  echo $this->jQuery(); 
+		$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/i18n/jquery.ui.datepicker-fr.js');
+		$this->Jquery()->addJavascriptFile($this->baseUrl() .'/scriptjs/d3.js');	
+		$this->Jquery()->addJavascriptFile($this->baseUrl() .'/scriptjs/jquery.tipsy.js');
+	
+		$this->headScript()->appendFile( $this->baseUrl() .'/js/myScriptCalendarview.js');
+	  
+		echo $this->jQuery(); 
 	  ?> 
  
+ <script type="text/javascript">
+ 
+ $(document).ready(function(){
+
+        $('#Debut').change(function(){
+
+
+            alert('debut a changé');});
+        $('#Fin').change(function(){
+
+            alert('Fin a changé');});
+        $('#Ressource').change(function(){
+
+          
+        
+        	date = new Date();
+        	iMoisCourant = date.getMonth();
+        	iMoisCourantForPHP = iMoisCourant + 1 ; // janvier == 0 Décembre à 11 pr javascript / janvier == 1 et décembre à 12 pr PHP
+            anneeCourante = date.getFullYear();
+
+
+            from = iMoisCourantForPHP+'-'+ anneeCourante;
+            to = iMoisCourantForPHP+'-'+anneeCourante;
+
+            idPersonne = jQuery('#Ressource option:selected').val();
+           
+            periode = {
+                    "Year": anneeCourante,
+                    	"From": from,
+                    		"To": to
+                };
+            data = getCalendarContent(idPersonne,periode);
+            
+             periode = {
+                    "Year": anneeCourante,
+                    	"From": iMoisCourant,
+                    		"To": iMoisCourant
+                };
+            
+
+             /*
+              * On Supprime toutes les balises SVG
+              *
+              */
+             jQuery('.hero-unit')
+                 .remove();
+
+             d3.selectAll('svg')
+                 .style("opacity", 1)
+                 .transition()
+                 .duration(400)
+                 .style("opacity", 0)
+                 .remove();
+                      
+            DrawMonthCalendar(periode, calendarOptions, data);
+
+            
+        });
+      
+        
+	 
+ });
+ 
+ 
+ </script>
  
 		<div class="row-fluid offset1">
 		<div id="header-container">
@@ -38,6 +107,7 @@
 	 * 
 	 */
 	$this->layout()->setLayout('mylayout');
+	if(isset($this->form))
 	$this->form->setAction($this->url());
   
 	?>
@@ -107,7 +177,7 @@
 			<legend ><?php if(isset($this->title))echo $this->title;?></legend>
 				
 				<!-- On récupére les informations nécessaire du formulaire via le $this->form -->
-					<form action="<?php $this->form->getAction() ?>" name="<?php $this->form->getName() ?>" method="post">
+					<form action="<?php if(isset($this->form))$this->form->getAction() ?>" name="<?php if(isset($this->form))$this->form->getName() ?>" method="post">
 					
                       <?php
                       	
@@ -118,6 +188,10 @@
                       /*
                        * On récupére les élements du formulaire , et on compte le nombre de ceux ci
                        */
+                      if(isset($this->form))
+                      {
+                      	
+                      
 	                      $Elements =$this->form->getElements();
 	                      $N_Elements = count($Elements);
 
@@ -208,17 +282,19 @@
                                   echo $this->form->getElement($k); 
                            
                       } // fin else 
-                      	
+                      }
                         ?>
                       </div>
                         </form>
 		</fieldset>
                 
 		</div><!-- MBA Fermeture div class="well row-fluid" -->
+		 <div id="wrapper" class="offset2 span10" >
+			    <!-- ici sera affichÃ© le calendrier -->
+	      </div>
 	</div><!-- MBA Fermeture div class="container" -->
         
 <!-- MBA FIN AFFICHAGE DU FORMULAIRE -->
-
 
   
  <?php #endregion MBA

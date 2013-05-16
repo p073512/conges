@@ -16,15 +16,15 @@ class PropositionController extends Zend_Controller_Action
 		$proposition = new Default_Model_Proposition;
 		//$this->view->propositionArray =$proposition->fetchAll('Etat = "NV"');
 
-		//création de notre objet Paginator avec comme paramétre la méthode
-		//récupérant toutes les entrées dans notre base de données
+		//crï¿½ation de notre objet Paginator avec comme paramï¿½tre la mï¿½thode
+		//rï¿½cupï¿½rant toutes les entrï¿½es dans notre base de donnï¿½es
 		$paginator = Zend_Paginator::factory($proposition->fetchAll($str=array()));
-		//indique le nombre déléments é afficher par page
+		//indique le nombre dï¿½lï¿½ments ï¿½ afficher par page
 		$paginator->setItemCountPerPage(20);
-		//récupére le numéro de la page é afficher
+		//rï¿½cupï¿½re le numï¿½ro de la page ï¿½ afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 
-		//$this->view permet d'accéder é la vue qui sera utilisée par l'action
+		//$this->view permet d'accï¿½der ï¿½ la vue qui sera utilisï¿½e par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
 		$this->view->propositionArray = $paginator;
@@ -34,29 +34,194 @@ class PropositionController extends Zend_Controller_Action
 	//:::::::::::::// ACTION CREER//::::::::::::://
 	public function creerAction()   
 	{   
-		//création du fomulaire
+		
+	    
+		//si la page est POSTEE = formulaire envoyÃ©
+		if ($this->getRequest()->isXmlHttpRequest()) {
+			
+			  $conges          = array(); // tableau conteneur des congÃ©s qui seront renvoyÃ©s Ã  la vue
+	          $keysIndiceConge = array(); // tableau des indice congÃ© (dans le cas ou plusieurs congÃ© posÃ© dans un seul mois)
+	          $indiceConge ; //mois-annee , les congÃ©s posÃ©s sur un mois sont associÃ©s a cette clÃ©
+	          $ressourcesArray = array();
+              //rÃ©cupÃ©ration des donnÃ©es envoyÃ©es en ajax
+              $data = $this->getRequest()->getPost();
+              
+              if (isset($data['from']) && isset($data['to'])) {
+                  
+                  if (isset($data['id_personne']) && $data['id_personne'] !== 'x') {
+                     
+                  	 $moisAnneeDebut = explode("-", $data['from']);
+                  	 $moisAnneeFin = explode("-", $data['to']);
+                  	 
+                  
+                      $personne = new Default_Model_Personne();
+                      $personne->find($data['id_personne']);
+                      $cs = $personne->getEntite()->getCs();
+                      
+                      if ($cs == '1')
+                          $cs = true;
+                      else
+                          $cs = false;
+                      
+                      $congeObj   = new Default_Model_Conge();
+                      $congeArray = array();
+                      
+                      $outils  = new Default_Controller_Helpers_outils();
+                      
+                      	$anneeDebut = intval($moisAnneeDebut[1]);
+                        $anneeFin = intval($moisAnneeFin[1]);
+                      	$diffAnnee = $anneeFin - $anneeDebut ;
+                     
+                      
+                      if($anneeDebut !== $anneeFin)
+                      {
+                      
+                      	for($i = 0; $i<=$diffAnnee;$i++)
+                      	{
+                         $jferiesCSM[$anneeDebut + $i] = $outils->setJoursFerie($anneeDebut + $i, true, false);
+		                 $jferiesCSM[$anneeDebut + $i] = (array) $jferiesCSM[$anneeDebut + $i];
+		             
+		                 $jferiesFR[$anneeDebut + $i] = $outils->setJoursFerie($anneeDebut + $i);
+		                 $jferiesFR[$anneeDebut + $i] = (array) $jferiesFR[$anneeDebut + $i];
+                      	}
+                      	 
+                      	
+                      }
+                      else
+                      {
+                      
+                      $jferiesCSM[$anneeDebut] = $outils->setJoursFerie($anneeDebut, true, false);
+		              $jferiesCSM[$anneeDebut] = (array) $jferiesCSM[$anneeDebut];
+		             
+		              $jferiesFR[$anneeDebut] = $outils->setJoursFerie($anneeDebut);
+		              $jferiesFR[$anneeDebut] = (array) $jferiesFR[$anneeDebut];
+                      }
+
+                     
+                      // composition de la date dÃ©but a partir du mois et annÃ©e saisie dans le form
+                      $dateDebut = '01-' . $moisAnneeDebut['0'] . '-' . $moisAnneeDebut['1'];
+                      
+                      if ($moisAnneeDebut['0'] == '1') // : fÃ©vrier ( Janvier = 0) 
+                          {
+                          if (((($moisAnneeDebut['1'] % 4) == 0) && ((($moisAnneeDebut['1'] % 100) != 0) || (($moisAnneeDebut['1'] % 400) == 0)))) // annÃ©e bissextile
+                              {
+                              $dateFin = '29-' . $moisAnneeDebut['0'] . '-' . $moisAnneeDebut['1'] . ' 23:59:59';
+                              
+                          } else // annÃ©e non bissextile
+                              {
+                              $dateFin = '28-' . $moisAnneeDebut['0'] . '-' . $moisAnneeDebut['1'];
+                          }
+                      } else if ($moisAnneeDebut['0'] == '3' || $moisAnneeDebut['0'] == '5' || $moisAnneeDebut['0'] == '8' || $moisAnneeDebut['0'] == 10) // avril / juin / Septembre / Novembre
+                          {
+                          $dateFin = '30-' . $moisAnneeDebut['0'] . '-' . $moisAnneeDebut['1'] . ' 23:59:59';
+                      } else // Janvier/ Mars /Mai / Juillet /Aout / Octobre /DÃ©cembre
+                          {
+                          $dateFin = '31-' . $moisAnneeDebut['0'] . '-' . $moisAnneeDebut['1'] . ' 23:59:59';
+                      }
+                      
+                    
+                      // rÃ©cupÃ©ration des congÃ©s 
+                      $congeArray = $congeObj->conges_existant($personne->getId(), $dateDebut, $dateFin, '0');
+                     
+	                  $resultCount = count($congeArray);
+	                    
+	                   if($resultCount == 0) // si aucun congÃ©
+	                   {
+	                   	 $this->_helper->json(null);
+	                   	 return;
+	                   }
+	                   
+                      foreach ($congeArray as $k => $v) {
+                           
+                          $idTypeConge = $congeArray[$k]['id_type_conge'];
+		                  $typeConge = new Default_Model_TypeConge();
+		                  $tc = $typeConge->find($idTypeConge);
+		                  $codeTypeConge = $tc->getCode();   
+                              
+                          /*
+                           * rÃ©cupÃ©ation du dÃ©tail de la pÃ©riode de congÃ©
+                           * 
+                           */
+                          $conge = $outils->getPeriodeDetails($congeArray[$k]['date_debut'], $congeArray[$k]['date_fin'],$codeTypeConge,$cs, false);
+                          $conge['nombreJours'] = $congeArray[$k]['nombre_jours']; 
+                           
+                          // indice congÃ© sous format : annee-mois
+                          $indiceConge = explode("-", $congeArray[$k]['date_debut']);
+                          $indiceConge = $indiceConge['0'] . '-' . $indiceConge['1']; // indice conge sous format Annee-mois
+                          
+                          // compter le nombre de congÃ© posÃ©s sÃ©paremment sur un moi
+                          if (isset($keysIndiceConge[$indiceConge])) {
+                              $keysIndiceConge[$indiceConge] = $keysIndiceConge[$indiceConge] + 1;
+                          } else {
+                              $keysIndiceConge[$indiceConge] = 0;
+                              
+                          }
+                          
+                          // stocker les congÃ©s dans la table sous l'indice [annee-mois][numConge]
+                          $conges[$indiceConge][$keysIndiceConge[$indiceConge]] = (array) $conge;
+                          
+                          
+                      }
+                      $ferieArray = array();
+                      foreach ($jferiesCSM as $k=>$v)
+                               {
+                                                        	
+                                $ferieArray[$k] = array_merge($jferiesCSM[$k]['joursFerie'],$jferiesFR[$k]['joursFerie']);
+                               };
+                      
+                      
+                      /*
+                       * Tableau qui sera envoyÃ© Ã  la vue en format ensuite parsÃ© en javascript
+                       * pour dessiner le calendrier
+                       */
+                      $ressourcesArray = array('ressources'=>
+                                                     array('0'=>
+                                                          array('id_personne' => $personne->getId(),
+                                                                'Nom' => $personne->getNomPrenom(),
+                                                                'Pole' => array('libelle' =>$personne->getPole()->getLibelle(),'value'=> $personne->getPole()->getId()),
+                                                                'Entite' => array('libelle'=>$personne->getEntite()->getLibelle(),'value' => $personne->getEntite()->getId()),
+                                                                'Fonction'=> array('libelle' => $personne->getFonction()->getLibelle(),'value'=> $personne->getFonction()->getId()),
+                                                                'cs' => $personne->getEntite()->getCs(),
+                                                                'conge'=>  $conges )),
+                                                        
+                                                     
+                                                       'Ferie'=>  $ferieArray);
+                    
+                       // renvoie de la structure Ã  la vue en format json .
+                      $this->_helper->json($ressourcesArray);
+                      
+                      
+                      
+                      
+                  } 
+              }
+		}
+		
+		else if($this->_request->isPost() && !$this->getRequest()->isXmlHttpRequest())   
+		{    $data = array();
+		//crï¿½ation du fomulaire
 		$form = new Default_Form_Proposition();
-		//indique l'action qui va traiter le formulaire
-		//$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'create'), 'default', true));
-
-		//assigne le formulaire à la vue
-		$this->view->form = $form;
 		$this->view->title = "<h4>Cr&eacute;er une Proposition :</h4><br/>";
-
+			
+		
+		//assigne le formulaire ï¿½ la vue
+		$this->view->form = $form;
+		
 		// creer proposition    
 		$this->_helper->viewRenderer('creer');  
-	    $this->view->form = $form;
+	    //$this->view->form = $form;
 	    
         // remplir le select avec les ressources CSM lors du chargement de la page 
        
 	    $where =  array("id_entite = ?" => 2);
 	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
-
-	    $data = array();
-		//si la page est POSTEE = formulaire envoyé
-		if($this->_request->isPost())   
-		{    
-			//récupération des données envoyées par le formulaire
+			
+		
+	    
+			
+			
+			
+			//rï¿½cupï¿½ration des donnï¿½es envoyï¿½es par le formulaire
 			$data = $this->_request->getPost();
          
             $personne = new Default_Model_Personne();
@@ -66,18 +231,18 @@ class PropositionController extends Zend_Controller_Action
 	        $outils = new Default_Controller_Helpers_outils();   
 	
 	        
-			//vérifie que les données répondent aux conditions des validateurs
+			//vï¿½rifie que les donnï¿½es rï¿½pondent aux conditions des validateurs
 			if($form->isValid($data))  // form valide 
 			{
-				if($data['Ressource'] === 'x')  // si on a pas selectionné une ressource  id = 'x'
+				if($data['Ressource'] === 'x')  // si on a pas selectionnï¿½ une ressource  id = 'x'
 				{
 				   $this->view->error = "Veuillez selectionner une ressource !";
 				}
 				elseif ($data['Debut'] > $data['Fin']) // si date debut > date fin 
 				{	
-					$this->view->error = "La date de d&eacute;but doit étre inf&eacute;rieure ou &eacute;gale à la date de fin";
+					$this->view->error = "La date de d&eacute;but doit ï¿½tre inf&eacute;rieure ou &eacute;gale ï¿½ la date de fin";
 				}	
-				// si on a coché dans une journée les deux cases debut_midi et fin_midi 
+				// si on a cochï¿½ dans une journï¿½e les deux cases debut_midi et fin_midi 
 			    elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1))
 				{
 				     $this->view->error = "Sur un meme jour vous ne pouvez selectionner que 'Debut midi' ou 'Fin midi' !";
@@ -89,12 +254,12 @@ class PropositionController extends Zend_Controller_Action
 								  
 					try 
 					{          
-				       //création et initialisation d'un objet Default_Model_Proposition
-			    	   //qui sera enregistré dans la base de données
+				       //crï¿½ation et initialisation d'un objet Default_Model_Proposition
+			    	   //qui sera enregistrï¿½ dans la base de donnï¿½es
 	    		       $proposition = new Default_Model_Proposition();   
  
                  
-	    		       //************** gerer les datetimes en fonction des demis journées *****************************// 
+	    		       //************** gerer les datetimes en fonction des demis journï¿½es *****************************// 
 			     	    $date = $outils->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
 			     	   //***********************************************************************************************// 		   		        
           
@@ -105,7 +270,7 @@ class PropositionController extends Zend_Controller_Action
 
 				       if($tab == null)
 				       {    
-				       	    // pour l'affichage de  " du : 2013-05-06 à  Midi"     au lieu de  " du : 2013-02-06 12:00:00 " 
+				       	    // pour l'affichage de  " du : 2013-05-06 ï¿½ Midi"     au lieu de  " du : 2013-02-06 12:00:00 " 
 							$Arr =  $outils->makeMidi($date[0],$date[1]);  	
 				        	$this->view->warning = $pers->getNomPrenom()." a pos&eacute; une proposition sur une periode non ouvrable date debut :   ".$Arr[0]."  ".$Arr[1]."   date fin :  ".$Arr[2]."  ".$Arr[3];  
 				       }
@@ -129,18 +294,18 @@ class PropositionController extends Zend_Controller_Action
 							 $res_p = $p->propositions_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getMi_debut_journee(),$proposition->getMi_fin_journee(), null);
 		                    //****************************************************************************//	
 									
-							//****************/// Gestion des chevauchements de congés ///****************//			
+							//****************/// Gestion des chevauchements de congï¿½s ///****************//			
 							 $c = new Default_Model_DbTable_Conge();
 							 $res_c = $c->conges_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getMi_debut_journee(),$proposition->getMi_fin_journee(), null);
 		                    //****************************************************************************//	    
 								        
-					         // pour l'affichage de  " du : 2013-05-06 à  Midi"     au lieu de  " du : 2013-02-06 12:00:00 " 
+					         // pour l'affichage de  " du : 2013-05-06 ï¿½ Midi"     au lieu de  " du : 2013-02-06 12:00:00 " 
 							 $Arr =  $outils->makeMidi($proposition->getDate_debut(),$proposition->getDate_fin());  	
 	    
-						     // proposition n'existe pas dans la base de donnée 
+						     // proposition n'existe pas dans la base de donnï¿½e 
 		                      if($res_p == null)
 		                   	  {    
-		                   		  // si le congé n'existe pas 
+		                   		  // si le congï¿½ n'existe pas 
 		                   		  if($res_c == null)
 		                   		  {
 		                   		  	
@@ -154,7 +319,7 @@ class PropositionController extends Zend_Controller_Action
 											    
 									      $this->view->success = "Cr&eacute;ation d'une proposition pour :   ".$pers->getNomPrenom()." 	&nbsp;&nbsp;&nbsp; du :   ".$Arr[0]."  ".$Arr[1]."	  &nbsp;&nbsp;&nbsp; au :   ".$Arr[2]."   ".$Arr[3];             
 		                                        
-			                   		      // vider le formulaire pour crée une autre proposition
+			                   		      // vider le formulaire pour crï¿½e une autre proposition
 										   $form->getElement('Ressource')->setValue('');
 										   $form->getElement('Debut')->setValue('');
 										   $form->getElement('Fin')->setValue('');
@@ -187,7 +352,7 @@ class PropositionController extends Zend_Controller_Action
 									        } 
 									  }
 		                   		  }
-		                   	      // si le congé existe 
+		                   	      // si le congï¿½ existe 
 						  	      else
 						          {   
 					    	       	 // non 
@@ -206,7 +371,7 @@ class PropositionController extends Zend_Controller_Action
 											
 											// Responsable sur l'affichage de la periode total des propositions ( 'date_debut' de la "1ere proposition"     et 'date_fin' de la "derniere proposition" )
 											// remplir un tableau par toute les dates (debut et fin) de toute les propositions de cette personne 
-											// trié le tableau rempli et afficher la premiere et la derniere valeur 
+											// triï¿½ le tableau rempli et afficher la premiere et la derniere valeur 
 										$j = 0;
 										for($i=0; $i < count($res_p); $i++ )
 										{
@@ -214,7 +379,7 @@ class PropositionController extends Zend_Controller_Action
 										    	$t[$j+1] = $res_p[$i]['date_fin'];
 										    	$j = $j+2;
 										 }
-								   	     sort($t);   // trié ASC par default 
+								   	     sort($t);   // triï¿½ ASC par default 
 
 								   	     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 										$Arr =  $outils->makeMidi($t[0],$t[count($t)-1]);
@@ -234,8 +399,29 @@ class PropositionController extends Zend_Controller_Action
 			}
 			else  // form invalide 
 			{   
+				
+				$data = array();
+		//crï¿½ation du fomulaire
+		$form = new Default_Form_Proposition();
+		$this->view->title = "<h4>Cr&eacute;er une Proposition :</h4><br/>";
+			
+		
+		//assigne le formulaire ï¿½ la vue
+		$this->view->form = $form;
+		
+		// creer proposition    
+		$this->_helper->viewRenderer('creer');  
+	    //$this->view->form = $form;
+	    
+        // remplir le select avec les ressources CSM lors du chargement de la page 
+       
+	    $where =  array("id_entite = ?" => 2);
+	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
+			
+				
+				
 				$form->populate($data);
-				if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
+				if($data['Ressource'] === 'x')     // si on a pas selectionnï¿½ une ressource  id = 'x'
 				{
 				   $this->view->error = "Veuillez selectionner une ressource !";
 				}
@@ -252,7 +438,7 @@ class PropositionController extends Zend_Controller_Action
 				}
 				elseif ($data['Debut'] > $data['Fin'])
 					
-					$this->view->error = "La date de d&eacute;but doit &ecirc;tre inf&eacute;rieure ou &eacute;gale à la date de fin";
+					$this->view->error = "La date de d&eacute;but doit &ecirc;tre inf&eacute;rieure ou &eacute;gale ï¿½ la date de fin";
 				else
 				
 					$this->view->error = "Formulaire invalide !";
@@ -261,8 +447,28 @@ class PropositionController extends Zend_Controller_Action
 		}
 		else 
 		{      
-			//si erreur rencontrée, le formulaire est rempli avec les données
-		    //envoyées précédemment 
+			$data = array();
+		//crï¿½ation du fomulaire
+		$form = new Default_Form_Proposition();
+		$this->view->title = "<h4>Cr&eacute;er une Proposition :</h4><br/>";
+			
+		
+		//assigne le formulaire ï¿½ la vue
+		$this->view->form = $form;
+		
+		// creer proposition    
+		$this->_helper->viewRenderer('creer');  
+	    //$this->view->form = $form;
+	    
+        // remplir le select avec les ressources CSM lors du chargement de la page 
+       
+	    $where =  array("id_entite = ?" => 2);
+	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
+			
+			
+			
+			//si erreur rencontrï¿½e, le formulaire est rempli avec les donnï¿½es
+		    //envoyï¿½es prï¿½cï¿½demment 
 			$form->populate($data);
 			
 		}
@@ -273,22 +479,22 @@ class PropositionController extends Zend_Controller_Action
 	public function modifierAction()
 	{
         $this->_helper->viewRenderer('creer'); // creer proposition
-		//création du fomulaire
+		//crï¿½ation du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
 		//$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'edit'), 'default', true));
 		$form->Valider->setLabel('Modifier');
-		//assigne le formulaire à la vue
+		//assigne le formulaire ï¿½ la vue
 		$this->view->form = $form;
 		$this->view->title = "Modifier Proposition"; //MTA
 		
-		//récupération des données envoyées par le formulaire
+		//rï¿½cupï¿½ration des donnï¿½es envoyï¿½es par le formulaire
 		 $data_id =  $this->getRequest()->getParams();
 
          $proposition = new Default_Model_Proposition();
          $personne = new Default_Model_Personne();
          
-         // recupere l'id personne qui a posé la proposition  
+         // recupere l'id personne qui a posï¿½ la proposition  
          $prop = $proposition->find($data_id['id']);
 	     $id_personne =  $prop->getId_personne();  // id personne 
 	  
@@ -318,7 +524,7 @@ class PropositionController extends Zend_Controller_Action
 		 $form->getElement('Fin')->setAttrib('placeholder', 'Saisissez une date fin ...');
 		 
 
-		// remplir le formulaire par les données recupérer 
+		// remplir le formulaire par les donnï¿½es recupï¿½rer 
 		$form->getElement('Ressource')->setValue($id_personne);
 		$form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
 		$form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
@@ -338,10 +544,10 @@ class PropositionController extends Zend_Controller_Action
 		
 		
 		
-		//si la page est POSTée = formulaire envoyé
+		//si la page est POSTï¿½e = formulaire envoyï¿½
 		if($this->getRequest()->isPost())
 		{ 
-			//récupération des données envoyées par le formulaire
+			//rï¿½cupï¿½ration des donnï¿½es envoyï¿½es par le formulaire
 			$data =  $this->getRequest()->getParams();
 			
 		    $requete = $this->getRequest();
@@ -351,11 +557,11 @@ class PropositionController extends Zend_Controller_Action
 			}
 			
             
-			//vérifie que les données répondent aux conditions des validateurs
+			//vï¿½rifie que les donnï¿½es rï¿½pondent aux conditions des validateurs
 			if($form->isValid($data))
 			{   
 				$i = 1;
-				// vérifie si les données ont subit une modification
+				// vï¿½rifie si les donnï¿½es ont subit une modification
 				foreach($PreData as $k=>$v)
 				{
 					 if((string)$PreData[$k] != (string)$data[$k])
@@ -363,7 +569,7 @@ class PropositionController extends Zend_Controller_Action
 					       	$i*=0;
 					 }
 			    }
-				if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
+				if($data['Ressource'] === 'x')     // si on a pas selectionnï¿½ une ressource  id = 'x'
 				{
 				   $this->view->error = "Veuillez selectionner une ressource !";
 				}
@@ -378,7 +584,7 @@ class PropositionController extends Zend_Controller_Action
 				      $this->view->warning = "Aucun champ n'a &eacute;t&eacute; modifi&eacute; !";
 				}
 				elseif ($data['Debut'] > $data['Fin'])
-				      $this->view->error = "La date de d&eacute;but doit &ecirc;tre inf&eacute;rieure ou &eacute;gale à la date de fin";
+				      $this->view->error = "La date de d&eacute;but doit &ecirc;tre inf&eacute;rieure ou &eacute;gale ï¿½ la date de fin";
 				else 
 			    {       
                       $this->view->title = "Modification de la proposition";
@@ -387,7 +593,7 @@ class PropositionController extends Zend_Controller_Action
 					try 
 					{       
 						 		        
-			    		//************** gerer les datetimes en fonction des demis journées *****************************// 
+			    		//************** gerer les datetimes en fonction des demis journï¿½es *****************************// 
 					      $date =  $outils->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
 					    //***********************************************************************************************// 	
 						 				
@@ -395,7 +601,7 @@ class PropositionController extends Zend_Controller_Action
 					       $tab = $outils->normaliser_date($date[0],$date[1],true);      // maroc = true 
 		                //****************************************************************//
 			
-						// remplir l'objet proposition par les valeurs modifiées     
+						// remplir l'objet proposition par les valeurs modifiï¿½es     
 					    $proposition->setId($data_id['id']);
 					    $proposition->setId_personne($id_personne);
 					    $proposition->setDate_debut($tab[0]);
@@ -412,17 +618,18 @@ class PropositionController extends Zend_Controller_Action
 						$p = new Default_Model_DbTable_Proposition();
 						$res_p = $p->propositions_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getId());               
 										 
-						//****************/// Gestion des chevauchements de congés ///****************//			
+						//****************/// Gestion des chevauchements de congï¿½s ///****************//			
 					    $c = new Default_Model_DbTable_Conge();
 					    $res_c = $c->conges_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(), null);
 	                    //****************************************************************************//	    
 							    
-						// proposition n'existe pas dans la base de donnée 
+						// proposition n'existe pas dans la base de donnï¿½e 
 			            if($res_p == null)
 			            {   
-			                   // si le congé n'existe pas 
+			                   // si le congï¿½ n'existe pas 
 			                   if($res_c == null)
 			                   {   // oui 
+
 		
 		                   		      $res =  $outils->authorized($pers,$proposition);
 
@@ -461,11 +668,12 @@ class PropositionController extends Zend_Controller_Action
 			                   
 			                   }
 			                   // si le congé existe 
+
 								elseif($res_c <> null)
 							   {   
 								 // non 
 			                   	  $this->view->warning = "Avec cette modification vous touchez un cong&eacute; existant !";
-			                   	 // remplir le formulaire par les données recupérer 
+			                   	 // remplir le formulaire par les donnï¿½es recupï¿½rer 
 								  $form->getElement('Ressource')->setValue($id_personne);
 							  	  $form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
 								  $form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
@@ -478,7 +686,7 @@ class PropositionController extends Zend_Controller_Action
 						 elseif($res_p <> null)
 						 {    
 							 $this->view->warning = "Avec cette modification vous touchez une proposition existante !";
-						   	 // remplir le formulaire par les données recupérer 
+						   	 // remplir le formulaire par les donnï¿½es recupï¿½rer 
 							 $form->getElement('Ressource')->setValue($id_personne);
 				  			 $form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
 							 $form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
@@ -502,18 +710,18 @@ class PropositionController extends Zend_Controller_Action
 	{
 		 if($this->getRequest()->isXmlHttpRequest())
 		 {     
-		 	//récupére les paramétres de la requéte Ajax 
+		 	//rï¿½cupï¿½re les paramï¿½tres de la requï¿½te Ajax 
 		 	$data = $this->getRequest()->getPost();
 			$id = $data['id'];   
 		        
 
-			//création du modéle pour la suppression
+			//crï¿½ation du modï¿½le pour la suppression
 			$proposition = new Default_Model_Proposition();
           
             
 			try 
 			{     //appel de la fcontion de suppression avec en argument,
-				  //la clause where qui sera appliquée
+				  //la clause where qui sera appliquï¿½e
 				  $result = $proposition->delete("id=$id");   
 			}
 			catch (Zend_Db_Exception $e)
@@ -525,7 +733,7 @@ class PropositionController extends Zend_Controller_Action
 	       				      
 	       			echo $content;
 			}
-				        	 //en cas de succés envoie de reponse avec code succés [200]
+				        	 //en cas de succï¿½s envoie de reponse avec code succï¿½s [200]
 					         $this->view->success = "La proposition a bien &eacute;t&eacute; supprimer !";
 				        	 $content = array("status"=>"200","result"=> "1");
 	       					
@@ -535,14 +743,14 @@ class PropositionController extends Zend_Controller_Action
 
 }
 		/*
-		 * cette fonction permet à l'admin de valider les propositions et les enregistré dans 
+		 * cette fonction permet ï¿½ l'admin de valider les propositions et les enregistrï¿½ dans 
 		 * la table :conge
 		 */
 
 	//:::::::::::::// ACTION Valider //::::::::::::://
 	public function validerAction()
 	{
-		//récupére les paramétres de la requéte	
+		//rï¿½cupï¿½re les paramï¿½tres de la requï¿½te	
 		$params = $this->getRequest()->getParams();
 
 		$proposition = new Default_Model_Proposition();
@@ -550,7 +758,7 @@ class PropositionController extends Zend_Controller_Action
 
         if(isset($params['id']))
 		{   
-				// sauvegarder les données recus de la requete 
+				// sauvegarder les donnï¿½es recus de la requete 
 				$id_proposition = $proposition->getId(); 
 				$id_personne = $proposition->getId_personne(); 
 				$date_debut =$proposition->getDate_debut(); 
@@ -558,10 +766,10 @@ class PropositionController extends Zend_Controller_Action
 				$debut_midi = $proposition->getMi_debut_journee();
 				$fin_midi = $proposition->getMi_fin_journee();
 				    	
-				// mettre l'etat de la proposition é OK
+				// mettre l'etat de la proposition ï¿½ OK
 				$etat = $proposition->setEtat("OK")->save();  
 			            
-				// extraire l'année de reference depuis la date de debut 
+				// extraire l'annï¿½e de reference depuis la date de debut 
 				$time = strtotime($date_debut);
 		        $annee_ref = date('Y',$time);
 		        $id_type_conge = '1';
@@ -608,14 +816,14 @@ class PropositionController extends Zend_Controller_Action
  	//:::::::::::::// ACTION REFUSER //::::::::::::://
 	public function refuserAction()
 	{
-		//récupére les paramétres de la requéte
+		//rï¿½cupï¿½re les paramï¿½tres de la requï¿½te
 		$params = $this->getRequest()->getParams();
-		//vérifie que le paramétre id existe
+		//vï¿½rifie que le paramï¿½tre id existe
 		if(isset($params['id']))
 		{
 			$id = $params['id'];
 
-			//création du modéle pour le refus
+			//crï¿½ation du modï¿½le pour le refus
 			$proposition = new Default_Model_Proposition();
 						
 			$result = $proposition->find($id);

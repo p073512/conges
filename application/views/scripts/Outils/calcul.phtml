@@ -1,0 +1,217 @@
+	 <?php
+	 #region MBA
+	 /*
+	  * MBA : Import de la bibliotheque JqueryUI et datePicker elles seront utilisées dans le formulaire
+	  */
+		$this->JQuery()->addStyleSheet($this->baseUrl() . '/js/jquery/themes/smoothness/jquery-ui-1.8.23.custom.css');
+		// MBA : indique le fichier de script javascript à utliser avec jQuery UI
+		$this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
+		$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/i18n/jquery.ui.datepicker-fr.js');
+				   
+	  echo $this->jQuery(); 
+	  ?> 
+ 
+	<div class="row-fluid offset1">
+		<div id="header-container">
+            
+			<div class="dropdown">
+                  <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
+                  Conge
+                  </a>
+
+			</div><!--MBA : fermeture dropdown -->
+          
+		</div><!-- MBA : fermeture div="header-container" -->
+	</div><!-- MBA : fermeture div="row-fluid -->
+         <br/>
+	
+	  
+	<?php
+	/*
+	 * MBA : Appel au layout 'layouts/scripts/mylayout';
+	 * setAction : Le formulaire opère sur la page courante
+	 * 
+	 */
+	$this->layout()->setLayout('mylayout');
+	$this->form->setAction($this->url());
+	?>
+
+
+	<div class="container">
+		<div class="well row-fluid">
+					
+	<?php
+	/*
+	 * Si erreurs de traitements* renvoyé depuis le controlleur 
+	 * traitemets : logique, ajout BD, Exception ...
+	 */
+
+	if(isset($this->error))
+	{ 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert alert-error">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Erreur :</strong>  <?php //Message d'erreur
+                                         echo "   ".$this->error; ?>
+			</div>
+
+	<?php } ?>
+
+	<?php
+	
+	/*
+	 * Gestion des messages warnings 
+	 */
+
+	if(isset($this->warning)){ 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Alerte :</strong>  <?php //Message warning
+                                         echo "   ".$this->warning; ?>
+			</div>
+	
+	<?php } 
+	 
+	
+	
+ 	/*
+	 * Gestion des messages succès 
+	 */
+	
+	else if(isset($this->success))
+	{
+	?>
+	
+	<!-- afficage message succés  -->
+            <div class="alert alert-success">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Succes :</strong> <?php //Message succes
+	                                      echo "   ".$this->success ;?>
+			</div>
+	<?php }?>
+		<!-- ICI L'AFFICHAGE DU FORMULAIRE -->
+			
+		<fieldset>
+			<legend ><?php if(isset($this->title))echo $this->title;?></legend>
+				
+				<!-- On récupére les informations nécessaire du formulaire via le $this->form -->
+					<form action="<?php $this->form->getAction() ?>" name="<?php $this->form->getName() ?>" method="post">
+					
+                      <?php
+                      	
+                      
+                      
+                      
+                      
+                      /*
+                       * On récupére les élements du formulaire , et on compte le nombre de ceux ci
+                       */
+	                      $Elements =$this->form->getElements();
+	                      $N_Elements = count($Elements);
+
+	                      if($N_Elements > 5)
+	                      {
+	                      	/*
+	                         * Si Le nombre d'élément est supérieur à 5 l'affichage sera en deux colonnes 
+	                         * pour optimiser la visualisation. 
+	                         */
+                      ?>
+                      
+                      	<!-- ouverture première colonne (conteneur div )-->
+                      	<div class="span4 offset2">
+                      	
+                      	
+                      <?php 
+                      	/*
+                      	 * $i s'incremente tout au long du foreach
+                      	 * $break contient le nombre d'élément par 2 pour les afficher 
+                      	 * en deux colonnes (ne prend jamais valeur réel si nombre est impaire
+                      	 * la première colonne contiendra plus de champ (+1) que la deuxieme
+                      	 * 
+                      	 * ...
+                      	 * 
+                      	 */
+                      
+	                      $i = 0;
+	                      $break = 	$N_Elements%2==0?$N_Elements/2:($N_Elements +1)/2 ;
+	                      
+	                      	foreach( $Elements as $k=>$element)
+	                      	{
+	                      		/*si (Break n'est pas encore atteint ($i commençant de 0))
+	                      		 *  =>ecrire dans la premiere colonne 
+	                      		 */ 
+	                      		
+	                      		if($i != $break)
+	                      		{
+		                      		echo $this->form->getElement($k);
+		                      		$i ++;
+	                      		}
+	                      		elseif ($i >= $break)
+	                      		{
+	                      		/*si (Break est atteint ($i s'incrementant par 1 sur chaque écriture d'élément))
+	                      		 *  =>fermer la premiere colonne
+	                      		 *  =>ouvrir deuxieme colonne
+	                      		 *  =>ecrire dans la deuxieme colonne 
+	                      		 */ 
+	                      			
+	                      			
+	                      			?>	</div>
+	                      			<!-- Ouverture deuxieme colonne -->
+	                      		<div class="offset6">
+	                      		
+	                      		<?php 
+	                      		//ecriture dans deuxieme colonne
+	                      		
+	                      	    	echo $this->form->getElement($k);
+	                      		}
+	                      	
+	                      	}
+                      	 
+                      		    ?>
+                      		
+                      	</div>
+                      
+                      	<?php
+                      	/* 	
+                      	if($N_Elements > 15)
+                      	{
+                      		 	echo'affichage customisé à tester(ajout d'une 3 eme colonne)
+                      		 	 pour l'instant affichage max sur 2 colonne;
+                      	}
+                     */
+                      	
+                      }
+                      else { //$N_element <5
+                      	?>
+                      	<!--offset4 on se déplace de 4 case* pour centrer la colonne(div)
+                      	 case : .span voir système de grid (css)
+                      	 -->
+                      	
+                      	<div class="span offset4">
+                      	
+                      
+                      	<?php  //Ecriture dans la première colonne
+
+                      	      foreach ( $Elements as $k=>$Element)
+                                  echo $this->form->getElement($k); 
+                           
+                      } // fin else 
+                      	
+                        ?>
+                      </div>
+                        </form>
+		</fieldset>
+                
+		</div><!-- MBA Fermeture div class="well row-fluid" -->
+	</div><!-- MBA Fermeture div class="container" -->
+        
+<!-- MBA FIN AFFICHAGE DU FORMULAIRE -->
+
+
+  
+ <?php #endregion MBA

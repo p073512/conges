@@ -35,17 +35,15 @@ class Default_Form_TConnexion extends Default_Form_MyForm
 	      $iPassword->setLabel('Mot de passe ');	
 	      $iPassword->addDecorator('Fpassinput', array('label')); 			   
 		  $iPassword->setAttrib('placeholder','Saisir votre mot de passe ...'); 		   
-	      $iPassword->setErrorMessages(array("Mot de passe invalide !"));    							   
-	
-		
+	      $iPassword->setErrorMessages(array("Mot de passe invalide !"));
+	     
 	     /*
          * Debut midi type checkbox 
          */
 
 		 $iRemember =   new Zend_Form_Element_Checkbox( 'Remember',array('label' => 'se souvenir de moi ?'));
 	      
-	      
-	      
+     
 	      
 		/*
          * Submit type button 
@@ -53,8 +51,7 @@ class Default_Form_TConnexion extends Default_Form_MyForm
          */
 		   $iSubmit =   new Zend_Form_Element_submit('Connexion');
 
-		
-		   
+  
 		   
 		//ajout des éléments au formulaire
 		$this->addElements(array(

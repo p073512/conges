@@ -67,19 +67,19 @@ class PropositionController extends Zend_Controller_Action
 		//$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'create'), 'default', true));
 
 		$data = array();
+		
 		//assigne le formulaire é la vue
 		$this->view->form = $form;
 		$this->view->title = "Creer une Proposition";
 
 		
-	
+        // remplir le select avec les ressources CSM
         $where = array('id_entite= ?' => '2');
 	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
 
 	    
-
-		 $this->_helper->viewRenderer('creer');  // creer proposition
-	     $this->view->form = $form;
+		$this->_helper->viewRenderer('creer');  // creer proposition
+	    $this->view->form = $form;
 
 		//si la page est POSTée = formulaire envoyé
 		if($this->_request->isPost())   
@@ -88,26 +88,32 @@ class PropositionController extends Zend_Controller_Action
 			$data = $this->_request->getPost();
 
             $personne = new Default_Model_Personne();
-			$id_personne = $data['Ressource']; // id personne 
+			$id_personne = $data['Ressource'];       // id personne 
 	        $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
 	        
 	   
 			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))  // form valide 
 			{
-				if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
+				if($data['Ressource'] === 'x')  // si on a pas selectionné une ressource  id = 'x'
 				{
 				   $this->view->error = "Veuillez selectionner une ressource !";
 				}
 				elseif ($data['Debut'] > $data['Fin'])
-					// MTA : modification du message echo "......."
+				{	
 					$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";
+				}	
+			    elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1))
+				{
+				     $this->view->error = "Sur un meme jour vous ne pouvez selectionner que Debut midi ou Fin midi !";
+				     $form->getElement('DebutMidi')->setValue('0');
+				     $form->getElement('FinMidi')->setValue('0');
+				}
 				else       
 				{ 
 				//création et initialisation d'un objet Default_Model_Proposition
 				//qui sera enregistré dans la base de données
 	                $proposition = new Default_Model_Proposition();     
-					
 
 			    	$proposition->setId_personne($data['Ressource']);		
 					$proposition->setDate_debut($data['Debut']);
@@ -117,48 +123,31 @@ class PropositionController extends Zend_Controller_Action
 					$proposition->setNombre_jours();
 					$proposition->setEtat('NC');
                     
-					$p = new Default_Model_DbTable_Proposition();
+					// Vérification chevauchement !
 					$c = new Default_Model_DbTable_Conge();
+	   		        $congs = $c->conges_existant($data['Ressource'],$data['Debut'],$data['Fin'],1);
+       
+	   		        $p = new Default_Model_DbTable_Proposition();
+	   		        $props = $p->PropositionExistante($data['Ressource'],$data['Debut'],$data['Fin'],1);
 					
-					
-					
-				    $props = $p->PropositionExistante($data['Ressource'], $data['Debut'], $data['Fin']); // verifier si la proposition existe ou pas  
-				    $congs = $c->CongesExistant($data['Ressource'], $data['Debut'], $data['Fin']);  // verifier si le conge existe ou pas 
-	                
-				    //$pers->find($props['0']['id_personne'])->getNomPrenom(); // recuperer le nomprenom de la ressource
-	                
 
+					
 					try 
-					{	
-	                    if(($props || $congs) == null)
-	                    {
-	                    	$proposition->save();
-							$this->view->success = "Création de la proposition pour Mr/Mme :    ".$pers->getNomPrenom()."    du :    ".$data['Debut']."    au :    ".$data['Fin'];	
-	                    }
-						else 
-						{   
-							if($props <> 0)	
-                        		$this->view->warning =  "Mr/Mme    ".$pers->getNomPrenom()."    à déja posé une proposition du :    ".$props['0']['date_debut']."    au :    ".$props['0']['date_fin'];
-                       	    elseif($congs <> 0)
-                         		$this->view->warning = " La proposition de Mr/Mme    ".$pers->getNomPrenom()."    est déja passé en congé !";
-
-						}
-					    
-						// vider le formulaire pour crée une autre proposition 
-						$form->getElement('Ressource')->setValue('');
-						$form->getElement('Debut')->setValue('');
-						$form->getElement('Fin')->setValue('');
-						$form->getElement('DebutMidi')->setValue('');
-						$form->getElement('FinMidi')->setValue('');
-						//redirection vers afficher csm 	
-						//$this->_helper->redirector('affichercsm');
-							 
-				
-					} 
+					{          
+						 
+	       				  				$proposition->save();
+	       				  				$this->view->error = "Création de la proposition pour  : ".$pers->getNomPrenom();	
+	       				  				// vider le formulaire pour crée un autre congé
+									    $form->getElement('Ressource')->setValue('');
+										$form->getElement('Debut')->setValue('');
+										$form->getElement('Fin')->setValue('');
+										$form->getElement('DebutMidi')->setValue('');
+										$form->getElement('FinMidi')->setValue('');	
+	       			}
 					catch (Exception $e) 
 					{
 						//$this->view->error = $e->getMessage();
-						 $this->view->error = "Création de la proposition pour Mr/Mme : ".$pers->getNomPrenom()." à échoué !";	
+						 $this->view->error = "Création de la proposition pour  : ".$pers->getNomPrenom()." à échoué !";	
 					}
 
 				
@@ -425,7 +414,7 @@ class PropositionController extends Zend_Controller_Action
 						}
 
 				    	//redirection
-				        $this->_helper->redirector('affichercsm');
+				        $this->_helper->redirector('afficheradmin');
 
 	  
 		 }  

@@ -1,7 +1,7 @@
 <?php
 class ConnexionController extends Zend_Controller_Action
 {
-	private $_auth;
+	  private $_auth;
 
       public function preDispatch() 
 	  {
@@ -12,33 +12,30 @@ class ConnexionController extends Zend_Controller_Action
 
 	  }
 
-	public function indexAction()
-	{
-	 //création du fomulaire
+	  public function indexAction()
+	 {
+	    //création du fomulaire
 		$form = new Default_Form_TConnexion();
 		
-        //assigne le formulaire é la vue
+        //assigne le formulaire à la vue
 		$this->view->form = $form;
 
-		// remplir le select par les profils
+		 // remplir le select par les profils ( admin , csm , equipe )
 	     $form->setDbOptions('Profil',new Default_Model_Profil(),'getLogin','getLogin');
-		//vérification si la page a bien été appelée à partir d'un formulaire
-
+		
+	     //vérification si la page a bien été appelée à partir d'un formulaire
 	     if($this->_request->isPost())
 		{   
 			
 			//enregistrement des données envoyées à partir du formulaire dans un tableau
-			$data = $this->_request->getPost();
+			 $data = $this->_request->getPost();
 			
 			//validation du formulaire
 			if($form->isValid($data))
 			{
-				//Zend_Debug::dump($data, $label = "Formulaire de connexion valide", $echo = true);
-				$profil = $data['Profil'];
-				$mot_passe =  $data['Password'];
-			
 				
-				// MTA 
+				$profil = $data['Profil']; // recuperer la valeur du profil
+				$mot_passe =  $data['Password']; // recuperer la valeur du mot de passe 
                 $remember_me = $data['Remember']; // recupere la valeur de checkbox remember me 
                 
    
@@ -54,7 +51,7 @@ class ConnexionController extends Zend_Controller_Action
 
 				//préparation de la requête d'authentification en indiquant l'identité et le crédit
 				$authAdapter->setIdentity($profil);
-				$authAdapter->setCredential(md5($mot_passe));
+				$authAdapter->setCredential(md5($mot_passe)); // cryptage mot de pass algo MD5 
 
 
 				//exécution de la requête d'authentification et enregistrement du résultat
@@ -69,47 +66,44 @@ class ConnexionController extends Zend_Controller_Action
 					//le second argument permet d'indiquer les valeurs que l'on ne souhaite pas enregistrer
 					$this->_auth->getStorage()->write($res = $authAdapter->getResultRowObject(null, 'mot_passe'));
 
-					// MTA
+					// si on coche la case se souvenir de moi 
 					if ($remember_me === '1')
 			        {   
 			           	Zend_Session::rememberMe(24*3600);   // remember me pendant = 24h  
 	                }
-	
-					//permet de regénérer l'identifiant de session
-                    //  Zend_Session::rememberMe();  appel  Zend_Session::regenerateId();
-                    //  Zend_Session::regenerateId();
-                   
-                    
+
 			            if($data['Profil'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
 						{
 						   $this->view->error = "Veuillez selectionner un profil !";
 						}
 				        
-						elseif ($data['Password'] === '')
+						elseif ($data['Password'] === '')  // mot de passe vide 
 						{	
-							$this->view->error = "Veuillez renseignez votre Mot de pass !";	//création et initialisation d'un objet Default_Model_Users
+							$this->view->error = "Veuillez renseignez votre Mot de passe !";	//création et initialisation d'un objet Default_Model_Users
 						}
-						else 
+						else  // sinon 
 						{   
 	
-						    if($profil === 'Admin')
+						    if($profil === 'admin')
 								$this->view->success = " Bienvenue a vous Mr l'".$profil;
-							elseif($profil === 'Csm')
+							elseif($profil === 'csm')
 								$this->view->success = " Bienvenue a vous responsable de l'equipe ".$profil;
-							elseif($profil === 'Equipe')
+							elseif($profil === 'equipe')
 								$this->view->success = " Bienvenue a vous membre de l'".$profil;
 							else 
 							$this->view->success = " Bienvenue a vous membre guest ";
 
-			                
+                            // affichage du message d'acceuil et redirection apres 1 sec
+							header("Refresh:1;URL=http://localhost/eclipse/conges/public/calendrier/calendriermensuel");
+							
 							//redirection
-					        $this->_helper->_redirector('calendriermensuel', 'calendrier');
-					        
+					        //$this->_helper->_redirector('calendriermensuel', 'calendrier');
+
 						}
 
 				}
 				else
-				{
+				{       // profil et mot de passe non vide 
 				        if($data['Profil'] === 'x' && $data['Password'] <> '')     // si on a pas selectionné une ressource  id = 'x'
 						{
 						   $this->view->error = "Veuillez selectionner d'abord un profil !";

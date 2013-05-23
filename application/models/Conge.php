@@ -302,7 +302,7 @@ class Default_Model_Conge
  	{
     	return $this->getMapper()->CongesNondoublontPole( $tableau_id,$debut_mois,$fin_mois)  ;
     }
-    
+  
 	
 /*
 	 * calcule de nombre de jours ouvres dans un mois  
@@ -389,5 +389,143 @@ class Default_Model_Conge
     }
     	return $tableau_jours_feries;
 	}
+    
 	
+	
+/////////////////////////////// Fonction vérifier chevauchement des congés	///////////////////////////////////
+	public function verifier_chevauchement($conge)
+    {
+      // recupérer les valeurs à inserer (Formulaire congés) 
+	  $c__id_personne = $conge->getId_personne();
+	  $c__date_debut = $conge->getDate_debut();
+	  $c__date_fin =  $conge->getDate_fin();
+	  $c__debut_midi = $conge->getMi_debut_journee();
+	  $c__fin_midi = $conge->getMi_fin_journee();
+	 
+	  // chargé les congés d'une ressource donnée 
+	  $c = new Default_Model_DbTable_Conge();
+	  $c__tab = $c->conges_par_ressource($c__id_personne);
+
+	  if($c__tab == null)      // si la ressource n'a pas de congés 
+	  {
+	    $res = 1;              // code succès 
+	  }
+	  else                     // sinon 
+	  {
+		  // boucler sur les congés de cette personne 
+		  foreach($c__tab as $k => $v)
+		  {
+		      // pour chaque congé on loge ses valeurs dans les variables 
+			  $B__id_personne = $c__tab[$k]['id_personne'];
+			  $B__date_debut = $c__tab[$k]['date_debut'];
+			  $B__date_fin =  $c__tab[$k]['date_fin'];
+			  $B__debut_midi = $c__tab[$k]['mi_debut_journee'];
+			  $B__fin_midi = $c__tab[$k]['mi_fin_journee'];
+		      	
+		      // le conge existe et identique dans la base de données 
+		      if(($c->conges_indentique($c__id_personne,$c__date_debut,$c__date_fin ,$c__debut_midi,$c__fin_midi)) <> NULL)
+			  {return -1 ;}
+			  else // congé existe et non identique 
+			  {     
+			  	    // vérifier que les données saisies existe dans la base de donnée ( avec conditions flag == 0 )
+			           $existe_0 = $c->conges_existant($c__id_personne,$c__date_debut,$c__date_fin ,0);
+			        // vérifier que les données saisies existe dans la base de donnée ( avec conditions flag == 1 )
+			           $existe_1 = $c->conges_existant($c__id_personne,$c__date_debut,$c__date_fin ,1);      
+			                
+					// conge ayant date_debut <> date_fin 
+					if( $B__date_debut <> $B__date_fin )
+					{
+						     // si le congé à    debut_midi[0]		 et       Fin_midi[0]    
+						     if($B__debut_midi == 0  && $B__fin_midi == 0 ) 
+							{    
+							     if($existe_0 == null)  // donnée saisie n'existe pas 
+								 {return  2;}           // code succès 
+							     else                   // donnée saisie existe 
+								 {return -2 ;}          // code erreur 		 
+							}
+
+							// si le congé à   debut_midi[1] et  fin_midi[0]   ou   debut_midi[0] et  fin_midi[1]   ou   debut_midi[1] et  fin_midi[1]        
+							 if($B__debut_midi == 1  ||  $B__fin_midi == 1)   
+						    { 
+						    	//     Base données :      d_d 2013-05-05   d_m[1]  f_m[0]                    05___________10
+						    	//     Formulaire   :      d_f 2013-05-05   d_m[0]  f_m[1]       01___________05
+						    	if($c__date_fin == $B__date_debut  &&  $c__fin_midi  == 1 && $B__debut_midi == 1)
+						    	{    
+						    		if($existe_1 == null)  // donnée saisie n'existe pas 
+						    		 {return  3;}          // code succès 
+						    		else                   // donnée saisie existe 
+						    		{$res = -3;}           // code erreur 		   
+						    	}
+						    	//     Base données :      d_f 2013-05-05   d_m[0]  f_m[1]              01___________05     
+						    	//     Formulaire   :      d_d 2013-05-05   d_m[1]  f_m[0]                           05__________10 
+						    	elseif($B__date_fin == $c__date_debut  &&  $B__fin_midi  == 1 && $c__debut_midi == 1)
+						    	{  
+						         	if($existe_1 == null)   // donnée saisie n'existe pas 
+						    	    {return  3;}            // code succès
+						    		else                    // donnée saisie existe 
+						    		{$res = -3;}            // code erreur
+						    	}
+						    	else
+						    	{   			    		
+						    	    if($existe_0 == null)   // donnée saisie n'existe pas
+						    		{return  3;}            // code succès
+						    		else                    // donnée saisie existe
+						    		{return -3;}            // code erreur	
+						    	}
+						    }
+						}
+			}
+			// conge ayant date_debut == date_fin 
+			if($B__date_debut == $B__date_fin )
+			{   
+				// 1 jour 
+				// si le congé à    debut_midi[0]		 et       Fin_midi[0]  
+				if($B__debut_midi == 0  && $B__fin_midi == 0 ) 
+				{     
+					 if($existe_0 == null)  // donnée saisie n'existe pas
+					 {return 4;}        // code succès
+					 else                   // donnée saisie existe
+					 {$res = -4;}       // code erreur
+				} 
+					    
+				// 1/2 journee 
+				// si le congé à    debut_midi[1]    et   Fin_midi[0]          ou            debut_midi[0]    et   Fin_midi[1]
+				if($B__debut_midi == 1  && $B__fin_midi == 0  ||  $B__debut_midi == 0 && $B__fin_midi == 1)  
+				{   
+					 // formulaire debut_debut = date_fin
+					if($c__date_debut == $c__date_fin )
+					{   
+						//formulaire: fin_midi[1] et  BD: debut_midi[1]       ou       formulaire: debut_midi[1] et  BD: fin_midi[1]
+						if ((($c__fin_midi == 1 && $B__debut_midi == 1) || ($c__debut_midi == 1 && $B__fin_midi == 1)) )
+						{return 5;}        // code succés 
+						else
+						{     
+							if($existe_0 == null) // données saisies existent 
+							{return 5;}         // code succés 
+							else 
+							{$res =  -5;}       // code d'erreur         
+						}			  
+					}
+					// formulaire debut_debut <> date_fin
+					if($c__date_debut <> $c__date_fin )      
+		            {   
+		               //formulaire: fin_midi[1] et  BD: debut_midi[1]       ou       formulaire: debut_midi[1] et  BD: fin_midi[1]
+					   if (($c__fin_midi == 1 && $B__debut_midi == 1) || ($c__debut_midi == 1 && $B__fin_midi == 1))
+					   {return 6;}   // code succés
+					   else
+					   {     
+					       if($existe_0 == null) // données saisies existent 
+						   {return 6;}          // code succés 
+						   else 
+					       {$res = -6;}       // code d'erreur 			        
+					   }
+			
+					}
+		       }
+			 }
+		   }
+         }
+		return $res;    // resultat de la fonction 
+     } 
 }
+///////////////////////////////FIN Fonction vérifier chevauchement des congés	///////////////////////////////////

@@ -13,7 +13,8 @@ $(document).ready(function()
 		    $(this).css('cursor','auto');
 		});
 	
-  $('.icon-remove').live('click',function(){
+  $('.icon-remove').live('click',function()
+  {
 	 
 	id = $(this).parent().parent().attr('id');
     url = $(this).attr('id');

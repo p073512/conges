@@ -208,7 +208,7 @@
 		  $nombreJour = array('Total' => $cpt-($dm + $fm),
 		                      'Fériés' => $f,
 							  'Weenkends'=> $we,
-							  'jours Normaux' => $nbrej)	;
+							  'Nombre Jours congés' => $nbrej)	;
 	    return $nombreJour;
 	}
 

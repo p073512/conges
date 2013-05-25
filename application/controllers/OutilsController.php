@@ -10,17 +10,17 @@ class OutilsController extends Zend_Controller_Action
 	  
 	  
 	  
-	  public function calculAction()
+	  public function calculNombreJoursCongeAction()
 	{
 		
-		//crÃ©ation du fomulaire
+		//création du fomulaire
 		$form = new Default_Form_OutilsForm();
 		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'outils', 'action' => 'Calcul'), 'default', true));
+		$form->setAction($this->view->url(array('controller' => 'outils', 'action' => 'calculNombreJoursConge'), 'default', true));
 
-        //assigne le formulaire Ã  la vue
+        //assigne le formulaire à la vue
 		$this->view->form = $form;
-		$this->view->title = "CrÃ©er un conge";
+		$this->view->title = "Créer un conge";
 			/*************************************/
 	    $conge = new Default_Model_Conge();
 	  
@@ -29,16 +29,16 @@ class OutilsController extends Zend_Controller_Action
 		{
 			
 			
-			// rÃ©cupÃ©ration des donnÃ©es envoyÃ©s par le formulaire
+			// récupération des données envoyés par le formulaire
 			$data = $this->_request->getPost();
 			
 		
-			// si date(s) non renseignÃ©e(s)
+			// si date(s) non renseignée(s)
             if($data['dateDebut'] == '' || $data['dateFin'] == '')
             {
             	if($data['dateDebut'] =='')
             	{
-            	$this->view->error = 'saisissez la date de dÃ©but !!';
+            	$this->view->error = 'saisissez la date de début !!';
             	$form->populate($data);
             	}
             	else
@@ -49,7 +49,7 @@ class OutilsController extends Zend_Controller_Action
             }
             else if($data['dateDebut'] >$data['dateFin'] )
             {
-            	$this->view->error = 'date fin doit Ãªtre supperieur ou Ã©gale Ã  date debut';
+            	$this->view->error = 'date fin doit être supperieur ou égale à date debut';
             	$form->populate($data);
             }
             else 
@@ -70,7 +70,7 @@ class OutilsController extends Zend_Controller_Action
 			
 			
 			
-			if(!isset($debutMidi))
+			if($debutMidi == '0')
 			{
 				$conge->setMi_debut_journee(false);
 			}
@@ -78,7 +78,7 @@ class OutilsController extends Zend_Controller_Action
 			{
 				$conge->setMi_debut_journee(true);
 			}
-			if(!isset($finMidi))
+			if($finMidi == '0')
 			{
 				$conge->setMi_fin_journee(false);
 			}
@@ -86,19 +86,19 @@ class OutilsController extends Zend_Controller_Action
 			{
 				$conge->setMi_fin_journee(true);
 			}
-			if(!isset($csm) && !isset($am) )
-			{//si CSM et Alsace Moselle non checkÃ©s
+			if($csm == '0' && $am == '0' )
+			{//si CSM et Alsace Moselle non checkés
 				$conge->CalculNombreJoursConge();
 			}
 			else
 			{
-				//CSM checkÃ©
-				if(isset($csm) == 1)
+				//CSM checké
+				if($csm == '1')
 				{
 					$csm = true;
 				}
-				//Alsace Moselle checkÃ©
-				if(isset($am) == 1)
+				//Alsace Moselle checké
+				if($am == '1')
 				{
 					$am = true;
 				}	

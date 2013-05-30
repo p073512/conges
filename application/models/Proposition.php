@@ -245,5 +245,46 @@ class Default_Model_Proposition
 	}
 		return $nb_jours_ouvres;
 	}
+	
+	
+/*
+ * MTA  
+ */
+
+/////////////////////////////// DEBUT Fonction Normaliser date_debut et date_fin ///////////////////////////////////
+public function normaliser_dates($date_debut,$date_fin)
+{
+	
+	 $outil = new Default_Controller_Helpers_Validation();
+	 if($date_debut <> $date_fin )
+	 {
+			  $time1 = strtotime($date_debut);
+			  $d = date('Y-m-d',$time1);
+			  $d_d = new DateTime($d);
+			  $time2 = strtotime($date_fin);
+			  $dff = date('Y-m-d',$time2);
+			  $d_f = new DateTime($dff);
+			  $dd = $outil->normaliser_date_debut_conge($d_d,false);
+			  $df = $outil->normaliser_date_fin_conge($d_f,false);
+
+			  $tab[0] = $dd->format('Y-m-d');
+			  $tab[1] = $df->format('Y-m-d');
+	}
+	else 
+    {
+		      $time1 = strtotime($date_debut);
+			  $d = date('Y-m-d',$time1);
+			  $d_d = new DateTime($d);
+			  $dd = $outil->normaliser_date_debut_conge($d_d,false);
+		   
+		      $tab[0] = $dd->format('Y-m-d');
+			  $tab[1] = $tab[0];
+	}
+		                  	    
+	 return $tab; 
+	
+}
+///////////////////////////////FIN Fonction Normaliser date_debut et date_fin ///////////////////////////////////
+	
 
 }

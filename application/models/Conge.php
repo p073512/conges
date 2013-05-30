@@ -421,144 +421,44 @@ class Default_Model_Conge
 	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*50)); // Pentecote
     }
     	return $tableau_jours_feries;
-	}
-    
-	
-	
-/////////////////////////////// Fonction v�rifier chevauchement des cong�s	///////////////////////////////////
-	public function verifier_chevauchement($conge)
-    {
-      // recup�rer les valeurs � inserer (Formulaire cong�s) 
-	  $c__id_personne = $conge->getId_personne();
-	  $c__date_debut = $conge->getDate_debut();
-	  $c__date_fin =  $conge->getDate_fin();
-	  $c__debut_midi = $conge->getMi_debut_journee();
-	  $c__fin_midi = $conge->getMi_fin_journee();
-	 
-	  // charg� les cong�s d'une ressource donn�e 
-	  $c = new Default_Model_DbTable_Conge();
-	  $c__tab = $c->conges_par_ressource($c__id_personne);
-
-	  if($c__tab == null)      // si la ressource n'a pas de cong�s 
-	  {
-	    $res = 1;              // code succ�s 
-	  }
-	  else                     // sinon 
-	  {
-		  // boucler sur les cong�s de cette personne 
-		  foreach($c__tab as $k => $v)
-		  {
-		      // pour chaque cong� on loge ses valeurs dans les variables 
-			  $B__id_personne = $c__tab[$k]['id_personne'];
-			  $B__date_debut = $c__tab[$k]['date_debut'];
-			  $B__date_fin =  $c__tab[$k]['date_fin'];
-			  $B__debut_midi = $c__tab[$k]['mi_debut_journee'];
-			  $B__fin_midi = $c__tab[$k]['mi_fin_journee'];
-		      	
-		      // le conge existe et identique dans la base de donn�es 
-		      if(($c->conges_indentique($c__id_personne,$c__date_debut,$c__date_fin ,$c__debut_midi,$c__fin_midi)) <> NULL)
-			  {return -1 ;}
-			  else // cong� existe et non identique 
-			  {     
-			  	    // v�rifier que les donn�es saisies existe dans la base de donn�e ( avec conditions flag == 0 )
-			           $existe_0 = $c->conges_existant($c__id_personne,$c__date_debut,$c__date_fin ,0);
-			        // v�rifier que les donn�es saisies existe dans la base de donn�e ( avec conditions flag == 1 )
-			           $existe_1 = $c->conges_existant($c__id_personne,$c__date_debut,$c__date_fin ,1);      
-			                
-					// conge ayant date_debut <> date_fin 
-					if( $B__date_debut <> $B__date_fin )
-					{
-						     // si le cong� �    debut_midi[0]		 et       Fin_midi[0]    
-						     if($B__debut_midi == 0  && $B__fin_midi == 0 ) 
-							{    
-							     if($existe_0 == null)  // donn�e saisie n'existe pas 
-								 {return  2;}           // code succ�s 
-							     else                   // donn�e saisie existe 
-								 {return -2 ;}          // code erreur 		 
-							}
-
-							// si le cong� �   debut_midi[1] et  fin_midi[0]   ou   debut_midi[0] et  fin_midi[1]   ou   debut_midi[1] et  fin_midi[1]        
-							 if($B__debut_midi == 1  ||  $B__fin_midi == 1)   
-						    { 
-						    	//     Base donn�es :      d_d 2013-05-05   d_m[1]  f_m[0]                    05___________10
-						    	//     Formulaire   :      d_f 2013-05-05   d_m[0]  f_m[1]       01___________05
-						    	if($c__date_fin == $B__date_debut  &&  $c__fin_midi  == 1 && $B__debut_midi == 1)
-						    	{    
-						    		if($existe_1 == null)  // donn�e saisie n'existe pas 
-						    		 {return  3;}          // code succ�s 
-						    		else                   // donn�e saisie existe 
-						    		{$res = -3;}           // code erreur 		   
-						    	}
-						    	//     Base donn�es :      d_f 2013-05-05   d_m[0]  f_m[1]              01___________05     
-						    	//     Formulaire   :      d_d 2013-05-05   d_m[1]  f_m[0]                           05__________10 
-						    	elseif($B__date_fin == $c__date_debut  &&  $B__fin_midi  == 1 && $c__debut_midi == 1)
-						    	{  
-						         	if($existe_1 == null)   // donn�e saisie n'existe pas 
-						    	    {return  3;}            // code succ�s
-						    		else                    // donn�e saisie existe 
-						    		{$res = -3;}            // code erreur
-						    	}
-						    	else
-						    	{   			    		
-						    	    if($existe_0 == null)   // donn�e saisie n'existe pas
-						    		{return  3;}            // code succ�s
-						    		else                    // donn�e saisie existe
-						    		{return -3;}            // code erreur	
-						    	}
-						    }
-						}
-			}
-			// conge ayant date_debut == date_fin 
-			if($B__date_debut == $B__date_fin )
-			{   
-				// 1 jour 
-				// si le cong� �    debut_midi[0]		 et       Fin_midi[0]  
-				if($B__debut_midi == 0  && $B__fin_midi == 0 ) 
-				{     
-					 if($existe_0 == null)  // donn�e saisie n'existe pas
-					 {return 4;}        // code succ�s
-					 else                   // donn�e saisie existe
-					 {$res = -4;}       // code erreur
-				} 
-					    
-				// 1/2 journee 
-				// si le cong� �    debut_midi[1]    et   Fin_midi[0]          ou            debut_midi[0]    et   Fin_midi[1]
-				if($B__debut_midi == 1  && $B__fin_midi == 0  ||  $B__debut_midi == 0 && $B__fin_midi == 1)  
-				{   
-					 // formulaire debut_debut = date_fin
-					if($c__date_debut == $c__date_fin )
-					{   
-						//formulaire: fin_midi[1] et  BD: debut_midi[1]       ou       formulaire: debut_midi[1] et  BD: fin_midi[1]
-						if ((($c__fin_midi == 1 && $B__debut_midi == 1) || ($c__debut_midi == 1 && $B__fin_midi == 1)) )
-						{return 5;}        // code succ�s 
-						else
-						{     
-							if($existe_0 == null) // donn�es saisies existent 
-							{return 5;}         // code succ�s 
-							else 
-							{$res =  -5;}       // code d'erreur         
-						}			  
-					}
-					// formulaire debut_debut <> date_fin
-					if($c__date_debut <> $c__date_fin )      
-		            {   
-		               //formulaire: fin_midi[1] et  BD: debut_midi[1]       ou       formulaire: debut_midi[1] et  BD: fin_midi[1]
-					   if (($c__fin_midi == 1 && $B__debut_midi == 1) || ($c__debut_midi == 1 && $B__fin_midi == 1))
-					   {return 6;}   // code succ�s
-					   else
-					   {     
-					       if($existe_0 == null) // donn�es saisies existent 
-						   {return 6;}          // code succ�s 
-						   else 
-					       {$res = -6;}       // code d'erreur 			        
-					   }
-			
-					}
-		       }
-			 }
-		   }
-         }
-		return $res;    // resultat de la fonction 
-     } 
 }
-///////////////////////////////FIN Fonction v�rifier chevauchement des cong�s	///////////////////////////////////
+
+/////////////////////////////// DEBUT Fonction Normaliser date_debut et date_fin ///////////////////////////////////
+public function normaliser_dates($date_debut,$date_fin)
+{
+	
+	 $outil = new Default_Controller_Helpers_Validation();
+	 if($date_debut <> $date_fin )
+	 {
+			  $time1 = strtotime($date_debut);
+			  $d = date('Y-m-d',$time1);
+			  $d_d = new DateTime($d);
+			  $time2 = strtotime($date_fin);
+			  $dff = date('Y-m-d',$time2);
+			  $d_f = new DateTime($dff);
+			  $dd = $outil->normaliser_date_debut_conge($d_d,false);
+			  $df = $outil->normaliser_date_fin_conge($d_f,false);
+
+			  $tab[0] = $dd->format('Y-m-d');
+			  $tab[1] = $df->format('Y-m-d');
+	}
+	else 
+    {
+		      $time1 = strtotime($date_debut);
+			  $d = date('Y-m-d',$time1);
+			  $d_d = new DateTime($d);
+			  $dd = $outil->normaliser_date_debut_conge($d_d,false);
+		   
+		      $tab[0] = $dd->format('Y-m-d');
+			  $tab[1] = $tab[0];
+	}
+		                  	    
+	 return $tab; 
+	
+}
+///////////////////////////////FIN Fonction Normaliser date_debut et date_fin ///////////////////////////////////
+
+
+
+}
+

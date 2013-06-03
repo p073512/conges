@@ -41,7 +41,7 @@
 	{
 		
 		if (!$cs) {
-			$this->joursFerie = array(
+			$this->joursFerie = array('France' => array(
 		    "$annee-01-01"=> 'Nouvel an'      //    Nouvel an
 			,$this->dimanche_paques($annee) => 'Dimanche Pâques'
 			,$this->lundi_paques($annee) => 'Lundi Pâques'
@@ -54,11 +54,11 @@
 			,"$annee-11-11" => 'Armistice 1918'       //    Armistice 1918
 			,"$annee-11-01" => 'Toussaint'       //    Toussaint
 			,"$annee-12-25" => 'Noël'       //    Noël
-			);
+			));
 			if($alsacemoselle)
 			{
-				$this->joursFerie["$annee-12-26"] = 'alsace Moselle';
-				$this->joursFerie[$this->vendredi_saint($annee)] = 'Vendredi Saint';
+				$this->joursFerie['France']["$annee-12-26"] = 'alsace Moselle';
+				$this->joursFerie['France'][$this->vendredi_saint($annee)] = 'Vendredi Saint';
 			}
 			
 			return $this; // retourne tableau de jours fériés français
@@ -71,8 +71,7 @@
 		
 		foreach ($jours_feries_csm as $j) 
 		{
-			$this->joursFerie[$j->getDate_debut()] = $j->getLibelle();
-			
+			$this->joursFerie['CSM'][$j->getDate_debut()] = $j->getLibelle();
 		
 		}
 
@@ -122,7 +121,15 @@
 		// récupération des jours fériés sur l'année référence.
 		$jFerie =  $this->setJoursFerie($annee,$cs,$alsacemoselle);
         $jFerie =(array) $jFerie;
-		
+        
+		if($cs == false)
+		{
+			$iCs = 'France'; // indice cs france
+		}
+		else 
+		{
+			$iCs = 'CSM'; // indice csm
+		}
 		
         //récupération des jours de la période.
 			  foreach ($period as $k=>$date)
@@ -132,27 +139,27 @@
 				
 				if($this->isWeekend($dDate) )
 				{
-					$conge[$k][$dDate]['TypeJour'] ='WE';
+					$conge[$dDate]['TypeJour'] ='WE';
 					
 				}
 				// vérif si le date est fériée
-			    elseif(isset($jFerie['joursFerie'][$dDate]))
+			    elseif(isset($jFerie['joursFerie'][$iCs][$dDate]))
 			    {
-			    	$conge[$k][$dDate]['TypeJour'] ='F';
-					$conge[$k][$dDate]['LibelleFerie'] = $jFerie['joursFerie'][$dDate];
+			    	$conge[$dDate]['TypeJour'] ='F';
+					$conge[$dDate]['LibelleFerie'] = $jFerie['joursFerie'][$iCs][$dDate];
 			    }
 				else
 				{
-					$conge[$k][$dDate]['TypeJour'] = 'N';
+					$conge[$dDate]['TypeJour'] = 'N';
 					
 				}
-		       
+			    
 			     $conge[$k]['Date'] = $dDate;
 		   	}
 		   //debut midi et fin midi pour la période de congé.
-	       $conge['0'][$dateDebut]['DebutMidi'] = $dm;
-	       $fin = count($conge) -1;
-	       $conge[$fin][$dateFin]['FinMidi'] = $fm;
+	       $conge['0']['DebutMidi'] = $dm;
+	       $fin = (count($conge) -2)/2;
+	       $conge[$fin]['FinMidi'] = $fm;
 		   
 		return $conge;
 	
@@ -169,9 +176,8 @@
 		  // initialisation des compteurs
 		  $n = $f = $we = $cpt =  0;
 		  // dernier indice du tableau congé
-		  $fin = count($conge) -1;
+		  $fin = (count($conge) -2)/2;
 			
-		  
 			$dateDebut = $conge['0']['Date'];
 			$dateFin = $conge[$fin]['Date'];
 
@@ -179,25 +185,29 @@
 			foreach ($conge as $k=>$v)
 			  {
 			  	// compteur jour 
-			    $cpt++;
-			    $date = $conge[$k]['Date'];
 			    
-				  	if($conge[$k][$date]['TypeJour'] == 'N')
+			    if(isset($conge[$k]['Date']))
+			    {$cpt++;
+			    	 $date = $conge[$k]['Date'];
+			    
+				  	if($conge[$date]['TypeJour'] == 'N')
 						$n++;
-					elseif($conge[$k][$date]['TypeJour'] == 'F')
+					elseif($conge[$date]['TypeJour'] == 'F')
 						$f++;
-					elseif($conge[$k][$date]['TypeJour'] == 'WE')
+					elseif($conge[$date]['TypeJour'] == 'WE')
 						$we++;
+			    }
+			   
 			
 			  }
 			  
-		   if($conge['0'][$dateDebut]['DebutMidi'] == true && $conge['0'][$dateDebut]['TypeJour'] != 'F' && $conge['0'][$dateDebut]['TypeJour'] != 'WE')
+		   if($conge['0']['DebutMidi'] == true && $conge[$dateDebut]['TypeJour'] != 'F' && $conge[$dateDebut]['TypeJour'] != 'WE')
 		   $dm = 0.5;
 		   else {
 		       $dm = 0; // si date debut == we ou == f
 		   }
 	
-		   if($conge[$fin][$dateFin]['FinMidi'] == true && $conge[$fin][$dateFin]['TypeJour'] != 'F' && $conge[$fin][$dateFin]['TypeJour'] != 'WE')
+		   if($conge[$fin]['FinMidi'] == true && $conge[$dateFin]['TypeJour'] != 'F' && $conge[$dateFin]['TypeJour'] != 'WE')
 		   $fm = 0.5;
 		   else {
 		       $fm = 0; // si date fin == we ou == f

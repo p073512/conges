@@ -32,7 +32,7 @@ $(function(){
 
 
    // listview demo
-   $('#listview-grid-demo').on('click', '.mediumListIconTextItem', function(e){
+   $('#listview-grid-demo').live('click', '.mediumListIconTextItem', function(e){
       e.preventDefault();
       $(this).toggleClass('selected');
    });
@@ -84,7 +84,7 @@ function updateCSS(css){
       window.prettyPrint && prettyPrint()
 
       // add-ons
-      $('.add-on :checkbox').on('click', function () {
+      $('.add-on :checkbox').live('click', function () {
          var $this = $(this)
             , method = $this.attr('checked') ? 'addClass' : 'removeClass'
          $(this).parents('.add-on')[method]('active')
@@ -132,29 +132,29 @@ function updateCSS(css){
          , inputsVariables = $("#variables.download input")
 
       // toggle all plugin checkboxes
-      $('#components.download .toggle-all').on('click', function (e) {
+      $('#components.download .toggle-all').live('click', function (e) {
          e.preventDefault()
          inputsComponent.attr('checked', !inputsComponent.is(':checked'))
       })
 
-      $('#plugins.download .toggle-all').on('click', function (e) {
+      $('#plugins.download .toggle-all').live('click', function (e) {
          e.preventDefault()
          inputsPlugin.attr('checked', !inputsPlugin.is(':checked'))
       })
 
-      $('#variables.download .toggle-all').on('click', function (e) {
-         e.preventDefault()
-         inputsVariables.val('')
-      })
+      $('#variables.download .toggle-all').live('click', function (e) {
+         e.preventDefault();
+         inputsVariables.val('');
+      });
 
       // request built javascript
-      $('.download-btn').on('click', function () {
+      $('.download-btn').live('click', function () {
 
          var css = $("#components.download input:checked")
-               .map(function () { return this.value })
+               .map(function () { return this.value; })
                .toArray()
             , js = $("#plugins.download input:checked")
-               .map(function () { return this.value })
+               .map(function () { return this.value; })
                .toArray()
             , vars = {}
             , img = ['glyphicons-halflings.png', 'glyphicons-halflings-white.png']

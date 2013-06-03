@@ -185,7 +185,7 @@ class Default_Model_Conge
 	 * 
 	 */
 	
-   public function CalculNombreJoursConge($csm = false,$alsaceMoselle = false)
+public function CalculNombreJoursConge($csm = false,$alsaceMoselle = false)
 	{
 	//récupération des propriétés de l'objet congé	
 	$dateDebut = $this->getDate_debut();   
@@ -283,6 +283,11 @@ class Default_Model_Conge
 	public function fetchAll($str)
 	{
 		return $this->getMapper()->fetchAll($str);
+	}
+	// récupére les congés sur une période donnée.
+   public function conges_existant($id_personne,$date_debut,$date_fin,$flag) 
+	{
+		return $this->getMapper()->conges_existant($id_personne,$date_debut,$date_fin,$flag);
 	}
 
 	//permet la suppression

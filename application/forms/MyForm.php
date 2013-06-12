@@ -14,7 +14,8 @@ class Default_Form_MyForm extends Zend_Form
                                  'Zend_Form_Element_Select'=>'Fselect',
 									'Zend_Form_Element_Checkbox' =>'label',
 	                                    'Zend_Form_Element_Submit'=>'label',
-											'Zend_Form_Element_Password'=>'Fpassinput'
+											'Zend_Form_Element_Button'=>'label',
+												'Zend_Form_Element_Password'=>'Fpassinput'
 											);
 	
 	

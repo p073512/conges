@@ -1,9 +1,4 @@
-	<?php 
-	$this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/tipsy.css');
-	
-	$this->headScript()->appendFile( $this->baseUrl() .'/js/myScriptCalendar.js');
-	echo $this->headScript();
-	?>
+
 	
 	 <?php
 	 #region MBA
@@ -17,6 +12,7 @@
 		$this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
 		$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/i18n/jquery.ui.datepicker-fr.js');
 		$this->Jquery()->addJavascriptFile($this->baseUrl() .'/scriptjs/d3.js');
+			$this->headScript()->appendFile( $this->baseUrl() .'/js/myScriptCalendar.js');
 		$this->Jquery()->addJavascriptFile($this->baseUrl() .'/scriptjs/jquery.tipsy.js');		   
 	  echo $this->jQuery(); 
 	  ?> 
@@ -105,11 +101,32 @@
 			</div>
 			<div class="row">
 			 
-	<?php }echo '<div class="span3">'. $this->form . '</div>';?>
+	<?php } ?><div class="well row-fluid span3" style="{padding : 5px;width : 100px;}"><?php  
+	                   $Elements =$this->form->getElements();
+	                   foreach ( $Elements as $k=>$Element)
+                        echo $this->form->getElement($k);?>
+             </div>
 
-   
-		<div id="wrapper" class="span9" >
+        <div id="calenderHeader" class="well row-fluid span9" style="{padding:0px; height:10px;position :absolute;}">
+     
+	        <span id="prev" class="span2 offset2" >
+		       
+		     </span>
+		    
+	       
+	        <center>
+	     	   <div id="moisAnnee" class="span6" class="well" ></div>
+	        </center>
+	       
+	        <span id="next" class="span2" >
+		      
+		    </span>
+		   
+		    <div id="wrapper" class="span9" >
             </div>
+        </div>
+        
+		
             
          </div>
                 

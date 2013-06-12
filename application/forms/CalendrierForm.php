@@ -38,15 +38,16 @@ public function init()
      	parent::init();
      	// nom par d�faut du form si on veut la chang� dans la classe fille il faut rappeller la m�thode.
      	 $this->setName('Calendrier');
-     	 // Method par d�faut du form
+     	 // Method par défaut du form
          $this->setMethod('post');
+         $this->removeAllDecorators();
    		 
 	$this->_eSelectPersonne = $this->createElement('select','personne' ,array(
-		    'label'  => 'Personne :',
+		    'label'  => 'Personne',
 		    'name' => 'personne',));
 	
 	$selectMois = $this->createElement('select','mois' ,array(
-		    'label'  => 'Mois :',
+		    'label'  => 'Mois',
 		    'name' => 'mois',));
 	
 	$selectMois->addMultiOptions(array(
@@ -67,7 +68,7 @@ public function init()
 	$this->_eSelectMois = $selectMois;
 	
 	$selectAnnee = $this->createElement('select','annee' ,array(
-									    'label'  => 'Annee :',
+									    'label'  => 'Annee',
 									    'name' => 'annee',));
 	
 	$selectAnnee->addMultiOptions(array(    '2012' => '2012',
@@ -76,10 +77,9 @@ public function init()
 	
 	$this->_eSelectAnnee = $selectAnnee;
 	
-	   $sub =   new Zend_Form_Element_Button( 'chargerCalendrier',
-				   array('label' => 'Charger Calendrier'));
-				  $sub->removeDecorator('wrapper');
-				  $this->_iSubmit = $sub;
+	 $this->_iSubmit =   new Zend_Form_Element_Button( 'chargerCalendrier',
+				 					  array('label' => 'Charger Calendrier'));
+				 
        
 	$this->addElements(array($this->geteSelectPersonne(),
 	                         $this->geteSelectMois(),

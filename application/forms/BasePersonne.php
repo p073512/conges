@@ -125,10 +125,12 @@ public function init()
 		$iDateEntree = new ZendX_JQuery_Form_Element_DatePicker('date_entree');
 		$iDateEntree->setJQueryParam('dateFormat', 'yy-mm-dd');
 		$iDateEntree->setLabel("Date d'entree");
+	
 		$iDateEntree->setRequired(true);
 		$iDateEntree->addValidator('date',true,array('date' => 'yy-MM-dd'));
 	
 	    $iDateEntree->addDecorator('Ftextinput', array('label'));
+	  
 		
         $this->iDateEntree =  $iDateEntree;
 	

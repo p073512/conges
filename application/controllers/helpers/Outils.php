@@ -125,11 +125,11 @@
 		if($cs == false)
 		{
 			$iCs = 'France'; // indice cs france
-		}
-		else 
-		{
-			$iCs = 'CSM'; // indice csm
-		}
+			}
+				else 
+				{
+					$iCs = 'CSM'; // indice csm
+					}
 		
         //récupération des jours de la période.
 			  foreach ($period as $k=>$date)

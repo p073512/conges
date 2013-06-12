@@ -63,6 +63,7 @@
                       // récupération des congés 
                       $congeArray = $congeObj->conges_existant($personne->getId(), $dateDebut, $dateFin, '1');
                       
+                     // print_r($congeArray);
                       foreach ($congeArray as $k => $v) {
                         /*
                          * transformation des valeur  0 et 1 en booléen
@@ -81,8 +82,9 @@
                            * récupéation du détail de la période de congé
                            * 
                            */
-                          $conge       = $outils->getPeriodeDetails($data['annee'], $congeArray[$k]['date_debut'], $congeArray[$k]['date_fin'], $dm, $fm, $cs, false);
-                          
+                          $conge = $outils->getPeriodeDetails($data['annee'], $congeArray[$k]['date_debut'], $congeArray[$k]['date_fin'], $dm, $fm, $cs, false);
+                          $conge['nombreJours'] = $congeArray[$k]['nombre_jours']; 
+                           
                           // indice congé sous format : annee-mois
                           $indiceConge = explode("-", $congeArray[$k]['date_debut']);
                           $indiceConge = $indiceConge['0'] . '-' . $indiceConge['1']; // indice conge sous format Annee-mois
@@ -152,7 +154,7 @@
       public function calculNombreJoursCongeAction()
       {
           
-          //cr�ation du fomulaire
+          //création du fomulaire
           $form = new Default_Form_OutilsForm();
           //indique l'action qui va traiter le formulaire
           $form->setAction($this->view->url(array(
@@ -160,7 +162,7 @@
               'action' => 'calculNombreJoursConge'
           ), 'default', true));
           
-          //assigne le formulaire � la vue
+          //assigne le formulaire à la vue
           $this->view->form  = $form;
           $this->view->title = "Créer un conge";
           /*************************************/
@@ -170,7 +172,7 @@
           if ($this->_request->isPost()) {
               
               
-              // r�cup�ration des donnéees envoyées par le formulaire
+              // récupération des donnéees envoyées par le formulaire
               $data = $this->_request->getPost();
               
               

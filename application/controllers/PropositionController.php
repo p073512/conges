@@ -90,14 +90,14 @@ class PropositionController extends Zend_Controller_Action
 	        $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
 	        
 	   
-			//v�rifie que les donn�es r�pondent aux conditions des validateurs
+			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))  // form valide 
 			{
-				if($data['Ressource'] === 'x')  // si on a pas selectionn� une ressource  id = 'x'
+				if($data['Ressource'] === 'x')  // si on a pas selectionné une ressource  id = 'x'
 				{
 				   $this->view->error = "Veuillez selectionner une ressource !";
 				}
-				elseif ($data['Debut'] > $data['Fin'])
+				elseif ($data['Debut'] > $data['Fin']) // si date debut > date fin 
 				{	
 					$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";
 				}	
@@ -108,20 +108,26 @@ class PropositionController extends Zend_Controller_Action
 				     $form->getElement('FinMidi')->setValue('0');
 				}
 				else       
-				{ 
+				{     
+								  
+
 					try 
 					{          
+						      //création et initialisation d'un objet Default_Model_Proposition
+			    		      //qui sera enregistr� dans la base de donn�es
+	    		                $proposition = new Default_Model_Proposition();   
 
-						        //création et initialisation d'un objet Default_Model_Proposition
-			    		        //qui sera enregistr� dans la base de donn�es
-	    		                $proposition = new Default_Model_Proposition();     
-
+	    		              //************** gerer les datetimes en fonction des demis journées *****************************// 
+			     			    $date = $proposition->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
+			     	          //***********************************************************************************************// 		   
+                                
 	    		              //************** Normaliser date debut et date fin ***************//
-				        	    $tab = $proposition->normaliser_dates($data['Debut'],$data['Fin']);
+				        	    $tab = $proposition->normaliser_dates($date[0],$date[1]);
 	                  	      //****************************************************************//    
+	    		               
 	    		                
 						    	$proposition->setId_personne($data['Ressource']);	
-						    	$proposition->setDate_debut($tab[0]);	// date_debut normaliser 										
+						        $proposition->setDate_debut($tab[0]);   // date_debut normaliser 
 								$proposition->setDate_fin($tab[1]);     // date_fin normaliser 
 								$proposition->setMi_debut_journee($data['DebutMidi']);
 								$proposition->setMi_fin_journee($data['FinMidi']);
@@ -133,15 +139,15 @@ class PropositionController extends Zend_Controller_Action
 							    $res_p = $p->propositions_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getMi_debut_journee(),$proposition->getMi_fin_journee(), null);
 	                          //****************************************************************************//	
 								
-							  //****************/// Gestion des chevauchements de cong�s ///****************//			
+							  //****************/// Gestion des chevauchements de congés ///****************//			
 							    $c = new Default_Model_DbTable_Conge();
 							    $res_c = $c->conges_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getMi_debut_journee(),$proposition->getMi_fin_journee(), null);
 	                          //****************************************************************************//	    
 							    
-					          // proposition n'existe pas dans la base de donn�e 
+					          // proposition n'existe pas dans la base de donnée 
 	                    	    if($res_p == null)
 	                   			{    
-	                   				// si le cong� n'existe pas 
+	                   				// si le congé n'existe pas 
 	                   				if($res_c == null)
 	                   		    	{   // oui 
 									    $proposition->save();
@@ -165,16 +171,12 @@ class PropositionController extends Zend_Controller_Action
 							    {    
 									 $this->view->warning = $pers->getNomPrenom()." a déja posé une proposition sur cette periode !";
 							    }
-
-					
 					}
 					catch (Exception $e) 
 					{
-						//$this->view->error = $e->getMessage();
+						  //echo  $e->getMessage();
 						 $this->view->error = "Création de la proposition pour  : ".$pers->getNomPrenom()." a échoué !";	
 					}
-
-				
 				}
 			}
 			else  // form invalide 
@@ -203,13 +205,11 @@ class PropositionController extends Zend_Controller_Action
 		else 
 		{
 		       
-			//si erreur rencontr�e, le formulaire est rempli avec les donn�es
-			//envoy�es pr�c�demment
-			
+			//si erreur rencontrée, le formulaire est rempli avec les données
+		    //envoyées précédemment 
 			$form->populate($data);
 			
 		}
-		
 }
 
 
@@ -227,7 +227,7 @@ class PropositionController extends Zend_Controller_Action
 		$this->view->title = "Modifier Proposition"; //MTA
 		
 		//r�cup�ration des donn�es envoy�es par le formulaire
-		$data_id =  $this->getRequest()->getParams();
+		 $data_id =  $this->getRequest()->getParams();
 
          $proposition = new Default_Model_Proposition();
          $personne = new Default_Model_Personne();
@@ -240,9 +240,9 @@ class PropositionController extends Zend_Controller_Action
 	     
 	     
 	    // stocker les anciennes valeurs du formulaire 
-		 $PreData['Debut']=  $proposition->getDate_debut();
+		 $PreData['Debut']=  substr($proposition->getDate_debut(),0,10);  // extraire la datedebut du datetime
 		 $PreData['DebutMidi'] = $proposition->getMi_debut_journee();
-		 $PreData['Fin'] = $proposition->getDate_fin();
+		 $PreData['Fin']=  substr($proposition->getDate_fin(),0,10);      // extraire la datefin du datetime
 		 $PreData['FinMidi'] = $proposition->getMi_fin_journee();
 	     
 	     // stocker les nouvelles valeurs du formulaire 
@@ -262,37 +262,42 @@ class PropositionController extends Zend_Controller_Action
 		 $form->getElement('Fin')->setAttrib('placeholder', 'Saisissez une date fin ...');
 		 
 		 
-		// remplir le formulaire par les donn�es recup�rer 
+		// remplir le formulaire par les données recupérer 
 		$form->getElement('Ressource')->setValue($id_personne);
-		$form->getElement('Debut')->setValue($PreData['Debut']);
-		$form->getElement('Fin')->setValue($PreData['Fin']);
+		$form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
+		$form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
 		$form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);
 		$form->getElement('FinMidi')->setValue($PreData['FinMidi']);
 		
 
-		//si la page est POST�e = formulaire envoy�
+		//si la page est POSTée = formulaire envoyé
 		if($this->getRequest()->isPost())
 		{ 
-			//r�cup�ration des donn�es envoy�es par le formulaire
+			//récupération des données envoyées par le formulaire
 			$data =  $this->getRequest()->getParams();
             
-			//v�rifie que les donn�es r�pondent aux conditions des validateurs
+			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))
 			{
 				           
 				           $i = 1;
-					       // v�rifie si les donn�es ont subit une modification
+					       // vérifie si les données ont subit une modification
 					        foreach($PreData as $k=>$v)
 					        {
 					        	if((string)$PreData[$k] != (string)$data[$k])
 					        	{
 					        		$i*=0;
 					        	}
-					        	
 					        }
 							if($data['Ressource'] === 'x')     // si on a pas selectionn� une ressource  id = 'x'
 							{
 							   $this->view->error = "Veuillez selectionner une ressource !";
+							}
+							elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1))
+							{
+							   $this->view->error = "Sur un meme jour vous ne pouvez selectionner que ' Debut midi ' ou ' Fin midi '  !";
+						       $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);  
+							   $form->getElement('FinMidi')->setValue($PreData['FinMidi']);
 							}
 							elseif($i == 1)
 				        	{
@@ -303,14 +308,19 @@ class PropositionController extends Zend_Controller_Action
 				         	else 
 			                {       
                                        $this->view->title = "Modification de la proposition";
+                                           
 									try 
 						 			{       
-						 		
+						 		        
+			    		                //************** gerer les datetimes en fonction des demis journées *****************************// 
+					     			        $date = $proposition->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
+					     	            //***********************************************************************************************// 	
+						 				
 							 		    //************** Normaliser date debut et date fin ***************//
-					        	   	    	$tab = $proposition->normaliser_dates($data['Debut'],$data['Fin']);
+					        	   	    	$tab = $proposition->normaliser_dates($date[0],$date[1]);
 		                  	    	    //****************************************************************//
 			
-						        	    // remplir l'objet proposition par les valeurs modifi�es     
+						        	    // remplir l'objet proposition par les valeurs modifiées     
 					                	 $proposition->setId($data_id['id']);
 					                     $proposition->setId_personne($id_personne);
 					                	 $proposition->setDate_debut($tab[0]);
@@ -320,11 +330,11 @@ class PropositionController extends Zend_Controller_Action
 							             $proposition->setNombre_jours();
 							             $proposition->setEtat('NC');
 							           
-							            //****************/// Gestion des chevauchements de cong�s ///****************//	
+							            //****************/// Gestion des chevauchements de propositions ///****************//	
 												
 									     $p = new Default_Model_DbTable_Proposition();
-										 $res_p = $p->propositions_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getMi_debut_journee(),$proposition->getMi_fin_journee(),$proposition->getId());
-						                 
+										 $res_p = $p->propositions_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getId());
+						                /*    
 										 if( $res_p == null)
 										 {	  
 									 		  $proposition->save();
@@ -336,13 +346,61 @@ class PropositionController extends Zend_Controller_Action
 										 {
 										 	 $this->view->warning = "Avec cette modification vous touchez une proposition existante !";
 		
-										 	 // remplir le formulaire par les donn�es recup�rer 
+										 	 // remplir le formulaire par les données recupérer 
 											 $form->getElement('Ressource')->setValue($id_personne);
 											 $form->getElement('Debut')->setValue($PreData['Debut']);
 											 $form->getElement('Fin')->setValue($PreData['Fin']);
 											 $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);
 											 $form->getElement('FinMidi')->setValue($PreData['FinMidi']);
-										 }	  
+										 }	
+										 */
+
+										 
+										 
+						 			    //****************/// Gestion des chevauchements de congés ///****************//			
+							               $c = new Default_Model_DbTable_Conge();
+							               $res_c = $c->conges_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(), null);
+	                                    //****************************************************************************//	    
+							    
+							            // proposition n'existe pas dans la base de donnée 
+			                    	    if($res_p == null)
+			                   			{    
+			                   				// si le congé n'existe pas 
+			                   				if($res_c == null)
+			                   		    	{   // oui 
+											    $proposition->save();
+			                   				    $this->view->success = " La proposition a été modifié avec succés !";
+										        header("Refresh:1.5;URL= http://localhost/eclipse/conges/public/proposition/affichercsm");
+		
+			                   			    }
+			                   			    // si le congé existe 
+										    elseif($res_c <> null)
+									        {   
+									        	  // non 
+			                   				     $this->view->warning = "Avec cette modification vous touchez un congé existant !";
+			                   				     // remplir le formulaire par les données recupérer 
+												$form->getElement('Ressource')->setValue($id_personne);
+												$form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
+												$form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
+												$form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);
+												$form->getElement('FinMidi')->setValue($PreData['FinMidi']);
+			                   				     
+									        }	 
+			                   			}
+			                   			// si la proposition existe
+										elseif($res_p <> null)
+									    {    
+											$this->view->warning = "Avec cette modification vous touchez une proposition existante !";
+											// remplir le formulaire par les données recupérer 
+											$form->getElement('Ressource')->setValue($id_personne);
+											$form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
+											$form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
+											$form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);
+											$form->getElement('FinMidi')->setValue($PreData['FinMidi']);
+									    }
+										 
+										 
+										 
 				                }
 								catch (Exception $e) 
 								{
@@ -395,8 +453,7 @@ class PropositionController extends Zend_Controller_Action
 		 * cette fonction permet � l'admin de valider les propositions et les enregistr� dans 
 		 * la table :conge
 		 */
-	
-	
+
 	//:::::::::::::// ACTION Valider //::::::::::::://
 	public function validerAction()
 	{
@@ -481,7 +538,6 @@ class PropositionController extends Zend_Controller_Action
 			$this->_helper->redirector('affichercsm');
 			
 		}
-		
 		else
 		{
 			$this->view->form = $params;

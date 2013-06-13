@@ -41,32 +41,35 @@ class CongeController extends Zend_Controller_Action
 	//MTA : OK 
 	public function creerAction()
 	{  
-		//cr�ation du fomulaire
+		//***// création du fomulaire
 		 $form = new Default_Form_Conge();
+		 
 		//indique l'action qui va traiter le formulaire
 		//$form->setAction($this->view->url(array('controller' => 'conge', 'action' => 'creer'), 'default', true));
 
-        //assigne le formulaire � la vue
+        //***// assigne le formulaire à la vue
 		$this->view->form = $form;
 		$this->view->title = "Deposer un conge";
 
 
-		// remplir la list Ann�e de reference par Annee , Annee + 1 , Annee - 1
+		//***// remplir la list Année de reference par Annee , Annee + 1 , Annee - 1
+		
 	    $date_tmp = getdate(); // recuperer date system
-	    $annee = (string) $date_tmp['year']; // extraire l'ann�e 
-	    // replir la list par annee-1 , annee , annee+1
+	    $annee = (string) $date_tmp['year']; // extraire l'année 
+	    
+	    // remplir la list par annee-1 , annee , annee+1
 	    $list_annee = array((string)$annee-1=>(string)$annee-1,$annee=>$annee,(string)$annee+1=>(string)$annee+1);
 		$anneeref = $form->getElement('AnneeRef');
 		$anneeref->setValue($annee);
 		$anneeref->setMultiOptions($list_annee);
 		
 
-		// remplir le select par les ressources front 
+		//***// remplir le select par les ressources front 
         $where = array('id_entite <> ?' => '2');
 	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
 		
 	    
-	     // remplir le type de conge  
+	    //***// remplir le type de conge  
 	     $form->setDbOptions('TypeConge',new Default_Model_TypeConge(),'getId','getCode');
 
 		 $this->_helper->viewRenderer('creer');  // creer proposition
@@ -77,7 +80,7 @@ class CongeController extends Zend_Controller_Action
 		if($this->_request->isPost())   
 		{
 			
-			// r�cup�ration des donn�es envoy�s par le formulaire
+			// récupération des données envoyés par le formulaire
 			$data = $this->_request->getPost();
 			$personne = new Default_Model_Personne();
 			$id_personne = $data['Ressource']; // id personne 
@@ -85,22 +88,18 @@ class CongeController extends Zend_Controller_Action
 	        $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
 			
 			
-			//V�rifie si les donn�es r�pondent aux conditions de validateurs 
+			//Vérifie si les données répondent aux conditions de validateurs 
 			if($form->isValid($data)) // formulaire valide 
 			{
-	
-	            if($data['Ressource'] === 'x')     // si on a pas selectionn� une ressource  id = 'x'
-				{
-				   $this->view->error = "Veuillez selectionner une ressource !";
-				}
-				elseif($data['TypeConge'] === 'x')     // si on a pas selectionn� un type de conge
-				{
-				   $this->view->error = "Veuillez selectionner un Type de conge !";
-				}
+	            if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
+				{$this->view->error = "Veuillez selectionner une ressource !";}
+				
+				elseif($data['TypeConge'] === 'x')     // si on a pas selectionné un type de conge
+				{$this->view->error = "Veuillez selectionner un Type de conge !";}
+				
 				elseif ($data['Debut'] > $data['Fin'])
-				{	
-					$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";	//cr�ation et initialisation d'un objet Default_Model_Users
-				}
+				{$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";}
+				
 				elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1))
 				{   
 				    $this->view->error = "Sur un meme jour vous ne pouvez selectionner que ' Debut midi ' ou ' Fin midi ' !";
@@ -112,84 +111,103 @@ class CongeController extends Zend_Controller_Action
 	                  try
 	                  {     
 		                  	//Remplir l'objet qui sera enregistr� dans la base de donn�es
-							$conge = new Default_Model_Conge();
-                            
+						  	 $conge = new Default_Model_Conge();  
+						  	 
+						  	//************** gerer les datetimes en fonction des demis journées *****************************// 
+			     			    $date = $conge->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
+			     	        //***********************************************************************************************// 		 
+						  	 
+		
+			     			    
+			     			    
 							//************** Normaliser date debut et date fin ***************//
-				        	    $tab = $conge->normaliser_dates($data['Debut'],$data['Fin']);
+				        	    $tab = $conge->normaliser_dates($date[0],$date[1]);
 	                  	    //****************************************************************//
-							
-							
-							$conge->setId_personne($data['Ressource']);
-							$conge->setId_type_conge($data['TypeConge']);
-							$conge->setDate_debut($tab[0]);   // date_debut normaliser 
-							$conge->setDate_fin($tab[1]);     // date_fin normaliser 
-							$conge->setMi_debut_journee($data['DebutMidi']);
-							$conge->setMi_fin_journee($data['FinMidi']);
-							$conge->setNombre_jours();
-							$conge->setAnnee_reference($data['AnneeRef']);
-							$conge->setFerme($data['Ferme']);
-	
+      
+		
+								$conge->setId_personne($data['Ressource']);
+								$conge->setId_type_conge($data['TypeConge']);
+								$conge->setDate_debut($tab[0]);   // date_debut normaliser 
+								$conge->setDate_fin($tab[1]);     // date_fin normaliser 
+								$conge->setMi_debut_journee($data['DebutMidi']);
+								$conge->setMi_fin_journee($data['FinMidi']);
+								$conge->setNombre_jours();
+								$conge->setAnnee_reference($data['AnneeRef']);
+								$conge->setFerme($data['Ferme']);
+			           
 							 
-					      //****************/// Gestion des chevauchements de cong�s ///****************//			
+					      //****************/// Gestion des chevauchements de congés ///****************//			
 							$c = new Default_Model_DbTable_Conge();
-							$res = $c->conges_en_double($conge->getId_personne(),$conge->getDate_debut(),$conge->getDate_fin(),$conge->getMi_debut_journee(),$conge->getMi_fin_journee(), null);
-	                      //****************************************************************************//	
+
+							$res = $c->conges_en_double($conge->getId_personne(),$conge->getDate_debut(),$conge->getDate_fin(), null);
+
 							if($res == null)
 							{	 
-								 $this->view->success = "Création du congé pour : ".$pers->getNomPrenom()."	du : ".$conge->getDate_debut()."	au : ".$conge->getDate_fin()."" ;
-								 $conge->save();
+								   // affichage des debut midi et fin midi dans le message succés
+								  /*  $d = '';
+								    $f = '';
+								    if($conge->getMi_debut_journee()== 1 )
+								    {$d = ' à midi';}
+							        if($conge->getMi_fin_journee() == 1)
+							        {$f = ' à midi';}
+							        $this->view->success = "Création du congé pour :  ".$pers->getNomPrenom()." 	du :  ".$conge->getDate_debut()." ".$d." 	au :  ".$conge->getDate_fin()." ".$f ;       
+							          
+							        
+							      */
+								    
+							       // 
+								    $this->view->success = "Création du congé pour :  ".$pers->getNomPrenom()." 	du :  ".$conge->getDate_debut()."	au :  ".$conge->getDate_fin();                      
+								    $conge->save(); 
 								
-								 // vider le formulaire pour cr�e un autre cong�
-							     $form->getElement('Ressource')->setValue('');
-								 $form->getElement('TypeConge')->setValue('');
-								 $form->getElement('Debut')->setValue('');
-								 $form->getElement('Fin')->setValue('');
-								 $form->getElement('DebutMidi')->setValue('');
-								 $form->getElement('FinMidi')->setValue('');
-								 $form->getElement('Ferme')->setValue('');  
+									 // vider le formulaire pour crée un autre congé
+								     $form->getElement('Ressource')->setValue('');
+									 $form->getElement('TypeConge')->setValue('');
+									 $form->getElement('Debut')->setValue('');
+									 $form->getElement('Fin')->setValue('');
+									 $form->getElement('DebutMidi')->setValue('');
+									 $form->getElement('FinMidi')->setValue('');
+									 $form->getElement('Ferme')->setValue(''); 
 							}
 							else 
 							{
 								$this->view->warning = $pers->getNomPrenom()." à déja posé un congé sur cette période !";
 							}   
-							
 	                  }
 		       	      catch (Exception $e) 
-					  {
-							 $this->view->error = "Création du congé pour : ".$pers->getNomPrenom()." échoué !";	
+					  {      
+					  	   echo  $e->getMessage();
+  						 $this->view->error = "Création du congé pour : ".$pers->getNomPrenom()." échoué !";	
 					  }
-
 		         } 
 	      }
 	      else  // forme invalide 
 	      {
-	      
-	            if($data['Ressource'] === 'x')     // si on a pas selectionn� une ressource  id = 'x'
-				{
-				   $this->view->error = "Veuillez selectionner une ressource !";
-				}    
-			    elseif($data['Debut'] == null )
-			    {
-			        $this->view->error = "Veuillez saisir une date de debut !";
-			 
-			    }
-				elseif($data['TypeConge'] === 'x')     // si on a pas selectionn� un type de conge
-				{
-				   $this->view->error = "Veuillez selectionner un type de conge !";
-				}
+	            if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
+				{$this->view->error = "Veuillez selectionner une ressource !";}    
+			    
+				elseif($data['Debut'] == null )
+			    { $this->view->error = "Veuillez saisir une date de debut !"; }
+				
+			    elseif($data['TypeConge'] === 'x')     // si on a pas selectionné un type de conge
+				{$this->view->error = "Veuillez selectionner un type de conge !";}
+				
 			    elseif($data['Fin'] == null )
-					  	 	
-			    	$this->view->error = "Veuillez saisir une date de fin !";
+			    {$this->view->error = "Veuillez saisir une date de fin !";}
 
 			    elseif ($data['Debut'] > $data['Fin'])
-				{	
-					$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";	//cr�ation et initialisation d'un objet Default_Model_Users
-				}
+				{$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";}	//cr�ation et initialisation d'un objet Default_Model_Users
 
 	            $form->populate($data);
 	      }   
 	   }
+
+	   
 	}
+	
+	
+	
+	
+	
 	
 	//:::::::::::::// ACTION MODIFIER //::::::::::::://
 	//MTA  : OK
@@ -212,7 +230,7 @@ class CongeController extends Zend_Controller_Action
 
        
           
-        // recupere l'id personne qui a pos� le conge
+         // recupere l'id personne qui a pos� le conge
          $cong = $conge->find($data_id['id']);
 	     $id_personne =  $cong->getId_personne();  // id personne 
 
@@ -230,9 +248,9 @@ class CongeController extends Zend_Controller_Action
  
  		 
  		 // stocker les anciennes valeurs du formulaire 
-		 $PreData['Debut']=  $conge->getDate_debut();
+		 $PreData['Debut']=  substr($conge->getDate_debut(),0,10);  	// extraire la datedebut du datetime 											
 		 $PreData['DebutMidi'] = $conge->getMi_debut_journee();
-		 $PreData['Fin'] = $conge->getDate_fin();
+		 $PreData['Fin'] =  substr($conge->getDate_fin(),0,10);         // extraire la datefin du datetime 	
 		 $PreData['FinMidi'] = $conge->getMi_fin_journee();    
 		 $PreData['AnneeRef'] = $conge->getAnnee_reference();
 		 $PreData['TypeConge'] = $conge->getId_type_conge();
@@ -249,8 +267,8 @@ class CongeController extends Zend_Controller_Action
 	     $data['_id_type_conge'] = $form->getElement('TypeConge')->getValue();
 	     $data['_ferme'] = $form->getElement('Ferme')->getValue();
 		 
-	      // remplie le select avec les types de conge qui existent
-		  $form->setDbOptions('TypeConge',new Default_Model_TypeConge(),'getId','getCode');
+	     // remplie le select avec les types de conge qui existent
+		 $form->setDbOptions('TypeConge',new Default_Model_TypeConge(),'getId','getCode');
 	     
 	     
 		 // remplie le select avec le  nom et prenom de la personne ayant id personne  
@@ -263,9 +281,9 @@ class CongeController extends Zend_Controller_Action
 		 		 
 		 // remplir le formulaire par les donn�es recup�rer 
 		 $form->getElement('Ressource')->setValue($id_personne);
-		 $form->getElement('Debut')->setValue($PreData['Debut']);
-		 $form->getElement('Fin')->setValue($PreData['Fin']);
-		 $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);
+		 $form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
+		 $form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
+		 $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);  
 		 $form->getElement('FinMidi')->setValue($PreData['FinMidi']);
 		 $form->getElement('AnneeRef')->setValue($PreData['AnneeRef']);
 		 $form->getElement('TypeConge')->setValue($id_type_conge); 
@@ -275,21 +293,21 @@ class CongeController extends Zend_Controller_Action
 	  	  //si la page est POST�e = formulaire envoy�
 		  if($this->getRequest()->isPost())
 		  { 
-		 		//r�cup�ration des donn�es envoy�es par le formulaire
+		 		//récupération des données envoyées par le formulaire
 		  	    $data = $this->_request->getPost();
 
-			//v�rifie que les donn�es r�pondent aux conditions des validateurs
+			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))
 			{      
 				     $i = 1;
-					// v�rifie si les donn�es ont subit une modification
+					// vérifie si les données ont subit une modification
 					 foreach($PreData as $k=>$v)
 					 {
 					     if((string)$PreData[$k] != (string)$data[$k])
 					     { $i*=0; }  	
 					 }
 					 
-					 if($data['Ressource'] === 'x')     // si on a pas selectionn� une ressource  id = 'x'
+					 if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
 					{
 						$this->view->error = "Veuillez selectionner une ressource !";
 					}
@@ -299,11 +317,11 @@ class CongeController extends Zend_Controller_Action
 					}
 				    elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1))
 					{
-					    $this->view->error = "Sur un meme jour vous ne pouvez selectionner que ' Debut midi ' ou ' Fin midi '  !";
-					    $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);  
-					    $form->getElement('FinMidi')->setValue($PreData['FinMidi']);
+					       $this->view->error = "Sur un meme jour vous ne pouvez selectionner que ' Debut midi ' ou ' Fin midi '  !";
+					       $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);   // afficher que la date du datetime 
+					       $form->getElement('FinMidi')->setValue($PreData['FinMidi']);       // afficher que la date du datetime
 					}
-					elseif($i == 1)  // pas de modification effectu� 
+					elseif($i == 1)  // pas de modification effectué
 				    {
 				        $this->view->warning = "Aucun champs n'a été modifié !";
 				    }
@@ -314,61 +332,64 @@ class CongeController extends Zend_Controller_Action
 				    else       
 			        {           
 					            $this->view->title = "Modification du congé";
+					            
 						try 
-					 	{       
-					 		
-					 		    //************** Normaliser date debut et date fin ***************//
-			        	   	    	$tab = $conge->normaliser_dates($data['Debut'],$data['Fin']);
+					 	{        
+					            //************** gerer les datetimes en fonction des demis journées *****************************// 
+			     			        $date = $conge->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
+			     	            //***********************************************************************************************// 		 
+
+			     			    //************** Normaliser date debut et date fin ***************//
+			        	   	    	$tab = $conge->normaliser_dates($date[0],$date[1]);
                   	    	    //****************************************************************//
-			        	
-						        // remplir l'objet conge par les valeurs modifi�es     
-					            $conge ->setId($data_id['id']);
-					            $conge->setId_proposition($cong->getId_proposition());
-					            $conge->setId_personne($id_personne);
-					            $conge->setDate_debut($tab[0]);
-							    $conge->setDate_fin($tab[1]);
-							    $conge->setMi_debut_journee($data['DebutMidi']);
-							    $conge->setMi_fin_journee($data['FinMidi']);
-							    $conge->setAnnee_reference($data['AnneeRef']);
-							    $conge->setNombre_jours();
-							    $conge->setId_type_conge($data['TypeConge']);
-							    $conge->setFerme($data['Ferme']);
-		                
-					 		    		 
-								 //****************/// Gestion des chevauchements de cong�s ///****************//	
+			        	         
+							        // remplir l'objet conge par les valeurs modifi�es     
+						            $conge ->setId($data_id['id']);
+						            $conge->setId_proposition($cong->getId_proposition());
+						            $conge->setId_personne($id_personne);
+						            $conge->setDate_debut($tab[0]);
+								    $conge->setDate_fin($tab[1]);
+								    $conge->setMi_debut_journee($data['DebutMidi']);
+								    $conge->setMi_fin_journee($data['FinMidi']);
+								    $conge->setAnnee_reference($data['AnneeRef']);
+								    $conge->setNombre_jours();
+								    $conge->setId_type_conge($data['TypeConge']);
+								    $conge->setFerme($data['Ferme']);
+			            
+								    
+								    
+								 //****************/// Gestion des chevauchements de congés ///****************//	
 										
 									$c = new Default_Model_DbTable_Conge();
-									$res = $c->conges_en_double($conge->getId_personne(),$conge->getDate_debut(),$conge->getDate_fin(),$conge->getMi_debut_journee(),$conge->getMi_fin_journee(),$conge->getId());
-				                 
-									if( $res == null)
+									$res = $c->conges_en_double($conge->getId_personne(),$conge->getDate_debut(),$conge->getDate_fin(),$conge->getId());
+									
+									if($res == null)
 									{	  
 										  $conge->save();
-										  
 										  $this->view->success = " Modification du congé réussie !";
 							              header("Refresh:1.5;URL=http://localhost/eclipse/conges/public/conge/afficher");
 									}
 									else 
-									{
+									{    
 										 $this->view->warning = "Avec cette modification vous touchez un congé existant !";
-
+                                         
 										 // remplir le formulaire par les donn�es recup�rer 
 										 $form->getElement('Ressource')->setValue($id_personne);
-										 $form->getElement('Debut')->setValue($PreData['Debut']);
-										 $form->getElement('Fin')->setValue($PreData['Fin']);
-										 $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);
+										 $form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
+										 $form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
+										 $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);  
 										 $form->getElement('FinMidi')->setValue($PreData['FinMidi']);
 										 $form->getElement('AnneeRef')->setValue($PreData['AnneeRef']);
 										 $form->getElement('TypeConge')->setValue($id_type_conge); 
 										 $form->getElement('Ferme')->setValue($PreData['Ferme']);
+
 									}  
-							     //****************************************************************************//
-							 		
-		
-								
+							      //****************************************************************************//
+	
 						} 
 						catch (Exception $e) 
 						{
-								//$this->view->error = $e->getMessage();
+								$this->view->error = $e->getMessage();
 								$this->view->error = "Modification du congé pour : ".$pers->getNomPrenom()." à échoué !";	
 						}
 				
@@ -429,4 +450,127 @@ class CongeController extends Zend_Controller_Action
 		$this->view->congeArray = $paginator;
      		
 	}	
+	
+	
+    public function exportcsvAction()
+    {
+        $this->_helper->viewRenderer->setNoRender(true);
+        $this->_helper->layout->disableLayout();
+        header("Content-Type: application/csv-tab-delimited-table");
+        header("Content-disposition: filename=users.csv");
+        $champexport = array('id','id_proposition','id_personne','date_debut','mi_debut_journee','date_fin','mi_fin_journee','annee_reference','nombre_jours','id_type_conge','ferme');
+
+        $conges = new Default_Model_DbTable_Conge();
+        $rows = $conges->fetchAll();
+        
+        $csv_terminated = "\n";
+        $csv_separator = ";";
+        $csv_enclosed = "";
+        $csv_escaped = "\\";        
+        $schema_insert = "";
+           #########TITRE DES COLONNES
+           foreach($champexport as $champ)
+           {
+	            $l = $csv_enclosed . str_replace($csv_enclosed, $csv_escaped . $csv_enclosed,
+	            stripslashes(strtoupper($champ))) . $csv_enclosed;
+	            $schema_insert .= $l;
+	            $schema_insert .= $csv_separator;
+           }
+
+        $out = trim(substr($schema_insert, 0, -1));
+        $out .= $csv_terminated;
+        ############
+        if(count($rows) > 0)
+        {
+            foreach($rows as $content)
+            {
+                $schema_insert = '';
+                if ($content->id != '')
+                {
+                    foreach($champexport as $value)
+                    {   
+                    	
+                    		if ($value=='id')
+                    		{  
+                    			$content->$value = $content->$value; 
+	                        }
+	                        if ($value=='id_proposition')
+	                        {   
+	                             if($content->$value == null)
+	                               $content->$value = '-'; 
+	                             else
+	                              $content->$value = $content->$value; 
+	                        }
+	      
+	                        if ($value=='id_personne')
+	                        {	$content->$value = $content->$value;  
+	                       
+	                        }
+	                        
+	             
+	                        if ($value=='date_debut')
+	                        {	$content->$value = $content->$value;  
+	                   
+	                        }
+	                        
+	                
+	                        if ($value=='mi_debut_journee')
+	                        {	 $content->$value = $content->$value;  
+	           
+	                        }
+	             
+	                        if ($value=='date_fin')
+	                        {  	 $content->$value = $content->$value; 
+	                       
+	                        }
+	                        
+	              
+	                        if ($value=='mi_fin_journee')
+	                        {     $content->$value = $content->$value;  
+	                        
+	                        }
+                            if ($value=='annee_reference')
+	                        {     $content->$value = $content->$value;    
+	                        
+	                        }
+	     
+	                        if ($value=='nombre_jours')
+	                        {     $content->$value = $content->$value;    
+	                        
+	                        }
+	                        
+	          
+	                        if ($value=='id_type_conge')
+	                        {     $content->$value = $content->$value; 
+	                       
+	                    
+	                        
+	                        }
+	                        if ($value=='ferme')
+	                        {    if($content->$value == null)
+	                               $content->$value = 'Non'; 
+	                             else
+	                              $content->$value = $content->$value;  
+                                
+	                        }
+	                        
+                             $schema_insert .= $csv_enclosed .
+	                             str_replace($csv_enclosed, $csv_escaped . $csv_enclosed,$content->$value) . $csv_enclosed;
+	                             $schema_insert .= $csv_separator; 
+                
+	
+                    }                                 
+               }        
+                $schema_insert .= $csv_separator;
+                $out .= $schema_insert;
+                $out .= $csv_terminated;
+            }
+        }
+
+        print utf8_decode($out);
+    }
+	
+	
+	
+	
 }

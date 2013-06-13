@@ -414,7 +414,7 @@ class Default_Model_Conge
 	    $tableau_jours_feries[] = '1_11_'.$annee; // Toussaint
 	    $tableau_jours_feries[] = '11_11_'.$annee; // Armistice 1918
 	    $tableau_jours_feries[] = '25_12_'.$annee; // Noel
-	    // Rï¿½cupï¿½ration de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
+	    // Récupération de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
 	    $easter = easter_date($annee);
 	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + 86400); // Paques
 	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*39)); // Ascension
@@ -426,30 +426,35 @@ class Default_Model_Conge
 /////////////////////////////// DEBUT Fonction Normaliser date_debut et date_fin ///////////////////////////////////
 public function normaliser_dates($date_debut,$date_fin)
 {
-	
 	 $outil = new Default_Controller_Helpers_Validation();
+	 
 	 if($date_debut <> $date_fin )
 	 {
-			  $time1 = strtotime($date_debut);
-			  $d = date('Y-m-d',$time1);
-			  $d_d = new DateTime($d);
-			  $time2 = strtotime($date_fin);
-			  $dff = date('Y-m-d',$time2);
-			  $d_f = new DateTime($dff);
-			  $dd = $outil->normaliser_date_debut_conge($d_d,false);
-			  $df = $outil->normaliser_date_fin_conge($d_f,false);
-
-			  $tab[0] = $dd->format('Y-m-d');
-			  $tab[1] = $df->format('Y-m-d');
+			  $d_d = new DateTime($date_debut);
+			  $d_f = new DateTime($date_fin);
+                 
+			  // si date_debut = férié ou week      et       date_fin = férié ou week   on les décale tt les deux en avant 
+			  if(($outil->est_ferie(date_format($d_f,'Y-m-d H:i:s'),false,false) || in_array(date_format($d_f, 'l'),array('Saturday','Sunday')) && ($outil->est_ferie(date_format($d_d, 'Y-m-d H:i:s'),false,false)) || in_array(date_format($d_d, 'l'),array('Saturday','Sunday'))))
+			  {
+			     $dd = $outil->normaliser_date_debut_conge($d_d,false);
+			     $df = $outil->normaliser_date_debut_conge($d_f,false);
+			     $tab[0] = $dd->format('Y-m-d H:i:s');
+				 $tab[1] = $df->format('Y-m-d H:i:s');
+			  }
+			  else 
+			  {
+				  $dd = $outil->normaliser_date_debut_conge($d_d,false);
+				  $df = $outil->normaliser_date_fin_conge($d_f,false);
+				  $tab[0] = $dd->format('Y-m-d H:i:s');
+				  $tab[1] = $df->format('Y-m-d H:i:s');
+			  }
 	}
 	else 
     {
-		      $time1 = strtotime($date_debut);
-			  $d = date('Y-m-d',$time1);
-			  $d_d = new DateTime($d);
+		      $d_d = new DateTime($date_debut);
 			  $dd = $outil->normaliser_date_debut_conge($d_d,false);
 		   
-		      $tab[0] = $dd->format('Y-m-d');
+		      $tab[0] = $dd->format('Y-m-d H:i:s');
 			  $tab[1] = $tab[0];
 	}
 		                  	    
@@ -457,6 +462,42 @@ public function normaliser_dates($date_debut,$date_fin)
 	
 }
 ///////////////////////////////FIN Fonction Normaliser date_debut et date_fin ///////////////////////////////////
+
+
+
+
+////////////////////////////// reglage des dates en fonction des demis journées ////////////////////////////////
+public function makeDatetime($date_debut,$date_fin,$debut_midi,$fin_midi) 
+{
+	$date_deb = new DateTime($date_debut);
+    $date_fi = new DateTime($date_fin);
+
+	// gerer les datetimes 			
+	if($debut_midi == 1)
+	{   
+		// ajouter 12h00m00s à la date 
+		$date_deb =  $date_deb->add(new DateInterval('PT12H00M00S'));				    
+	} 
+							    
+	if($fin_midi == 1)
+	{
+		 // ajouter 11h59m59s à la date 
+		$date_fi =   $date_fi->add(new DateInterval('PT11H59M59S'));
+			     			    
+	}
+	else //  $fin_midi == 0
+	{
+		// ajouter 23h59m59s à la date 
+		$date_fi =  $date_fi->add(new DateInterval('PT23H59M59S'));
+	}
+	
+	 $date[0] = $date_deb->format('Y-m-d H:i:s');
+	 $date[1] = $date_fi->format('Y-m-d H:i:s');
+		
+	 return $date;
+
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 

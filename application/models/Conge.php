@@ -470,7 +470,7 @@ public function normaliser_dates($date_debut,$date_fin)
 
 
 
-}
+
 ////////////////////////////// reglage des dates en fonction des demis journées ////////////////////////////////
 public function makeDatetime($date_debut,$date_fin,$debut_midi,$fin_midi) 
 {

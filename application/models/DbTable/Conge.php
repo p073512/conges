@@ -9,8 +9,6 @@ class Default_Model_DbTable_Conge extends Zend_Db_Table_Abstract
 	 * cette fonction calcule la somme des jour ouvres  pour chaque annee de reference - les jour de conge
 	 */
 
-	
-	
 	public function somme($id,$annee_reference) 
     {
          $sum = $this->select()->distinct()
@@ -93,14 +91,12 @@ class Default_Model_DbTable_Conge extends Zend_Db_Table_Abstract
      * d'un conge à fin de reperer les conges qui ont de mi de journee
      * elle utilisée au niveau du calendrier phtml
      */
-	public function RecupererLeNombreConge( $id_personne,$date_debut) 
+	public function RecupererLeNombreConge($id_personne,$date_debut) 
     {
     	$db = $this->getAdapter();  
         $select = $this->select()->setIntegrityCheck(false)
-                    ->from(array('c' => $this->_name),'id_type_conge')
-                     ->where('('.$db->quoteInto('c.date_debut=?', $date_debut).'&&'.$db->quoteInto('c.id_personne =?', $id_personne).')');
-        			
-       
+                   ->from(array('c' => $this->_name),'id_type_conge')
+                   ->where('('.$db->quoteInto('c.date_debut=?', $date_debut).'&&'.$db->quoteInto('c.id_personne =?', $id_personne).')');
         return $this->fetchAll($select)->toArray();
     }
     
@@ -116,7 +112,7 @@ class Default_Model_DbTable_Conge extends Zend_Db_Table_Abstract
     	return $this->fetchAll($select)->toArray();
     }
 	
-   public function CongesNondoublontPole( $tableau_id,$debut_mois,$fin_mois) 
+    public function CongesNondoublontPole( $tableau_id,$debut_mois,$fin_mois) 
     {
     	$db = $this->getAdapter();  
         $select = $this->select()->distinct()->setIntegrityCheck(false)
@@ -127,101 +123,31 @@ class Default_Model_DbTable_Conge extends Zend_Db_Table_Abstract
        
         return $this->fetchAll($select)->toArray();
     }
-
-    ////////////////////////////////////////////////////////////////////MTA/////////////////////////////////////////////////////////////////////
    
-    public function conges_en_double($id_personne,$date_debut,$date_fin,$debut_midi,$fin_midi,$id_conge) 
-    {   
+////////////////////////////////////////////////////////////////////MTA///////////////////////////////////////////////////////////////////// 
+    public function conges_en_double($id_personne,$date_debut,$date_fin,$id_conge) 
+    {
 	        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 		    $select = new Zend_Db_Select($db);
-		    $select ->from((array('c' =>'conge')),array('c.id_personne' ,'c.date_debut','c.date_fin','c.mi_debut_journee','c.mi_fin_journee')); 
+		    $select ->from((array('c' =>$this->_name)),array('c.id','c.id_personne' ,'c.date_debut','c.date_fin')); 
 	        $select->where('c.id_personne ='.$id_personne);
-            
+
 	        // pour la modification 
 	        if(isset($id_conge))
 	        {
 	           $select->where('c.id <>'.$id_conge);
 	        }
 	        ///////////////////////
-	        
-	        if($date_debut <> $date_fin)
-	        {
-		        if($debut_midi == 0  &&  $fin_midi == 0)
-		        {   
-		        	$select->where('('.$db->quoteInto('c.date_debut >=?', $date_debut).'&&'.$db->quoteInto('c.date_fin <= ?', $date_fin).') OR    
-		            				('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).')OR                    		
-		            				('.$db->quoteInto('c.date_debut <= ?', $date_fin).'&&'.$db->quoteInto('c.date_debut > ?', $date_debut).')OR 	                        		
-		            				('.$db->quoteInto('c.date_fin >= ?', $date_debut).'&&'.$db->quoteInto('c.date_fin < ?', $date_fin).')OR	                        		
-		            				('.$db->quoteInto('c.date_debut = ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).')OR	                        		
-		            				('.$db->quoteInto('c.date_fin = ?', $date_fin).'&&'.$db->quoteInto('c.date_debut < ?', $date_debut).')');
-		        
-		        }
-		        elseif($debut_midi == 1  &&  $fin_midi == 0)        
-		        {  
-		             $select->where('('.$db->quoteInto('c.date_debut > ?', $date_debut).'&&'.$db->quoteInto('c.date_fin < ?', $date_fin).')OR    
-                                     ('.$db->quoteInto('c.date_debut = ?', $date_debut).'&&'.$db->quoteInto('c.date_fin = ?', $date_fin).')OR    
-		             				 ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).')OR                    		
-		            				 ('.$db->quoteInto('c.date_debut <= ?', $date_fin).'&&'.$db->quoteInto('c.date_debut > ?', $date_debut).')OR 	                     		 
-		            				 ('.$db->quoteInto('c.date_fin = ?', $date_debut).'&&'.$db->quoteInto('c.date_fin < ?', $date_fin).'&&'.$db->quoteInto('c.mi_fin_journee <> ?', $debut_midi).')OR	                        		
-		            				 ('.$db->quoteInto('c.date_fin > ?', $date_debut).'&&'.$db->quoteInto('c.date_fin < ?', $date_fin).')OR		            				 
-		            				 ('.$db->quoteInto('c.date_debut = ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).')OR
-		            				 ('.$db->quoteInto('c.date_fin = ?', $date_fin).'&&'.$db->quoteInto('c.date_debut < ?', $date_debut).')');
-		                            
-		        }
-		        elseif($debut_midi == 0  &&  $fin_midi == 1)
-		        {     
-		        	 $select->where('('.$db->quoteInto('c.date_debut > ?', $date_debut).'&&'.$db->quoteInto('c.date_fin < ?', $date_fin).') OR
-		        	                 ('.$db->quoteInto('c.date_debut = ?', $date_debut).'&&'.$db->quoteInto('c.date_fin = ?', $date_fin).') OR
-		            				 ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).')OR 
-		            				 ('.$db->quoteInto('c.date_debut = ?', $date_fin).'&&'.$db->quoteInto('c.date_debut > ?', $date_debut).'&&'.$db->quoteInto('c.mi_debut_journee <> ?', $fin_midi).') OR                    		
-		            				 ('.$db->quoteInto('c.date_debut < ?', $date_fin).'&&'.$db->quoteInto('c.date_debut > ?', $date_debut).')OR                   		 		            				 
-								     ('.$db->quoteInto('c.date_fin >= ?', $date_debut).'&&'.$db->quoteInto('c.date_fin < ?', $date_fin).')OR	                        		
-								     ('.$db->quoteInto('c.date_debut = ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).')OR	                        		
-		            				 ('.$db->quoteInto('c.date_fin = ?', $date_fin).'&&'.$db->quoteInto('c.date_debut < ?', $date_debut).')');
-		        }
-		        elseif($debut_midi == 1  ||  $fin_midi == 1)   
-		        {   
-		             $select->where('('.$db->quoteInto('c.date_debut > ?', $date_debut).'&&'.$db->quoteInto('c.date_fin < ?', $date_fin).') OR
-		        	                 ('.$db->quoteInto('c.date_debut = ?', $date_debut).'&&'.$db->quoteInto('c.date_fin = ?', $date_fin).') OR  
-		            				 ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).')OR    
-		            				 ('.$db->quoteInto('c.date_debut = ?', $date_fin).'&&'.$db->quoteInto('c.date_debut > ?', $date_debut).'&&'.$db->quoteInto('c.mi_debut_journee <> ?', $fin_midi).') OR                		
-		            				 ('.$db->quoteInto('c.date_debut < ?', $date_fin).'&&'.$db->quoteInto('c.date_debut > ?', $date_debut).')OR   
-		            				 ('.$db->quoteInto('c.date_fin = ?', $date_debut).'&&'.$db->quoteInto('c.date_fin < ?', $date_fin).'&&'.$db->quoteInto('c.mi_fin_journee <> ?', $debut_midi).')OR
-		                             ('.$db->quoteInto('c.date_fin > ?', $date_debut).'&&'.$db->quoteInto('c.date_fin < ?', $date_fin).')OR 
-		                             ('.$db->quoteInto('c.date_debut = ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).')OR
-		                             ('.$db->quoteInto('c.date_fin = ?', $date_fin).'&&'.$db->quoteInto('c.date_debut < ?', $date_debut).')');
-		       }
-	        }
-			if($date_debut == $date_fin)
-			{
-			 	    if($debut_midi == 0  &&  $fin_midi == 0)
-			        {   
-			        	$select->where('('.$db->quoteInto('c.date_debut <=?', $date_debut).'&&'.$db->quoteInto('c.date_fin >=?', $date_debut).')');   
-			        }
-			        elseif($debut_midi == 1  &&  $fin_midi == 0)        
-			        {  	
-			        	$select->where('('.$db->quoteInto('c.date_debut =?', $date_debut).'&&'.$db->quoteInto('c.date_fin =?', $date_debut).'&&'.$db->quoteInto('c.mi_fin_journee = ?', $fin_midi).') OR
-			        	                ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin = ?', $date_debut).'&&'.$db->quoteInto('c.mi_fin_journee = ?', $fin_midi).') OR
-			        	                ('.$db->quoteInto('c.date_debut = ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_debut).'&&'.$db->quoteInto('c.mi_debut_journee <> ?', $debut_midi).') OR
-			        	                ('.$db->quoteInto('c.date_debut = ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_debut).'&&'.$db->quoteInto('c.mi_debut_journee <> ?', $fin_midi).') OR
-			        	                ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_debut).')');
-			        }
-			        elseif($debut_midi == 0  &&  $fin_midi == 1)
-			        {   
-			        	$select->where('('.$db->quoteInto('c.date_debut =?', $date_debut).'&&'.$db->quoteInto('c.date_fin =?', $date_debut).'&&'.$db->quoteInto('c.mi_debut_journee = ?', $debut_midi).') OR	    	
-			        	                ('.$db->quoteInto('c.date_debut = ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_debut).'&&'.$db->quoteInto('c.mi_debut_journee = ?', $debut_midi).') OR
-			        	                ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin = ?', $date_debut).'&&'.$db->quoteInto('c.mi_fin_journee <> ?', $fin_midi).') OR
-			        	                ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin = ?', $date_debut).'&&'.$db->quoteInto('c.mi_fin_journee <> ?', $debut_midi).') OR
-			        	                ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_debut).')');	                
-			        }
-			}
-	                 
-			  return  $row = $select->query()->fetchAll(); 
-    }// fin fonction 
     
-   
-  
-     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		       $select->where('('.$db->quoteInto('c.date_debut >= ?', $date_debut).'&&'.$db->quoteInto('c.date_debut <= ?', $date_fin).') OR  
+	  					       ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).') OR
+		       				   ('.$db->quoteInto('c.date_debut <= ?', $date_fin).'&&'.$db->quoteInto('c.date_debut >= ?', $date_debut).') OR  
+	                           ('.$db->quoteInto('c.date_fin >= ?', $date_debut).'&&'.$db->quoteInto('c.date_fin <= ?', $date_fin).')');
+     
+			return  $select->query()->fetchAll(); 
+			
+    }// fin fonction 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
     
     

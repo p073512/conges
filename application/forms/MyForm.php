@@ -155,19 +155,10 @@ class Default_Form_MyForm extends Zend_Form
 	 */
 	public function init()
 	{
-		 // le chemin du décorateur est défini.
-           $this->addElementPrefixPath('My_Form_Decorators',
-                       APPLICATION_PATH.'../../My/Form/Decorators',
-		              'decorator');
-	 	
-   		
-   		 
+      // le chemin du décorateur est défini.
+      $this->addElementPrefixPath('My_Form_Decorators',APPLICATION_PATH.'../../My/Form/Decorators','decorator');
+	 
 	}
-	
-				
 
-		
-		
-	
 }
 #endregion MBA

@@ -10,7 +10,7 @@ class Default_Form_Conge extends Default_Form_MyForm
 
 	public function init()
 	{
-		parent::init();
+		 parent::init();
 		
 		// nom du form 
      	 $this->setName('Create_Conge');
@@ -21,37 +21,33 @@ class Default_Form_Conge extends Default_Form_MyForm
         /*
          * Nom Prenom type select
          */ 
-		$iRessource = $this->createElement('select', 'Ressource', array(
-			  															'label'  => 'Ressource ',
-			  															'name' => 'Ressource',
-		                                                                'required'   => 'true',
-																		) 
-	         							   ); 
-						   
-	         							   
+		 $iRessource = $this->createElement('select', 'Ressource', array(
+			  															 'label'  => 'Ressource ',
+			  															 'name' => 'Ressource',
+		                                                                 'required'   => 'true',
+																		 ) 
+	         							   ); 					        							   
         /*
          * Type de conge type select
          */
-	    $iTypeConge = $this->createElement('select', 'TypeConge', array(
-			  															'label'  => 'Type de conge ',
-			  															'name' => 'TypeConge',
-		                                                                'required'   => 'true',
-																		) 
-	         							   ); 
-							   
+	     $iTypeConge = $this->createElement('select', 'TypeConge', array(
+			  															 'label'  => 'Type de conge ',
+			  														  	 'name' => 'TypeConge',
+		                                                                 'required'   => 'true',
+																		 ) 
+	         							   ); 					   
         /*
          * Date debut type jquery_x datepicker
          * 
          */
-		
-		$iDebut = new ZendX_JQuery_Form_Element_DatePicker('Debut');
-		$iDebut->setJQueryParam('dateFormat', 'yy-mm-dd');
-		$iDebut->setLabel('Debut ');
-		$iDebut->addValidator('date',true,array('date' => 'yy-MM-dd'));
-		$iDebut->addDecorator('Ftextinput', array('label'));    
-		$iDebut->setRequired(true); 
-		$iDebut->setErrorMessages(array("Date D&eacute;but invalide !"));
-		$iDebut->setAttrib('placeholder', 'choisir une date debut ...');
+		 $iDebut = new ZendX_JQuery_Form_Element_DatePicker('Debut');
+		 $iDebut->setJQueryParam('dateFormat', 'yy-mm-dd');
+		 $iDebut->setLabel('Debut ');
+		 $iDebut->addValidator('date',true,array('date' => 'yy-MM-dd'));
+		 $iDebut->addDecorator('Ftextinput', array('label'));    
+		 $iDebut->setRequired(true); 
+		 $iDebut->setErrorMessages(array("Date D&eacute;but invalide !"));
+		 $iDebut->setAttrib('placeholder', 'choisir une date debut ...');
 	
 	
 		
@@ -66,21 +62,19 @@ class Default_Form_Conge extends Default_Form_MyForm
          * Date fin type jquery_x datepicker
          * 
          */
-		
-		$iFin = new ZendX_JQuery_Form_Element_DatePicker('Fin');
-		$iFin->setJQueryParam('dateFormat', 'yy-mm-dd');
-		$iFin->setLabel('Fin ');
-		$iFin->addValidator('date',true,array('date' => 'yy-MM-dd'));
-		$iFin->addDecorator('Ftextinput', array('label'));
-        $iFin->setRequired(true); 
-        $iFin->setErrorMessages(array("Date Fin invalide !"));
-        $iFin->setAttrib('placeholder', 'choisir une date fin ...');
+		 $iFin = new ZendX_JQuery_Form_Element_DatePicker('Fin');
+		 $iFin->setJQueryParam('dateFormat', 'yy-mm-dd');
+		 $iFin->setLabel('Fin ');
+		 $iFin->addValidator('date',true,array('date' => 'yy-MM-dd'));
+		 $iFin->addDecorator('Ftextinput', array('label'));
+         $iFin->setRequired(true); 
+         $iFin->setErrorMessages(array("Date Fin invalide !"));
+         $iFin->setAttrib('placeholder', 'choisir une date fin ...');
 		
 		/*
          * Debut midi type checkbox 
          * 
          */
-
 		  $iFinMidi =   new Zend_Form_Element_Checkbox('FinMidi',array('label' => 'Fin Midi'));
 		
 		  
@@ -88,8 +82,7 @@ class Default_Form_Conge extends Default_Form_MyForm
          * Ferme type checkbox 
          * 
          */
-
-		  $iFerme =   new Zend_Form_Element_Checkbox('Ferme',array('label' => 'Ferme'));	  
+		 $iFerme =   new Zend_Form_Element_Checkbox('Ferme',array('label' => 'Ferme'));	  
 		  
 		  
 		 /*
@@ -97,7 +90,7 @@ class Default_Form_Conge extends Default_Form_MyForm
          * 
          */
 		
-		$iAnneeRef = $this->createElement('select', 'AnneeRef', array(
+		 $iAnneeRef = $this->createElement('select', 'AnneeRef', array (
 			  															'label'  => 'Annee de reference ',
 			  															'name' => 'AnneeRef',
 		                                                                'required'   => 'true',

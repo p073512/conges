@@ -145,7 +145,7 @@
 			}
 		// fin setJoursFerie
 		
-			/**
+		/**
 	 * @desc : La fonction getPeriodeDetails retourne un tableau associatif contenant
 	 *		   tous les jours de la période ,renseignée en paramétre, avec leur type : 
 	 *          -N : jour ordinaire (ni Férié ni Weekend)

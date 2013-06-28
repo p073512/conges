@@ -2,7 +2,7 @@
 //"Default" correspond au namespace que nous avons défini dans le bootstrap
 class Default_Model_Proposition
 {
-	//variables correspondant à chacun des champs de notre table proposition
+	//////////////////////////////variables correspondant à chacun des champs de notre table proposition//////////////////////////////
 	protected  $_id;
 	protected  $_id_personne;
 	protected  $_date_debut;
@@ -11,11 +11,10 @@ class Default_Model_Proposition
 	protected  $_mi_fin_journee;
 	protected  $_nombre_jours;
 	protected  $_etat;
-
 	//le mapper va nous fournir les méthodes pour interagir avec notre table (objet de type Default_Model_PropositionMapper)
 	protected $_mapper;
 
-	//constructeur
+	//***// constructeur
 	//le tableau d'options peut contenir les valeurs des champs à utiliser
 	//pour l'initialisation de l'objet
 	public function __construct(array $options = null)
@@ -25,7 +24,9 @@ class Default_Model_Proposition
 			$this->setOptions($options);
 		}
 	}
-
+	
+	
+	
 	//cette méthode permet d'appeler n'importe quel settor en fonction
 	//des arguments
 	public function __set($name, $value)
@@ -37,7 +38,9 @@ class Default_Model_Proposition
 		}
 		$this->$method($value);
 	}
-
+	
+	
+	
 	//cette méthode permet d'appeler n'importe quel gettor en fonction
 	//du nom passé en argument
 	public function __get($name)
@@ -49,7 +52,9 @@ class Default_Model_Proposition
 		}
 		return $this->$method();
 	}
-
+	
+	
+	
 	//permet de gérer un tableau d'options passé en argument au constructeur
 	//ce tabelau d'options peut contenir la valeur des champs à utiliser
 	//pour l'initialisation de l'objet
@@ -67,18 +72,19 @@ class Default_Model_Proposition
 		return $this;
 	}
 
-	//gettors and settors d'accès aux variables
+	//////////////////////////////gettors and settors d'accès aux variables//////////////////////////////
 	public function setId($id)
 	{
 		$this->_id = (int)$id;
 		return $this;
 	}
-
 	public function getId()
 	{
 		return $this->_id;
 	}
-
+	
+	
+	
 	public function setId_personne($id_personne)
 	{
 		$this->_id_personne = (int)$id_personne;
@@ -88,7 +94,9 @@ class Default_Model_Proposition
 	{
 		return $this->_id_personne;
 	}
-
+	
+	
+	
 	public function setDate_debut($date_debut)
 	{
 		$this->_date_debut = $date_debut;
@@ -99,7 +107,9 @@ class Default_Model_Proposition
 	{
 		return $this->_date_debut;
 	}
-
+	
+	
+	
 	public function setMi_debut_journee($mi_debut_journee)
 	{
 		$this->_mi_debut_journee = $mi_debut_journee;
@@ -109,7 +119,9 @@ class Default_Model_Proposition
 	{
 		return $this->_mi_debut_journee;
 	}
-
+	
+	
+	
 	public function setDate_fin($date_fin)
 	{
 		$this->_date_fin = $date_fin;
@@ -120,7 +132,9 @@ class Default_Model_Proposition
 	{
 		return $this->_date_fin;
 	}
-
+	
+	
+	
 	public function setMi_fin_journee($mi_fin_journee)
 	{
 		$this->_mi_fin_journee = $mi_fin_journee;
@@ -130,46 +144,33 @@ class Default_Model_Proposition
 	{
 		return $this->_mi_fin_journee;
 	}
-	/* Mohamed khalil TAKAFI */
-	public function setNombre_jours()   //MTA : calcul nombre de jours proposition 
+	
+	
+	
+	public function setNombre_jours($nombre_jours)    
 	{
-		$date_debut = new DateTime($this->getDate_debut());    // date_debut 
-    	$date_fin = new DateTime($this->getDate_fin());        // date_fin
-    	
-    	$date_depart =  date_timestamp_get($date_debut);
-    	$annee = (string)date('Y', $date_depart);              // année 
-	    
-        $debut_midi = $this->getMi_debut_journee();            // debut midi 
-        $fin_midi = $this->getMi_fin_journee();                // fin midi 
-
-		$utils = new Default_Controller_Helpers_Validation();
-		
-		 // mettre les jours fériés maroc dans session TEST 
-		$jours_feries_maroc = new Zend_Session_Namespace('TEST',false);
-        $jours_feries_maroc->jfm = $utils->jours_feries_maroc($annee);
-		
-        $this->_nombre_jours = $utils->calculer_jours_conges($date_debut, $date_fin,$debut_midi,$fin_midi,true);
-        
-		return $this;
-	}
+		$this->_nombre_jours = $nombre_jours;
+		return $this;	
+	}		
 	public function  getNombre_jours()
 	{
 		return $this->_nombre_jours;
 	}
-
+	
+	
+	
 	public function setEtat($etat)
 	{
 		$this->_etat = (string)$etat;
 		return $this;
 	}
-
 	public function  getEtat()
 	{
 		return $this->_etat;
 	}
-
-
-
+	
+	
+	
 	public function setMapper($mapper)
 	{
 		$this->_mapper = $mapper;
@@ -184,24 +185,30 @@ class Default_Model_Proposition
 
 		return $this->_mapper;
 	}
-
-	//méthodes de classe utilisant les méthodes du mapper
+	
+	
+	
+	//////////////////////////////méthodes de classe utilisant les méthodes du mapper//////////////////////////////
+	
 	//crée ou met à jour une entrée dans la table
 	public function save()
 	{
 		$this->getMapper()->save($this);
 	}
-
+	
+	
+	
 	//récupère une entrée particulière
 	public function find($id)
 	{
 		$this->getMapper()->find($id, $this);
 		return $this;
 	}
-
-	//récupère toutes les entrées de la table
 	
-		public function fetchAll($str)
+	
+	
+	//récupère toutes les entrées de la table
+	public function fetchAll($str)
 	{
 		return $this->getMapper()->fetchAll($str);
 	}
@@ -212,7 +219,9 @@ class Default_Model_Proposition
 	{
 		$this->getMapper()->delete($id);
 	}
-
+	
+	
+	
 	public function joursOuvresDuMois($debut_mois,$fin_mois)
 	{
 
@@ -227,64 +236,49 @@ class Default_Model_Proposition
 		$nb= count($tableau_jours_feries );
 		$tableau = array();
 	
-		for ($i=0;$i<$nb;$i++)
-		{
-			$tableau[$i]=$tableau_jours_feries[$i]['date_debut'];
-			
-		}
-   		 $nb_jours_ouvres = 0;
-    // Mettre <= si on souhaite prendre en compte le dernier jour dans le décompte
-    while ($date_debut <= $date_fin) 
-    {
-    // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvrés
-	    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date(date('Y', $date_debut).'-n-j', $date_debut),$tableau)) 
-	    {
-	    	$nb_jours_ouvres ++;
-	    }
-	    	$date_debut = mktime(date('H', $date_debut), date('i', $date_debut), date('s', $date_debut), date('m', $date_debut), date('d', $date_debut) + 1, date('Y', $date_debut));
-	}
+			for ($i=0;$i<$nb;$i++)
+			{
+				$tableau[$i]=$tableau_jours_feries[$i]['date_debut'];
+				
+			}
+   		    $nb_jours_ouvres = 0;
+   			 // Mettre <= si on souhaite prendre en compte le dernier jour dans le décompte
+		    while ($date_debut <= $date_fin) 
+		    {
+		    // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvrés
+			    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date(date('Y', $date_debut).'-n-j', $date_debut),$tableau)) 
+			    {
+			    	$nb_jours_ouvres ++;
+			    }
+			    	$date_debut = mktime(date('H', $date_debut), date('i', $date_debut), date('s', $date_debut), date('m', $date_debut), date('d', $date_debut) + 1, date('Y', $date_debut));
+			}
+		
 		return $nb_jours_ouvres;
 	}
-	
-	
-/*
- * MTA  
- */
 
-/////////////////////////////// DEBUT Fonction Normaliser date_debut et date_fin ///////////////////////////////////
-public function normaliser_dates($date_debut,$date_fin)
-{
+	/**
+	 * Description : 
+	 * Fonction responsable du calcul de nombre de jours 
+	 * elle fait appel a une autre fonction calculer_jours 
+	 * le resultat et passé en argument au setter "setNombre_jours($nbj)" de l'objet concerner 
+	 */
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public function calcul_periode_proposition($date_debut,$date_fin)
+	{
+	        $outils = new Default_Controller_Helpers_outils();  
+	       
+	       
+	        $date_depart =  date_timestamp_get(new DateTime($date_debut));
+	        $annee = (string)date('Y', $date_depart);              // année 
 	
-	 $outil = new Default_Controller_Helpers_Validation();
-	 if($date_debut <> $date_fin )
-	 {
-			  $time1 = strtotime($date_debut);
-			  $d = date('Y-m-d',$time1);
-			  $d_d = new DateTime($d);
-			  $time2 = strtotime($date_fin);
-			  $dff = date('Y-m-d',$time2);
-			  $d_f = new DateTime($dff);
-			  $dd = $outil->normaliser_date_debut_conge($d_d,false);
-			  $df = $outil->normaliser_date_fin_conge($d_f,false);
+	        // mettre les jours fériés maroc dans session TEST 
+			$jours_feries_maroc = new Zend_Session_Namespace('TEST',false);
+	        $jours_feries_maroc->jfm = $outils->jours_feries_maroc($annee);
+	 																		// true signifie maroc car on pose une proposition 
+	        $nbj =  $outils->calculer_jours(new DateTime($date_debut),new DateTime($date_fin),true); 
+	         
+	        $this->setNombre_jours($nbj);
+	}////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			  $tab[0] = $dd->format('Y-m-d');
-			  $tab[1] = $df->format('Y-m-d');
-	}
-	else 
-    {
-		      $time1 = strtotime($date_debut);
-			  $d = date('Y-m-d',$time1);
-			  $d_d = new DateTime($d);
-			  $dd = $outil->normaliser_date_debut_conge($d_d,false);
-		   
-		      $tab[0] = $dd->format('Y-m-d');
-			  $tab[1] = $tab[0];
-	}
-		                  	    
-	 return $tab; 
-	
-}
-///////////////////////////////FIN Fonction Normaliser date_debut et date_fin ///////////////////////////////////
-	
 
 }

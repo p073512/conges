@@ -38,6 +38,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	{
 		Zend_Controller_Action_HelperBroker::addHelper(new Default_Controller_Helpers_Validation());
 	}
+	
 	protected function _initJQuery()
 	{
 		$this->bootstrap('view');

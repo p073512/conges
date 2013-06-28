@@ -2,7 +2,11 @@
 //"Default" correspond au namespace que nous avons d�fini dans le bootstrap
 class Default_Model_Conge
 {
+
 	//////////////////////////////variables correspondant � chacun des champs de notre table users/////////////////////////////////
+
+
+	
 	protected  $_id;
 	protected  $_id_personne;
 	protected  $_id_proposition;
@@ -14,11 +18,15 @@ class Default_Model_Conge
 	protected  $_id_type_conge;
 	protected  $_annee_reference;
 	protected  $_ferme;
+
 	//le mapper va nous fournir les m�thodes pour interagir avec notre table (objet de type Default_Model_CongeMapper)
+
 	protected $_mapper;
 
 	//***// constructeur
+
 	//le tableau d'options peut contenir les valeurs des champs � utiliser
+
 	//pour l'initialisation de l'objet
 	public function __construct(array $options = null)
 	{
@@ -69,7 +77,9 @@ class Default_Model_Conge
 		return $this;
 	}
 
-	//////////////////////////////gettors and settors d'acc�s aux variables//////////////////////////////
+
+	//gettors and settors d'acc�s aux variables//
+
 	public function setId($id)
 	{
 		$this->_id = (int)$id;
@@ -220,11 +230,11 @@ class Default_Model_Conge
 
 	
 	
-	
-	
 	//////////////////////////////m�thodes de classe utilisant les m�thodes du mapper//////////////////////////////
 	
 	//cr�e ou met � jour une entr�e dans la table
+	
+
 	public function save()
 	{
 		$this->getMapper()->save($this);
@@ -232,16 +242,18 @@ class Default_Model_Conge
 	
 	
 	
+
 	//r�cup�re une entr�e particuli�re
+
 	public function find($id)
 	{
 		$this->getMapper()->find($id, $this);
 		return $this;
-	}	
-	
-	
-	
+	}
+
+
 	//r�cup�re toutes les entr�es de la table
+
 	public function fetchAll($str)
 	{
 		return $this->getMapper()->fetchAll($str);
@@ -249,7 +261,9 @@ class Default_Model_Conge
 	
 	
 	
+
 	// r�cup�re les cong�s sur une p�riode donn�e.
+
    public function conges_existant($id_personne,$date_debut,$date_fin,$flag) 
 	{
 		return $this->getMapper()->conges_existant($id_personne,$date_debut,$date_fin,$flag);
@@ -341,12 +355,15 @@ class Default_Model_Conge
 
 	public function joursOuvresDuMois($debut_mois,$fin_mois)
 	{
+
 			// tu peut utiliser cette fonction pour afficher les nombre totale ouvere pour un mois donn�
 	
 			$date_debut = strtotime($debut_mois );
 	    	$date_fin = strtotime($fin_mois );
 			
 	    	$tableau_jours_feries = array(); // Tableau des jours feri�s
+
+
 
 	    	// On boucle dans le cas o� l'ann�e de d�part serait diff�rente de l'ann�e d'arriv�e
 	    	$difference_annees = date('Y', $date_fin) - date('Y', $date_debut);
@@ -377,6 +394,7 @@ class Default_Model_Conge
 				    while ($date_debut <= $date_fin) 
 				    {
 				    // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour f�ri�, on incr�mente les jours ouvr�s
+
 					    if (!in_array(date('w', $date_debut), array(0,6)) && !in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) 
 					    {
 					    	$nb_jours_ouvres++;
@@ -399,14 +417,15 @@ class Default_Model_Conge
 		$date_debut = strtotime($debut_mois );
     	$date_fin = strtotime($fin_mois );
 		
+
     	$tableau_jours_feries = array(); // Tableau des jours feri�s
 
-    	// On boucle dans le cas o� l'ann�e de d�part serait diff�rente de l'ann�e d'arriv�e
     	$difference_annees = date('Y', $date_fin) - date('Y', $date_debut);
     	
 		 for ($i = 0; $i <= $difference_annees; $i++) 
 	    {
 		    $annee = (int)date('Y', $date_debut) + $i;
+
 		    // Liste des jours feri�s
 		    $tableau_jours_feries[] = '1_1_'.$annee;   // Jour de l'an
 		    $tableau_jours_feries[] = '1_5_'.$annee;   // Fete du travail
@@ -417,6 +436,7 @@ class Default_Model_Conge
 		    $tableau_jours_feries[] = '11_11_'.$annee; // Armistice 1918
 		    $tableau_jours_feries[] = '25_12_'.$annee; // Noel
 		    // R�cup�ration de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
+
 		    $easter = easter_date($annee);
 		    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + 86400); // Paques
 		    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*39)); // Ascension
@@ -440,10 +460,13 @@ class Default_Model_Conge
 	        $outils = new Default_Controller_Helpers_outils();  
 	
 	        $date_depart =  date_timestamp_get($date_debut);
+
 	        $annee = (string)date('Y', $date_depart);              // ann�e 
+
 	
 	        $maroc = false;                                        // France 
 	
+
 	        // mettre les jours f�ri�s maroc dans session TEST 
 			$jours_feries_maroc = new Zend_Session_Namespace('TEST',false);
 	        $jours_feries_maroc->jfm = $outils->jours_feries_maroc($annee);
@@ -491,6 +514,7 @@ class Default_Model_Conge
 	     
 	     //affichage du tableau du d�tails de la p�riode de cong�
 	     echo'Le d�tails du cong� ci-dessous :</br>';
+>>>>>>> branch 'refs/heads/CSM' of https://github.com/p073512/conges.git
 	     var_dump($conge);
 	     
 	     $this->_nombreJoursT = $outils->CalculNombreJourConge($conge);

@@ -11,23 +11,15 @@
 	  echo $this->jQuery(); 
 	  ?> 
  
+ 
 	<div class="row-fluid offset1">
 		<div id="header-container">
             
 			<div class="dropdown">
                   <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
-                     Proposition
-                     <b class="caret"></b>
+                  Proposition
                   </a>
-                  
-                 	 
-                   <ul class="dropdown-menu">
-                       <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'creer'), 'default', true) ?>">Créer</a></li>
-                       <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'affichercsm'), 'default', true) ?>">Afficher / Modifier</a></li>
-                       <li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'afficheradmin'), 'default', true) ?>">Valider / Refuser</a></li>                         
-                   </ul>
-                    
-              
+
 			</div><!--MBA : fermeture dropdown -->
           
 		</div><!-- MBA : fermeture div="header-container" -->

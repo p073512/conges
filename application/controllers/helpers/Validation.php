@@ -1,20 +1,19 @@
 <?php
 class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helper_Abstract
 {
-        public function verifierSolde ($id_personne,$debut_annee_reference, $fin_annee_reference,$annee_reference,$nombre_jours)
-        {
-        	$conge = new Default_Model_Conge();
-        	$solde = new Default_Model_Solde();
-        	$solde = $solde->find($id_personne,$annee_reference);
-        	$solde = $solde->getTotal_cp()+$solde->getTotal_q1()+$solde->getTotal_q2();
-        	$conge = $conge ->somme_solde_annuel_confe($id_personne, $debut_annee_reference, $fin_annee_reference);
-        	if ($solde <=($conge[0]['sum(nombre_jours)']+$nombre_jours))
-        	{
-        		
-        		return true;
-        	}
-        	else return false;
-        }
+     public function verifierSolde ($id_personne,$debut_annee_reference, $fin_annee_reference,$annee_reference,$nombre_jours)
+    {
+       	$conge = new Default_Model_Conge();
+       	$solde = new Default_Model_Solde();
+       	$solde = $solde->find($id_personne,$annee_reference);
+       	$solde = $solde->getTotal_cp()+$solde->getTotal_q1()+$solde->getTotal_q2();
+       	$conge = $conge ->somme_solde_annuel_confe($id_personne, $debut_annee_reference, $fin_annee_reference);
+       	if ($solde <=($conge[0]['sum(nombre_jours)']+$nombre_jours))
+        {        		
+       		return true;
+       	}
+       	else return false;
+    }
 
         
 	public function calendrier($tableau_id,$debut_mois,$fin_mois)
@@ -306,7 +305,8 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 
 	function jours_feries($annee, $alsacemoselle=false, $maroc=false)
 	{
-		if (!$maroc) {
+		if (!$maroc) 
+		{
 			$jours_feries = array
 			(    $this->dimanche_paques($annee)
 			,    $this->lundi_paques($annee)
@@ -322,6 +322,7 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 			,    "$annee-11-01"        //    Toussaint
 			,    "$annee-12-25"        //    Noël
 			);
+			
 			if($alsacemoselle)
 			{
 				$jours_feries[] = "$annee-12-26";
@@ -334,126 +335,97 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 			return $this->jours_feries_maroc($annee);
 		}
 	}
+	
+	
+	
 
 	function est_ferie($jour, $alsacemoselle=false, $maroc=false)
 	{
 		$jour = date("Y-m-d", strtotime($jour));
 		$annee = substr($jour, 0, 4);
+		
 		return in_array($jour, $this->jours_feries($annee, $alsacemoselle, $maroc));
 	}
 
+	
+	
+	
+	
 	// Indique si une date doit être normalisée ou non
-	function a_normaliser($date,$maroc=false) {
-		global $logger;
-
-		if (in_array(date_format($date, 'l'),array('Saturday','Sunday'))
-		|| $this->est_ferie(date_format($date, 'Y-m-d'),false,$maroc)) {
+	function a_normaliser($date,$maroc=false) 
+	{
+		if (in_array(date_format($date, 'l'),array('Saturday','Sunday')) || $this->est_ferie(date_format($date, 'Y-m-d'),false,$maroc)) 
+		{
 			return true;
 		}
 
 		return false;
 	}
 
+	
+	
+	
 	// On normalise un flag midi par rapport à une date non normalisée
-	function normaliser_flag_midi($date,$midi,$maroc=false) {
-		global $logger;
-
+	function normaliser_flag_midi($date,$midi,$maroc=false) 
+	{
+	
 		// Si la date de début ou fin congé tombe un WE ou JF, le flag midi ne peut pas être actif
-		if ($this->a_normaliser($date,$maroc)) {
+		if ($this->a_normaliser($date,$maroc)) 
+		{
 			$midi = false;
 		}
 
 		return $midi;
 	}
+	
+	
+	
+	
 
 	// Si la date de début de congé tombe un WE ou JF, on l'avance au 1er JO
-	function normaliser_date_debut_conge($date,$maroc=false) {
-		global $logger;
-		//$logger->log(date_format($date, 'l d F Y'),Zend_Log::INFO);
-
-		while (in_array(date_format($date, 'l'),array('Saturday','Sunday'))
-		|| $this->est_ferie(date_format($date, 'Y-m-d'),false,$maroc)) {
+	function normaliser_date_debut_conge($date,$maroc=false) 
+	{
+		while (in_array(date_format($date, 'l'),array('Saturday','Sunday')) || $this->est_ferie(date_format($date,'Y-m-d'),false,$maroc)) 
+		{
 			$date->add(new DateInterval("P1D"));
 		}
 
-		//$logger->debug(date_format($date, 'l d F Y'));
-
 		return $date;
 	}
+	
+	
+	
+	
+	
 
 	// Si la date de fin de congé tombe un WE ou JF, on la retarde au dernier JO
-	function normaliser_date_fin_conge($date,$maroc=false) {
-		global $logger;
-		//$logger->debug(date_format($date, 'l d F Y'));
-
-		while (in_array(date_format($date, 'l'),array('Saturday','Sunday'))
-		|| $this->est_ferie(date_format($date, 'Y-m-d'),false,$maroc)) {
+	function normaliser_date_fin_conge($date,$maroc=false) 
+	{
+	
+		while (in_array(date_format($date, 'l'),array('Saturday','Sunday')) || $this->est_ferie(date_format($date, 'Y-m-d'),false,$maroc)) 
+		{
 			$date->sub(new DateInterval("P1D"));
 		}
-
-		//$logger->debug(date_format($date, 'l d F Y'));
-
+		
 		return $date;
 	}
 
-	function calculer_jours_conges($date_debut,$date_fin,$debut_midi=false,$fin_midi=false,$maroc=false) {
-		global $logger;
-		$nombre_jours_conges = 0;
 
-		// Normaliser : commencer par les flag midi...
-		$debut_midi = $this->normaliser_flag_midi($date_debut,$debut_midi,$maroc);
-		$fin_midi = $this->normaliser_flag_midi($date_fin,$fin_midi,$maroc);
-		//... terminer par les dates
-		$date_debut = $this->normaliser_date_debut_conge($date_debut,$maroc);
-		$date_fin = $this->normaliser_date_fin_conge($date_fin,$maroc);
-
-		// Parcourir l'intervalle
-		$date_iterator = $date_debut;
-		while ($date_iterator <= $date_fin) {
-
-			// Loguer les jours ouvrés (tous les jours sauf les samedi, dimanche, fériés)
-			$weekday = date_format($date_iterator, 'l');
-			if (!in_array($weekday,array('Saturday','Sunday'))
-		 && !$this->est_ferie(date_format($date_iterator, 'Y-m-d'),false,$maroc)) {
-		 	//$logger->debug(date_format($date_iterator, 'l d F Y'));
-		 	$nombre_jours_conges++;
-		 }
-		 else {
-		 	//$logger->debug(date_format($date_iterator, 'l d F Y')." WE ou férié, non décompté dans les congés");
-		 }
-
-		 // Incrémenter l'iterator
-		 $date_iterator->add(new DateInterval("P1D"));
-		}
-
-		// Traiter les demi journées
-		if ($debut_midi) {
-			$nombre_jours_conges = $nombre_jours_conges - 0.5;
-		}
-		if ($fin_midi) {
-			$nombre_jours_conges = $nombre_jours_conges - 0.5;
-		}
-
-		return $nombre_jours_conges;
-	}
-
-	function calculer_jours_ouvres($date_debut,$date_fin) {
-		global $logger;
+	function calculer_jours_ouvres($date_debut,$date_fin) 
+	{
+		
 		$nombre_jours_ouvres = 0;
 
 		// Parcourir l'intervalle
 		$date_iterator = $date_debut;
-		while ($date_iterator <= $date_fin) {
+		while ($date_iterator <= $date_fin) 
+		{
 			// Loguer les jours ouvrés (tous les jours sauf les samedi, dimanche, fériés)
 			$weekday = date_format($date_iterator, 'l');
-			if (!in_array($weekday,array('Saturday','Sunday'))
-			 && !$this->est_ferie(date_format($date_iterator, 'Y-m-d'),false,false)) {
+			if (!in_array($weekday,array('Saturday','Sunday'))  && !$this->est_ferie(date_format($date_iterator, 'Y-m-d'),false,false)) {
 		 		$nombre_jours_ouvres++;
 		 	}
-			else {
-				//$logger->debug(date_format($date_iterator, 'l d F Y')." WE ou férié, non décompté dans les congés");
-			}
-	
+
 			// Incrémenter l'iterator
 			$date_iterator->add(new DateInterval("P1D"));
 		}
@@ -465,6 +437,61 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 	 * PTRI - FIN des fonctions de calcul de nombre de jours de congés
 	 */
 
+	
+
+	
+	
+
+	
+	
+	
+
+/*	
+	public function periode($date_debut,$date_fin,$maroc) 
+	{  
+		$dd = new DateTime($date_debut);  // date_debut xxxx-xx-xx xx:xx:xx
+		$df = new DateTime($date_fin);    // date_fin   xxxx-xx-xx xx:xx:xx
+		
+		$dt = substr($dd->format("Y-m-d H:i:s"),11,18);  // time debut  xx:xx:xx
+		$ft = substr($df->format("Y-m-d H:i:s"),11,18);  // time fin  xx:xx:xx
+
+		$i  = 0;
+	   if($dd < $df )
+	   { 	   	
+		    	$tab[$i] = $dd->format("Y-m-d");
+		    	$sab[$i] = "O0:00:00";
+		        $i = 1;
+
+		        while($dd  < $df )
+		      { 
+		        $s = $dd->add(new DateInterval('P1D'));
+		        $tab[$i] = $s->format("Y-m-d");
+		        $sab[$i] = "O";
+		        
+		        $i++;		
+		      }
+	   }
+	   else 
+	   {
+	      return null;
+	   }
+
+	
+	 	$rr =   array_combine($tab,$sab);
+	    $rr[$tab[0]] = $dt;
+	    $rr[$tab[count($rr) - 1]] = $ft;
+	   
+   return $rr;
+}
+*/
+	
+	
+	
+	
+	
+	
+	
+	
 	/*
 	 * PTRI - Calculer les droits à congés d'une ressource
 	 */
@@ -509,29 +536,39 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 		$jour_entree = date_format($date_entree, 'j'); // mois au format 1 à 31
 
 		// Calcul des CP
-		if ($annee_entree == $annee_reference) {
-			if ($mois_entree < 6) {
+		if ($annee_entree == $annee_reference) 
+		{
+			if ($mois_entree < 6) 
+			{
 				$cp = 2.25 * (6 - $mois_entree);
-				if ($jour_entree >= 15) {
+				
+				if ($jour_entree >= 15) 
+				{
 					$cp -= 2.25;
 				}
 			}
-			else {
+			else 
+			{
 				$cp = 0;
 			}
 		}
-		elseif ($annee_entree == $annee_reference - 1) {
-			if ($mois_entree < 6) {
+		elseif ($annee_entree == $annee_reference - 1) 
+		{
+			if ($mois_entree < 6) 
+			{
 				$cp = 27;
 			}
-			else {
+			else 
+			{
 				$cp = 2.25 * (5 + 12 - $mois_entree + 1);
-				if ($jour_entree >= 15) {
+				if ($jour_entree >= 15) 
+				{
 					$cp -= 2.25;
 				}
 			}
 		}
-		else {
+		else 
+		{
 			$cp = 27;
 		}
 		
@@ -540,16 +577,20 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 		echo date_format($annee_reference, 'd-m-Y').'<BR>';
 		$interval = $date_entree->diff($annee_reference);
 		$i = $interval->format('%y');
-		if ($i >= 2 && $i < 3) {
+		if ($i >= 2 && $i < 3) 
+		{
 			$cpa = 1;
 		}
-		elseif ($i >= 3 && $i < 5) {
+		elseif ($i >= 3 && $i < 5) 
+		{
 			$cpa = 2;
 		}
-		elseif ($i >= 5 && $i < 8) {
+		elseif ($i >= 5 && $i < 8) 
+		{
 			$cpa = 3;
 		}
-		elseif ($i >= 8) {
+		elseif ($i >= 8) 
+		{
 			$cpa = 4;
 		}
 				
@@ -559,32 +600,40 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 		$fin_annee = new DateTime($annee_reference.'-12-31');
 		$nb_jo = $this->calculer_jours_ouvres($debut_annee,$fin_annee);
 		
-		$nb_rtt_ms = 7.4*($nb_jo-25-12)+7>1607 ? 13 : 12;
-		$nb_rtt_rm_ac = $nb_jo-25-218<10 ? 10 : $nb_jo-25-218;
+		$nb_rtt_ms = 7.4 *($nb_jo-25-12) + 7 > 1607 ? 13 : 12;
+		$nb_rtt_rm_ac = $nb_jo-25-218 < 10 ? 10 : $nb_jo-25-218;
 		
 		$modalite = new Default_Model_Modalite();
 		$modalite = $modalite->find($ressource->getId_modalite());
 		$modalite = $modalite->getCode();
 		
-		if ($modalite == "MS") {
-			$q1 = 7.4*($nb_jo-25-12)+7>1607 ? 13 : 12;
+		if ($modalite == "MS") 
+		{
+			$q1 = 7.4 * ($nb_jo-25-12) + 7  > 1607 ? 13 : 12;
 		}
-		elseif ($modalite == "RM" || $modalite == "AC") {
-			$q1 = $nb_jo-25-218<10 ? 10 : $nb_jo-25-218;
+		elseif ($modalite == "RM" || $modalite == "AC") 
+		{
+			$q1 = $nb_jo-25-218 < 10 ? 10 : $nb_jo-25-218;
 		}
-		elseif ($modalite == "NO") {
+		elseif ($modalite == "NO") 
+		{
 			$q1 = 0;
 		}
-		else {
+		else 
+		{
 			$q1 = 10;
 		}
 	
 		// Pour les nouveaux entrants, appliquer un prorata
-		if ($annee_entree == $annee_reference) {
+		if ($annee_entree == $annee_reference) 
+		{
 			$nb_mois_complets = 12 - $mois_entree + 1;
-			if ($jour_entree >= 15) {
+			
+			if ($jour_entree >= 15) 
+			{
 				$nb_mois_complets -= 1;
 			}
+			
 			$q1 = round($q1 * $nb_mois_complets / 12, 0, PHP_ROUND_HALF_DOWN); 
 		}
 		
@@ -597,5 +646,6 @@ class Default_Controller_Helpers_Validation extends Zend_Controller_Action_Helpe
 		//	$logger->log($jours_feries_csm[0]->getDate_debut(), Zend_Log::INFO);
 		return array("CP" => $cp,"CPA" => $cpa,"Q1" => $q1);
 	}
+
 
 }

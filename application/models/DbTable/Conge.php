@@ -9,8 +9,6 @@ class Default_Model_DbTable_Conge extends Zend_Db_Table_Abstract
 	 * cette fonction calcule la somme des jour ouvres  pour chaque annee de reference - les jour de conge
 	 */
 
-	
-	
 	public function somme($id,$annee_reference) 
     {
          $sum = $this->select()->distinct()
@@ -93,12 +91,12 @@ class Default_Model_DbTable_Conge extends Zend_Db_Table_Abstract
      * d'un conge à fin de reperer les conges qui ont de mi de journee
      * elle utilisée au niveau du calendrier phtml
      */
-	public function RecupererLeNombreConge( $id_personne,$date_debut) 
+	public function RecupererLeNombreConge($id_personne,$date_debut) 
     {
     	$db = $this->getAdapter();  
         $select = $this->select()->setIntegrityCheck(false)
-                    ->from(array('c' => $this->_name),'id_type_conge')
-                     ->where('('.$db->quoteInto('c.date_debut=?', $date_debut).'&&'.$db->quoteInto('c.id_personne =?', $id_personne).')');
+                   ->from(array('c' => $this->_name),'id_type_conge')
+                   ->where('('.$db->quoteInto('c.date_debut=?', $date_debut).'&&'.$db->quoteInto('c.id_personne =?', $id_personne).')');
         return $this->fetchAll($select)->toArray();
     }
     
@@ -126,12 +124,12 @@ class Default_Model_DbTable_Conge extends Zend_Db_Table_Abstract
         return $this->fetchAll($select)->toArray();
     }
    
-    ////////////////////////////////////////////////////////////////////MTA///////////////////////////////////////////////////////////////////// 
+////////////////////////////////////////////////////////////////////MTA///////////////////////////////////////////////////////////////////// 
     public function conges_en_double($id_personne,$date_debut,$date_fin,$id_conge) 
     {
 	        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 		    $select = new Zend_Db_Select($db);
-		    $select ->from((array('c' =>'conge')),array('c.id','c.id_personne' ,'c.date_debut','c.date_fin')); 
+		    $select ->from((array('c' =>$this->_name)),array('c.id','c.id_personne' ,'c.date_debut','c.date_fin')); 
 	        $select->where('c.id_personne ='.$id_personne);
 
 	        // pour la modification 
@@ -143,7 +141,7 @@ class Default_Model_DbTable_Conge extends Zend_Db_Table_Abstract
     
 		       $select->where('('.$db->quoteInto('c.date_debut >= ?', $date_debut).'&&'.$db->quoteInto('c.date_debut <= ?', $date_fin).') OR  
 	  					       ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).') OR
-		       					('.$db->quoteInto('c.date_debut <= ?', $date_fin).'&&'.$db->quoteInto('c.date_debut >= ?', $date_debut).') OR  
+		       				   ('.$db->quoteInto('c.date_debut <= ?', $date_fin).'&&'.$db->quoteInto('c.date_debut >= ?', $date_debut).') OR  
 	                           ('.$db->quoteInto('c.date_fin >= ?', $date_debut).'&&'.$db->quoteInto('c.date_fin <= ?', $date_fin).')');
      
 			return  $select->query()->fetchAll(); 

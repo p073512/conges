@@ -31,7 +31,7 @@
 
    function Charms(element, options){
       this.element = element;
-
+        
       // jQuery has an extend method that merges the
       // contents of two or more objects, storing the
       // result in the first object. The first object
@@ -66,7 +66,7 @@
 
       showSection: function(sectionId, width){
          var w = this.options.width;
-
+        
          if (width != undefined)
             w = width;
          
@@ -77,7 +77,7 @@
          var transition = $.support.transition && $(this.element).hasClass('fade');
 
          $(this.element).show();
-
+          
          if (transition) {
             $(this.element).eq(0).offsetWidth(); // force reflow
          }

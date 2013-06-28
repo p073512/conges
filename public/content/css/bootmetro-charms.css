@@ -1,6 +1,7 @@
-﻿/* charms */
+/* charms */
+
 #charms {
-   background-color: #004D60;
+   background-color: #327CCB;
    position: fixed;
    top: 0%;
    right: 0%;
@@ -10,6 +11,9 @@
    margin: 0;
    display: none;
 }
+#charms.green {
+	 background-color: #379F7A;
+	}
    #charms .charms-section {
       margin: 0 40px 40px 40px;
    }
@@ -65,9 +69,10 @@
 #charms h3,
 #charms h4,
 #charms p,
-#charms a,
-#charms label {color: #19BFC9;}
-#charms a:hover {background-color: #216475}
+#charms label {color: #FFFFFF;}
+#charms a {color: black;}
+#charms a:hover {color: #FFFFFF; background-color: #327CCB}
+#charms.green a:hover {color:#FFFFFF; background-color: #379F7A}
 
 #charms hr {border: 1px solid #357281}
 

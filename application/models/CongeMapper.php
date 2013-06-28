@@ -122,7 +122,7 @@ class Default_Model_CongeMapper
 	    {  
 		    $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 		    $select = new Zend_Db_Select($db);
-		    $select ->from((array('c' =>'conge')),array('c.id_personne' ,'c.date_debut','c.date_fin','c.mi_debut_journee','c.mi_fin_journee','c.nombre_jours')); 
+		    $select ->from((array('c' =>'conge')),array('c.id_personne' ,'c.date_debut','c.date_fin','c.mi_debut_journee','c.mi_fin_journee','c.nombre_jours','c.id_type_conge')); 
 		    $select->where('c.id_personne ='.$id_personne);
 		    
 	        if($flag == 0) // retourne toute les dates qui touche la periode 

@@ -2,7 +2,7 @@
 //"Default" correspond au namespace que nous avons d�fini dans le bootstrap
 class Default_Model_Conge
 {
-	//variables correspondant � chacun des champs de notre table users
+	//////////////////////////////variables correspondant � chacun des champs de notre table users/////////////////////////////////
 	protected  $_id;
 	protected  $_id_personne;
 	protected  $_id_proposition;
@@ -14,12 +14,10 @@ class Default_Model_Conge
 	protected  $_id_type_conge;
 	protected  $_annee_reference;
 	protected  $_ferme;
-	protected $_nombreJoursT;
-
 	//le mapper va nous fournir les m�thodes pour interagir avec notre table (objet de type Default_Model_CongeMapper)
 	protected $_mapper;
 
-	//constructeur
+	//***// constructeur
 	//le tableau d'options peut contenir les valeurs des champs � utiliser
 	//pour l'initialisation de l'objet
 	public function __construct(array $options = null)
@@ -71,18 +69,19 @@ class Default_Model_Conge
 		return $this;
 	}
 
-	//gettors and settors d'acc�s aux variables
+	//////////////////////////////gettors and settors d'acc�s aux variables//////////////////////////////
 	public function setId($id)
 	{
 		$this->_id = (int)$id;
 		return $this;
 	}
-
 	public function getId()
 	{
 		return $this->_id;
 	}
-
+	
+	
+	
 	public function setId_personne($id_personne)
 	{
 		$this->_id_personne = (int)$id_personne;
@@ -93,6 +92,8 @@ class Default_Model_Conge
 		return $this->_id_personne;
 	}
 	
+	
+	
 	public function setId_proposition($id_proposition)
 	{
 		$this->_id_proposition = $id_proposition;
@@ -102,7 +103,9 @@ class Default_Model_Conge
 	{
 		return $this->_id_proposition;
 	}
-
+	
+	
+	
 	public function setDate_debut($date_debut)
 	{
 		$this->_date_debut = $date_debut;
@@ -112,7 +115,9 @@ class Default_Model_Conge
 	{
 		return $this->_date_debut;
 	}
-
+	
+	
+	
 	public function setMi_debut_journee($mi_debut_journee)
 	{
 		$this->_mi_debut_journee = $mi_debut_journee;
@@ -122,7 +127,9 @@ class Default_Model_Conge
 	{
 		return $this->_mi_debut_journee;
 	}
-
+	
+	
+	
 	public function setDate_fin($date_fin)
 	{
 		$this->_date_fin = $date_fin;
@@ -133,7 +140,9 @@ class Default_Model_Conge
 	{
 		return $this->_date_fin;
 	}
-
+	
+	
+	
 	public function setMi_fin_journee($mi_fin_journee)
 	{
 		$this->_mi_fin_journee = $mi_fin_journee;
@@ -144,79 +153,20 @@ class Default_Model_Conge
 		return $this->_mi_fin_journee;
 	}
 	
-	/* Mohamed khalil TAKAFI */
-	public function setNombre_jours()  // MTA : calcul nombre de jours Cong�
+	
+	
+	public function setNombre_jours($nombre_jours)
 	{
-		$date_debut = new DateTime($this->getDate_debut());    // date_debut 
-    	$date_fin = new DateTime($this->getDate_fin());        // date_fin
-    	
-    	$date_depart =  date_timestamp_get($date_debut);
-    	$annee = (string)date('Y', $date_depart);              // ann�e 
-	    
-        $debut_midi = $this->getMi_debut_journee();            // debut midi 
-        $fin_midi = $this->getMi_fin_journee();                // fin midi 
-
-        $maroc = false;                                        // France 
-        
-        $utils = new Default_Controller_Helpers_Validation();
-
-        // mettre les jours f�ri�s maroc dans session TEST 
-		$jours_feries_maroc = new Zend_Session_Namespace('TEST',false);
-        $jours_feries_maroc->jfm = $utils->jours_feries_maroc($annee);
-        
-        //MTA :  verifi� si c'est un CSM ou France     
-        $personne = new Default_Model_Personne();
-        $per = $personne->find($this->getId_personne());
-       
-        
-        if ($per->getEntite()->getCs() == 1) 
-        {
-		 $maroc = true;     // maroc 
-        }
-    
-        $this->_nombre_jours = $utils->calculer_jours_conges($date_debut, $date_fin,$debut_midi,$fin_midi,$maroc);
-		return $this;  
+	   $this->_nombre_jours = $nombre_jours;
+		return $this;
 	}
-	
-	/*
-	 * Fonction qui retourne le calcul de nombre de jour de congé
-	 * en affichant (pour test) le tableau de détails période congé
-	 * et le table des compteurs jours de congé
-	 * 
-	 */
-	
-public function CalculNombreJoursConge($csm = false,$alsaceMoselle = false)
-	{
-	//récupération des propriétés de l'objet congé	
-	$dateDebut = $this->getDate_debut();   
-    $dateFin = $this->getDate_fin(); 
-    $annneeReference = $this->getAnnee_reference();
-
-    // instance de la classe helper Outils
-     $outils = new Default_Controller_Helpers_outils();
-	 //ici changer les dates de congé:
-     $conge = $outils->getPeriodeDetails($annneeReference,$dateDebut , $dateFin,$this->getMi_debut_journee(),$this->getMi_fin_journee(),$csm,$alsaceMoselle );
-
-     // affichage tableau de calcul jours de congé
-     echo'Nombre jours congé : </br>';
-     var_dump($outils->calculNombreJourConge($conge));
-     
-     //affichage du tableau du détails de la période de congé
-     echo'Le détails du congé ci-dessous :</br>';
-     var_dump($conge);
-     
-     $this->_nombreJoursT = $outils->CalculNombreJourConge($conge);
-
-     return $this;
-		
-	}
-	
-	
 	public function  getNombre_jours()
 	{
 		return $this->_nombre_jours;
 	}
-
+	
+	
+	
 	public function setId_type_conge($id_type_conge)
 	{
 		$this->_id_type_conge = (int)$id_type_conge;
@@ -226,7 +176,9 @@ public function CalculNombreJoursConge($csm = false,$alsaceMoselle = false)
 	{
 		return $this->_id_type_conge;
 	}
-
+	
+	
+	
 	public function setAnnee_reference($annee_reference)
 	{
 			return $this->_annee_reference = (int)$annee_reference;
@@ -235,20 +187,21 @@ public function CalculNombreJoursConge($csm = false,$alsaceMoselle = false)
 	{
 		return $this->_annee_reference;
 	}
-
+	
+	
+	
 	public function setFerme($ferme)
 	{
 		$this->_ferme = $ferme;
 		return $this;
 	}
-
-	public function  getFerme()
+	public function getFerme()
 	{
 		return $this->_ferme;
 	}
-
-
-
+	
+	
+	
 	public function setMapper($mapper)
 	{
 		$this->_mapper = $mapper;
@@ -265,131 +218,175 @@ public function CalculNombreJoursConge($csm = false,$alsaceMoselle = false)
 		return $this->_mapper;
 	}
 
-	//m�thodes de classe utilisant les m�thodes du mapper
+	
+	
+	
+	
+	//////////////////////////////m�thodes de classe utilisant les m�thodes du mapper//////////////////////////////
+	
 	//cr�e ou met � jour une entr�e dans la table
 	public function save()
 	{
 		$this->getMapper()->save($this);
 	}
-
+	
+	
+	
 	//r�cup�re une entr�e particuli�re
 	public function find($id)
 	{
 		$this->getMapper()->find($id, $this);
 		return $this;
-	}
-
+	}	
+	
+	
+	
 	//r�cup�re toutes les entr�es de la table
 	public function fetchAll($str)
 	{
 		return $this->getMapper()->fetchAll($str);
-	}
-	// récupére les congés sur une période donnée.
+	}	
+	
+	
+	
+	// r�cup�re les cong�s sur une p�riode donn�e.
    public function conges_existant($id_personne,$date_debut,$date_fin,$flag) 
 	{
 		return $this->getMapper()->conges_existant($id_personne,$date_debut,$date_fin,$flag);
 	}
-
+		
+	
+	
 	//permet la suppression
 	public function delete($id)
 	{
 		$this->getMapper()->delete($id);
 	}
+		
+	
+	
 	public function somme($id,$annee_reference) 
     {
     	return $this->getMapper()->somme($id,$annee_reference);
     }
+	
+	
+	
     public function selctid() 
     {
     	return $this->getMapper()->selctid();
     }
+	
+	
+	
     public function somme_solde_annuel_confe($id_personnes, $debut_annee, $fin_annee)
     {
     	return $this->getMapper()->somme_solde_annuel_confe($id_personnes, $debut_annee, $fin_annee);
     }
-    
+	
+	
+	
     public function doublont( $debut_annee, $fin_annee)
     {
     	return $this->getMapper()->doublont(  $debut_annee, $fin_annee);
     }
-   
+	
+	
+	
     public function  DateDebutMin($id,$debut_mois,$fin_mois)
     {
     	return $this->getMapper()-> DateDebutMin($id,$debut_mois,$fin_mois);
     }
-    
+	
+	
+	
     public function DateFinMax($id,$debut_mois,$fin_mois)
     {
     	return $this->getMapper()-> DateFinMax($id,$debut_mois,$fin_mois);
     }
+	
+	
+	
     public function CongesNondoublont( $debut_mois,$fin_mois) 
  	{
     	return $this->getMapper()-> CongesNondoublont( $debut_mois,$fin_mois) ;
     }
+	
+	
+	
      public function RecupererLeNombreConge( $id_personne,$date_debut)
  	{
     	return $this->getMapper()-> RecupererLeNombreConge( $id_personne,$date_debut) ;
     }
-   
+	
+	
+	
   	 public function  DoublontAuNiveauPole( $tableau_id, $debut_mois,  $fin_mois)
  	{
     	return $this->getMapper()->DoublontAuNiveauPole( $tableau_id, $debut_mois,  $fin_mois) ;
     }
-    
+	
+	
+	
  	public function  CongesNondoublontPole( $tableau_id,$debut_mois,$fin_mois) 
  	{
     	return $this->getMapper()->CongesNondoublontPole( $tableau_id,$debut_mois,$fin_mois)  ;
     }
-  
 	
-/*
+	
+	
+    /*
 	 * calcule de nombre de jours ouvres dans un mois  
 	 */
 
 	public function joursOuvresDuMois($debut_mois,$fin_mois)
 	{
-		// tu peut utiliser cette fonction pour afficher les nombre totale ouvere pour un mois donn�
+			// tu peut utiliser cette fonction pour afficher les nombre totale ouvere pour un mois donn�
+	
+			$date_debut = strtotime($debut_mois );
+	    	$date_fin = strtotime($fin_mois );
+			
+	    	$tableau_jours_feries = array(); // Tableau des jours feri�s
 
-		$date_debut = strtotime($debut_mois );
-    	$date_fin = strtotime($fin_mois );
-		
-    	$tableau_jours_feries = array(); // Tableau des jours feri�s
-    // On boucle dans le cas o� l'ann�e de d�part serait diff�rente de l'ann�e d'arriv�e
-    	$difference_annees = date('Y', $date_fin) - date('Y', $date_debut);
-    for ($i = 0; $i <= $difference_annees; $i++) 
-    {
-	    $annee = (int)date('Y', $date_debut) + $i;
-	    // Liste des jours feri�s
-	    $tableau_jours_feries[] = '1_1_'.$annee; // Jour de l'an
-	    $tableau_jours_feries[] = '1_5_'.$annee; // Fete du travail
-	    $tableau_jours_feries[] = '8_5_'.$annee; // Victoire 1945
-	    $tableau_jours_feries[] = '14_7_'.$annee; // Fete nationale
-	    $tableau_jours_feries[] = '15_8_'.$annee; // Assomption
-	    $tableau_jours_feries[] = '1_11_'.$annee; // Toussaint
-	    $tableau_jours_feries[] = '11_11_'.$annee; // Armistice 1918
-	    $tableau_jours_feries[] = '25_12_'.$annee; // Noel
-	    // R�cup�ration de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
-	    $easter = easter_date($annee);
-	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + 86400); // Paques
-	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*39)); // Ascension
-	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*50)); // Pentecote
-    }
-    //print_r($tableau_jours_feries);
-    $nb_jours_ouvres = 0;
-    // Mettre <= si on souhaite prendre en compte le dernier jour dans le d�compte
-    while ($date_debut <= $date_fin) 
-    {
-    // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour f�ri�, on incr�mente les jours ouvr�s
-	    if (!in_array(date('w', $date_debut), array(0, 6)) && !in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) 
-	    {
-	    	$nb_jours_ouvres++;
-	    }
-	    	$date_debut = mktime(date('H', $date_debut), date('i', $date_debut), date('s', $date_debut), date('m', $date_debut), date('d', $date_debut) + 1, date('Y', $date_debut));
+	    	// On boucle dans le cas o� l'ann�e de d�part serait diff�rente de l'ann�e d'arriv�e
+	    	$difference_annees = date('Y', $date_fin) - date('Y', $date_debut);
+	    	
+			    for ($i = 0; $i <= $difference_annees; $i++) 
+			    {
+				    $annee = (int)date('Y', $date_debut) + $i;
+				    // Liste des jours feri�s
+				    $tableau_jours_feries[] = '1_1_'.$annee; // Jour de l'an
+				    $tableau_jours_feries[] = '1_5_'.$annee; // Fete du travail
+				    $tableau_jours_feries[] = '8_5_'.$annee; // Victoire 1945
+				    $tableau_jours_feries[] = '14_7_'.$annee; // Fete nationale
+				    $tableau_jours_feries[] = '15_8_'.$annee; // Assomption
+				    $tableau_jours_feries[] = '1_11_'.$annee; // Toussaint
+				    $tableau_jours_feries[] = '11_11_'.$annee; // Armistice 1918
+				    $tableau_jours_feries[] = '25_12_'.$annee; // Noel
+				    // R�cup�ration de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
+				    $easter = easter_date($annee);
+				    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + 86400); // Paques
+				    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*39)); // Ascension
+				    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*50)); // Pentecote
+			    }
+	   		  
+			  //print_r($tableau_jours_feries);
+	  		  $nb_jours_ouvres = 0;
+	  		  
+				    // Mettre <= si on souhaite prendre en compte le dernier jour dans le d�compte
+				    while ($date_debut <= $date_fin) 
+				    {
+				    // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour f�ri�, on incr�mente les jours ouvr�s
+					    if (!in_array(date('w', $date_debut), array(0,6)) && !in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) 
+					    {
+					    	$nb_jours_ouvres++;
+					    }
+					    	$date_debut = mktime(date('H', $date_debut), date('i', $date_debut), date('s', $date_debut), date('m', $date_debut), date('d', $date_debut) + 1, date('Y', $date_debut));
+					}
+	
+			return $nb_jours_ouvres; 
 	}
-
-		return $nb_jours_ouvres; 
-	}
-
+	
 	
 	
 	/*
@@ -397,73 +394,114 @@ public function CalculNombreJoursConge($csm = false,$alsaceMoselle = false)
 	 * elle est utilis�e afin de valoriser les jours feries au niveau du 
 	 * calendrier mensuel
 	 */
-	
-	
 	public function chercher_jours_feriers($debut_mois,$fin_mois)
 	{
-	$date_debut = strtotime($debut_mois );
-    $date_fin = strtotime($fin_mois );
+		$date_debut = strtotime($debut_mois );
+    	$date_fin = strtotime($fin_mois );
 		
     	$tableau_jours_feries = array(); // Tableau des jours feri�s
-    // On boucle dans le cas o� l'ann�e de d�part serait diff�rente de l'ann�e d'arriv�e
+
+    	// On boucle dans le cas o� l'ann�e de d�part serait diff�rente de l'ann�e d'arriv�e
     	$difference_annees = date('Y', $date_fin) - date('Y', $date_debut);
- for ($i = 0; $i <= $difference_annees; $i++) 
-    {
-	    $annee = (int)date('Y', $date_debut) + $i;
-	    // Liste des jours feri�s
-	    $tableau_jours_feries[] = '1_1_'.$annee; // Jour de l'an
-	    $tableau_jours_feries[] = '1_5_'.$annee; // Fete du travail
-	    $tableau_jours_feries[] = '8_5_'.$annee; // Victoire 1945
-	    $tableau_jours_feries[] = '14_7_'.$annee; // Fete nationale
-	    $tableau_jours_feries[] = '15_8_'.$annee; // Assomption
-	    $tableau_jours_feries[] = '1_11_'.$annee; // Toussaint
-	    $tableau_jours_feries[] = '11_11_'.$annee; // Armistice 1918
-	    $tableau_jours_feries[] = '25_12_'.$annee; // Noel
-	    // R�cup�ration de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
-	    $easter = easter_date($annee);
-	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + 86400); // Paques
-	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*39)); // Ascension
-	    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*50)); // Pentecote
-    }
+    	
+		 for ($i = 0; $i <= $difference_annees; $i++) 
+	    {
+		    $annee = (int)date('Y', $date_debut) + $i;
+		    // Liste des jours feri�s
+		    $tableau_jours_feries[] = '1_1_'.$annee;   // Jour de l'an
+		    $tableau_jours_feries[] = '1_5_'.$annee;   // Fete du travail
+		    $tableau_jours_feries[] = '8_5_'.$annee;   // Victoire 1945
+		    $tableau_jours_feries[] = '14_7_'.$annee;  // Fete nationale
+		    $tableau_jours_feries[] = '15_8_'.$annee;  // Assomption
+		    $tableau_jours_feries[] = '1_11_'.$annee;  // Toussaint
+		    $tableau_jours_feries[] = '11_11_'.$annee; // Armistice 1918
+		    $tableau_jours_feries[] = '25_12_'.$annee; // Noel
+		    // R�cup�ration de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
+		    $easter = easter_date($annee);
+		    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + 86400); // Paques
+		    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*39)); // Ascension
+		    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*50)); // Pentecote
+	    }
+	    
     	return $tableau_jours_feries;
-}
+     }
 
-/////////////////////////////// DEBUT Fonction Normaliser date_debut et date_fin ///////////////////////////////////
-public function normaliser_dates($date_debut,$date_fin)
-{
+	/**
+	 * @method : Fonction responsable du calcul de nombre de jours (pour csm et france)
+	 * 
+	 * @param : $date_debut 
+	 * @param : $date_fin
+	 * 
+	 * @author : Mohamed khalil TAKAFI
+	 */
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public function calcul_periode_conge($date_debut,$date_fin)
+	{
+	        $outils = new Default_Controller_Helpers_outils();  
 	
-	 $outil = new Default_Controller_Helpers_Validation();
-	 if($date_debut <> $date_fin )
-	 {
-			  $time1 = strtotime($date_debut);
-			  $d = date('Y-m-d',$time1);
-			  $d_d = new DateTime($d);
-			  $time2 = strtotime($date_fin);
-			  $dff = date('Y-m-d',$time2);
-			  $d_f = new DateTime($dff);
-			  $dd = $outil->normaliser_date_debut_conge($d_d,false);
-			  $df = $outil->normaliser_date_fin_conge($d_f,false);
-
-			  $tab[0] = $dd->format('Y-m-d');
-			  $tab[1] = $df->format('Y-m-d');
-	}
-	else 
-    {
-		      $time1 = strtotime($date_debut);
-			  $d = date('Y-m-d',$time1);
-			  $d_d = new DateTime($d);
-			  $dd = $outil->normaliser_date_debut_conge($d_d,false);
-		   
-		      $tab[0] = $dd->format('Y-m-d');
-			  $tab[1] = $tab[0];
-	}
-		                  	    
-	 return $tab; 
+	        $date_depart =  date_timestamp_get($date_debut);
+	        $annee = (string)date('Y', $date_depart);              // ann�e 
 	
-}
-///////////////////////////////FIN Fonction Normaliser date_debut et date_fin ///////////////////////////////////
+	        $maroc = false;                                        // France 
+	
+	        // mettre les jours f�ri�s maroc dans session TEST 
+			$jours_feries_maroc = new Zend_Session_Namespace('TEST',false);
+	        $jours_feries_maroc->jfm = $outils->jours_feries_maroc($annee);
+	        
+	        //verifi� si c'est un CSM ou France     
+	        $personne = new Default_Model_Personne();
+	        $per = $personne->find($this->getId_personne());
+	       
+	        
+	        if ($per->getEntite()->getCs() == 1) 
+	        {
+			 	$maroc = true;     // maroc 
+	        }
+	    
+	        $nbj = $outils->calculer_jours($date_debut,$date_fin,$maroc); 
+	        $this->setNombre_jours($nbj);
+	
+	
+	}////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	   /*
+		  Fonction qui retourne le calcul de nombre de jour de cong�
+		  en affichant (pour test) le tableau de d�tails p�riode cong�
+		  et le table des compteurs jours de cong�
+	
+		
+	    / MBA /// calcul nombre de jours 
+		 
+	    public function CalculNombreJoursConge($csm = false,$alsaceMoselle = false)
+		{
+		//r�cup�ration des propri�t�s de l'objet cong�	
+		$dateDebut = $this->getDate_debut();   
+	    $dateFin = $this->getDate_fin(); 
+	    $annneeReference = $this->getAnnee_reference();
+	
+	    // instance de la classe helper Outils
+	     $outils = new Default_Controller_Helpers_outils();
+		 //ici changer les dates de cong�:
+	     $conge = $outils->getPeriodeDetails($annneeReference,$dateDebut , $dateFin,$this->getMi_debut_journee(),$this->getMi_fin_journee(),$csm,$alsaceMoselle );
+	
+	     // affichage tableau de calcul jours de cong�
+	     echo'Nombre jours cong� : </br>';
+	     var_dump($outils->calculNombreJourConge($conge));
+	     
+	     //affichage du tableau du d�tails de la p�riode de cong�
+	     echo'Le d�tails du cong� ci-dessous :</br>';
+	     var_dump($conge);
+	     
+	     $this->_nombreJoursT = $outils->CalculNombreJourConge($conge);
+	
+	     return $this;
+			
+		}    */
+	
 
 
 
+	
 }
 

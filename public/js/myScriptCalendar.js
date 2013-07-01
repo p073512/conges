@@ -153,7 +153,6 @@ function myCalendar(date) {
 
 function isExist(structure, date) {
 
-
     // Calcul taille structure => nombre de conge par mois
 
     congeCount = Object.keys(structure)
@@ -172,20 +171,19 @@ function isExist(structure, date) {
 
             daysCount = (daysCount - 1) / 2; // - nombreJour
 
-
+          
             if (date == structure[i]['0']['Date'] || date == structure[i][daysCount - 1]['Date']) {
 
-                if (date == structure[i]['0']['Date'] && date == structure[i][daysCount - 1]['Date']) {
-
-
-                    if (structure[i]['0']['DebutMidi'] == 'false' && structure[i]['0']['FinMidi'] == 'false') {
-                        // console.log(date +' => '+i+ ' dd == df | debutMidi : False, FinMidi false' );
+                if (structure[i]['0']['Date'] == structure[i][daysCount - 1]['Date']) { // date debut == date fin
+                   
+                	if (structure[i]['0']['DebutMidi'] == 'false' && structure[i]['0']['FinMidi'] == 'false') {
+                         console.log(date +' => '+i+ ' dd == df | debutMidi : False, FinMidi false' );
                         data[date] = {};
                         data[date] = structure[i][date]['TypeConge'];
 
                     } else if (structure[i]['0']['DebutMidi'] == true) {
 
-                        //  console.log(date +' => '+i+ 'dd == df | debutMidi : true, FinMidi false' );
+                          console.log(date +' => '+i+ 'dd == df | debutMidi : true, FinMidi false' );
 
                         if (typeof data[date] == "undefined") {
                             data[date] = {};
@@ -194,10 +192,10 @@ function isExist(structure, date) {
                             data[date].j = structure[i][date]['TypeConge'];
                         else if (data[date].fm !== structure[i][date]['TypeConge'])
                             data[date].dm = structure[i][date]['TypeConge'];
-
+                       
 
                     } else if (structure[i]['0']['FinMidi'] == true) {
-                        //  console.log(date +' => '+i+ 'dd == df | debutMidi : false, FinMidi true' );
+                          console.log(date +' => '+i+ 'dd == df | debutMidi : false, FinMidi true' );
 
                         if (typeof data[date] == "undefined") {
                             data[date] = {};
@@ -207,32 +205,35 @@ function isExist(structure, date) {
                         else if (data[date].dm !== structure[i][date]['TypeConge'])
                             data[date].fm = structure[i][date]['TypeConge'];
 
-
+                       
                     }
-
-                } else if ((date == structure[i]['0']['Date'] && date !== structure[i][daysCount - 1]['Date']) || (date !== structure[i]['0']['Date'] && date == structure[i][daysCount - 1]['Date'])) {
-
+                	//date == structure[i]['0']['Date'] && date !== structure[i][daysCount - 1]['Date']) || (date !== structure[i]['0']['Date'] && date == structure[i][daysCount - 1]['Date'])
+                	
+                } else if (structure[i]['0']['Date'] !== structure[i][daysCount - 1]['Date']) {
+                	 console.log(data);
 
                     if (structure[i]['0']['DebutMidi'] == true && date == structure[i]['0']['Date']) {
-                        //	console.log(date +' => '+i+ 'dd !== df | debutMidi : true' );
-
+                        	console.log(date +' => '+i+ 'dd !== df | debutMidi : true' );
+                    	
                         if (typeof data[date] == "undefined") {
                             data[date] = {};
-                            data[date].dm = structure[i][date]['TypeConge'];
-                        } else if (data[date].fm == structure[i][date]['TypeConge'])
+                            data[date].dm = structure[i][date]['TypeConge']; 
+                        } else if (data[date].fm && data[date].fm == structure[i][date]['TypeConge'])
                             data[date].j = structure[i][date]['TypeConge'];
                         else if (data[date].fm !== structure[i][date]['TypeConge'])
                             data[date].dm = structure[i][date]['TypeConge'];
-
-
-                    } else if (structure[i]['0']['DebutMidi'] == false) {
-                        //		console.log(date +' => '+i+ 'dd !== df | debutMidi : False' );
+                       
+                       
+                    } else if (structure[i]['0']['DebutMidi'] == false && date == structure[i]['0']['Date'] ) {
+                    	 
                         data[date] = {};
                         data[date].j = structure[i][date]['TypeConge'];
+                    	 
 
                     }
+                    
                     if (structure[i][daysCount - 1]['FinMidi'] == true && date == structure[i][daysCount - 1]['Date']) {
-                        // console.log(date +' => '+i+ 'dd !== df | FinMidi : true' );
+                         console.log(date +' => '+i+ 'dd !== df | FinMidi : true' );
 
                         if (typeof data[date] == "undefined") {
                             data[date] = {};
@@ -243,8 +244,8 @@ function isExist(structure, date) {
                             data[date].fm = structure[i][date]['TypeConge'];
 
 
-                    } else if (structure[i][daysCount - 1]['FinMidi'] == false) {
-                        //	console.log(date +' => '+i+ 'dd !== df | FinMidi : false' );
+                    } else if (structure[i][daysCount - 1]['FinMidi'] == false && date == structure[i][daysCount - 1]['Date']) {
+                        	console.log(date +' => '+i+ 'dd !== df | FinMidi : false' );
                         data[date] = {};
                         data[date].j = structure[i][date]['TypeConge'];
 
@@ -271,7 +272,8 @@ function isExist(structure, date) {
                 if (data[date].j)
                     return data[date].j;
                 else
-                    return data;
+                	return data;
+                	
             } else if (typeof structure[i][date] !== "undefined")
 
                 return structure[i][date]['TypeConge'];
@@ -616,7 +618,7 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
 
                         }
                         if (typeof tConge !== 'undefined') {
-                            if (typeof tConge[thisDate] == 'undefined') { // si date est prise en entier comme congé  
+                            if (typeof tConge[thisDate] == 'undefined'  ) { // si date est prise en entier comme congé  
                                 dataJson[j] = {
                                     "date": thisDate,
                                     "typeJour": 'C',
@@ -704,8 +706,8 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
 
                 });
 
-                console.log('dataJson');
-                console.log(dataJson);
+               // console.log('dataJson');
+               // console.log(dataJson);
 
                 width = opt.dimensions.svg.w; //Largeur calendrier
                 height = opt.dimensions.svg.h; //Hauteur calendrier

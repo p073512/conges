@@ -1020,14 +1020,13 @@ function getCalendarContent(idPersonne, mois, annee) {
     jQuery.ajax({
         type: 'POST',
         async: false,
-        url: './calendrier-mensuel-beta',
+        url: './index',
         dataType: 'json', // échange en format JSON
         data: {
             annee: annee,
             mois: mois,
             id_personne: idPersonne
-
-        },
+              },
         success: function (data, status) {
 
             // Période qui sera affiché dans le calendrier.

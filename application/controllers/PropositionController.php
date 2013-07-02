@@ -8,7 +8,7 @@ class PropositionController extends Zend_Controller_Action
     {
     	    $doctypeHelper = new Zend_View_Helper_Doctype();
             $doctypeHelper->doctype('HTML5');
-    		$this->_helper->layout->setLayout('mylayout');
+    
 	}
  
 	//:::::::::::::// ACTION INDEX //::::::::::::://
@@ -32,27 +32,7 @@ class PropositionController extends Zend_Controller_Action
 		//(cf. application/views/scripts/users/index.phtml)
 		$this->view->propositionArray = $paginator;
 		
-		/*//création d'un d'une instance Default_Model_Users
-		$proposition = new Default_Model_Proposition();
-
-		//$this->view permet d'accéder é la vue qui sera utilisée par l'action
-		//on initialise la valeur usersArray de la vue
-		//(cf. application/views/scripts/users/index.phtml)
-		//la valeur correspond é un tableau d'objets de type Default_Model_Users récupérés par la méthode fetchAll($str)
-		//$this->view->PropositionArray = $propositon->fetchAll($str);
-
-		//création de notre objet Paginator avec comme paramétre la méthode
-		//récupérant toutes les entrées dans notre base de données
-		$paginator = Zend_Paginator::factory($proposition->fetchAll($str=array()));
-		//indique le nombre déléments é afficher par page
-		$paginator->setItemCountPerPage(10);
-		//récupére le numéro de la page é afficher
-		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
-
-		//$this->view permet d'accéder é la vue qui sera utilisée par l'action
-		//on initialise la valeur usersArray de la vue
-		//(cf. application/views/scripts/users/index.phtml)
-		$this->view->propositionArray = $paginator;*/
+	
 	}
 
 

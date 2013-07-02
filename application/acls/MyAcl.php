@@ -37,6 +37,7 @@ class Default_Acl_MyAcl extends Zend_Acl
 		$this->addResource(new Zend_Acl_Resource('proposition'));
 		$this->addResource(new Zend_Acl_Resource('demande'));
 		$this->addResource(new Zend_Acl_Resource('calendrier'));
+		$this->addResource(new Zend_Acl_Resource('ferie'));
 		
 	
 	}
@@ -80,12 +81,17 @@ class Default_Acl_MyAcl extends Zend_Acl
 		
 		// Profil  :: EQUIPE :: 
 		$this->allow('equipe','calendrier');
-		$this->allow('equipe','conge',array('afficher'));
-
+		$this->allow('equipe','index');
+		
+		
 		// Profil  :: CSM :: 
-		$this->allow('csm','personne', array('create','edit','delete'));
-		$this->allow('csm','proposition', array('creer','modifier','supprimer','valider','refuser','affichercsm','afficheradmin','index'));
-		$this->allow('csm','conge', array('afficher'));
+		
+		$this->allow('csm','personne', array('index','afficher','createp','edit','delete'));
+		$this->allow('csm','proposition', array('index','creer','modifier','supprimer','valider','refuser','affichercsm','index'));
+		$this->allow('csm','ferie',array('index','create'));
+		$this->allow('equipe','index');
+		
+		
 		
 
         // Profil :: ADMIN ::  

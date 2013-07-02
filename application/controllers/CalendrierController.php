@@ -1,300 +1,332 @@
 <?php
-class CalendrierController extends Zend_Controller_Action
-{
-	//action par d�faut
+  class CalendrierController extends Zend_Controller_Action
+  {
+      public function preDispatch()
+      {
+          $doctypeHelper = new Zend_View_Helper_Doctype();
+          $doctypeHelper->doctype('HTML5');
+         
+      }
+      
+      public function indexAction()
+      {
+          $conges          = array(); // tableau conteneur des congés qui seront renvoyés à la vue
+          $keysIndiceConge = array(); // tableau des indice congé (dans le cas ou plusieurs congé posé dans un seul mois)
+          $indiceConge ; //mois-annee , les congés posés sur un mois sont associés a cette clé
+          $ressourcesArray = array();
+          //requête Ajax reçue 
+          if ($this->getRequest()->isXmlHttpRequest()) {
+              //récupération des données envoyées en ajax
+              $data = $this->getRequest()->getPost();
+              
+              if (isset($data['annee']) && isset($data['mois'])) {
+                  
+                  if (isset($data['id_personne']) && $data['id_personne'] !== 'x') {
+                      
+                      $personne = new Default_Model_Personne();
+                      $personne->find($data['id_personne']);
+                      $cs = $personne->getEntite()->getCs();
+                      
+                      if ($cs == '1')
+                          $cs = true;
+                      else
+                          $cs = false;
+                      
+                      $congeObj   = new Default_Model_Conge();
+                      $congeArray = array();
+                      
+                      $outils  = new Default_Controller_Helpers_outils();
+                      $jferies = $outils->setJoursFerie($data['annee'], $cs, false);
+                      $jferies = (array) $jferies;
+                    
 
-	public function calendriermensuelAction()
-	{
-		
-		//Zend_Session::start();
-		$mois = new Zend_Session_Namespace('salut',false);
-		//$mois->mois = (int)$m;// IL FAUT PROPGRAMMER UNE FONCTION AU NIVEAU DE BOOSTTRAP POUR INITIALISER LES SESSIONS
-		//$mois->annee = $y;
-		
-		$form = new Default_Form_Filtre();
-		//$form->setAction($this->view->url(array( 'controller' => 'calendrier', 'action' => 'calendriermensuel'), 'default', true));
-		$form->submit_ca->setLabel('Filtrer');
-		$this->view->form = $form;
-		
-		$form2 = new Default_Form_ChoixMois();
-		$form2->setAction($this->view->url(array( 'controller' => 'calendrier', 'action' => 'calendriermensuel'), 'default', true));
-		$this->view->form2 = $form2;
-		 
-		$form3 = new Default_Form_ChoixAnnee();
-		$form3->setAction($this->view->url(array( 'controller' => 'calendrier', 'action' => 'calendriermensuel'), 'default', true));
-		$this->view->form3 = $form3;
-		$this->view->title_filtre = "Filtrer sur ressources";
-		$this->view->title_choix = "Filtre sur une periode";
-		$this->view->title = "Calendrier Mensuel";
-		
-		
-		// recuperation du premier de mois et de la fin du mois actuel
-		if ($this ->_getParam ('mois') )
-		{
-			$mois->mois = $this ->_getParam ('mois');
-			$mois->annee = $this ->_getParam ('annee');
-			
-		}
-		
-		if(!($this->_request->ispost()))
-		{
-			$fin_mois=date('Y-m-d',mktime(0,0,0,$_SESSION['salut']['mois']+1,0,$_SESSION['salut']['annee']));
-			$debut_mois=date('Y-m-d',mktime(0,0,0,$_SESSION['salut']['mois'],1,$_SESSION['salut']['annee']));
-			$personne = new Default_Model_Personne();
-			$reponse = $this->_helper->validation->calendrier($str=array(),$debut_mois,$fin_mois);
-			
-			if (count($reponse)== 0)
-			{
-				echo'<strong ><span style="color:red">Tous le monde bosse ce mois </span ></strong>';
-							
-			} 
-			
-			$this->view->calendrierArray = $reponse;
-			$this->view->mois  = $_SESSION['salut']['mois'];
-			$this->view->annee = $_SESSION['salut']['annee'];
-		
-		}
-		if ($this->_request->ispost())
-		{
-			$data = $this->_request->getPost();
-			
-			if (!(array_key_exists('num_mois', $data)|| array_key_exists('num_annee', $data))) 
-			{
-				if($form->isValid($data))
-				{
-					$set_personnes =array();
-					$fin_mois=date('Y-m-d',mktime(0,0,0,$_SESSION['salut']['mois']+1,0,$_SESSION['salut']['annee']));
-					$debut_mois=date('Y-m-d',mktime(0,0,0,$_SESSION['salut']['mois'],1,$_SESSION['salut']['annee']));
-					$personne = new Default_Model_Personne();
-					$id_pole = $form->getValue('id_pole_ca');
-					$id_fonction = $form->getValue('id_fonction_ca');
-					$id_entite =  $form->getValue('id_entite_ca');
-					
-					if ($id_pole!=0 && $id_entite==0 && $id_fonction==0 ) 
-					{
-						$set_personnes= $personne->fetchAll('id_pole ='.$id_pole );
-					}
-					elseif ($id_pole==0 && $id_entite!=0 &&$id_fonction==0 ) 
-					{
-						$set_personnes= $personne->fetchAll( 'id_entite ='.$id_entite );
-					}
-					elseif ($id_pole==0 && $id_entite==0 &&$id_fonction!=0 ) 
-					{
-						$set_personnes= $personne->fetchAll( 'id_fonction ='.$id_fonction );
-					}
-					elseif (($id_pole!=0 && $id_entite!=0) &&$id_fonction==0 ) 
-					{
-						$set_personnes= $personne->fetchAll('id_pole ='.$id_pole .'&&'. 'id_entite ='.$id_entite );
-					}
-					elseif (($id_fonction!=0 && $id_entite!=0) &&$id_pole==0 ) 
-					{
-						$set_personnes= $personne->fetchAll( 'id_fonction ='.$id_fonction .'&&'. 'id_entite ='.$id_entite );
-					}
-					elseif (($id_fonction!=0 && $id_pole!=0) &&$id_entite==0 ) 
-					{
-						$set_personnes= $personne->fetchAll('id_pole ='.$id_pole .'&&'. 'id_fonction ='.$id_fonction );
-					}
-					elseif ($id_fonction!=0 && $id_pole!=0 &&$id_entite!=0 ) 
-					{
-						$set_personnes= $personne->fetchAll('id_pole ='.$id_pole .'&&'. 'id_fonction ='.$id_fonction .'&&'. 'id_entite ='.$id_entite );
-					}
+                     
+                      // composition de la date début a partir du mois et année saisie dans le form
+                      $dateDebut = '01-' . $data['mois'] . '-' . $data['annee'];
+                      
+                      if ($data['mois'] == '1') // : février ( Janvier = 0) 
+                          {
+                          if (((($data['annee'] % 4) == 0) && ((($data['annee'] % 100) != 0) || (($data['annee'] % 400) == 0)))) // année bissextile
+                              {
+                              $dateFin = '29-' . $data['mois'] . '-' . $data['annee'] . ' 23:59:59';
+                              
+                          } else // année non bissextile
+                              {
+                              $dateFin = '28-' . $data['mois'] . '-' . $data['annee'];
+                          }
+                      } else if ($data['mois'] == '3' || $data['mois'] == '5' || $data['mois'] == '8' || $data['mois'] == 10) // avril / juin / Septembre / Novembre
+                          {
+                          $dateFin = '30-' . $data['mois'] . '-' . $data['annee'] . ' 23:59:59';
+                      } else // Janvier/ Mars /Mai / Juillet /Aout / Octobre /Décembre
+                          {
+                          $dateFin = '31-' . $data['mois'] . '-' . $data['annee'] . ' 23:59:59';
+                      }
+                      
+                      // récupération des congés 
+                      $congeArray = $congeObj->conges_existant($personne->getId(), $dateDebut, $dateFin, '0');
+                     
+                      
+                      foreach ($congeArray as $k => $v) {
+                           
+                          $idTypeConge = $congeArray[$k]['id_type_conge'];
+		                  $typeConge = new Default_Model_TypeConge();
+		                  $tc = $typeConge->find($idTypeConge);
+		                  $codeTypeConge = $tc->getCode();   
+                              
+                          /*
+                           * récupéation du détail de la période de congé
+                           * 
+                           */
+                          $conge = $outils->getPeriodeDetails($congeArray[$k]['date_debut'], $congeArray[$k]['date_fin'],$codeTypeConge,$cs, false);
+                          $conge['nombreJours'] = $congeArray[$k]['nombre_jours']; 
+                           
+                          // indice congé sous format : annee-mois
+                          $indiceConge = explode("-", $congeArray[$k]['date_debut']);
+                          $indiceConge = $indiceConge['0'] . '-' . $indiceConge['1']; // indice conge sous format Annee-mois
+                          
+                          // compter le nombre de congé posés séparemment sur un moi
+                          if (isset($keysIndiceConge[$indiceConge])) {
+                              $keysIndiceConge[$indiceConge] = $keysIndiceConge[$indiceConge] + 1;
+                          } else {
+                              $keysIndiceConge[$indiceConge] = 0;
+                              
+                          }
+                          
+                          // stocker les congés dans la table sous l'indice [annee-mois][numConge]
+                          $conges[$indiceConge][$keysIndiceConge[$indiceConge]] = (array) $conge;
+                          
+                          
+                      }
+                      
+                      /*
+                       * Tableau qui sera envoyé à la vue en format ensuite parsé en javascript
+                       * pour dessiner le calendrier
+                       */
+                      $ressourcesArray = array('ressources'=>
+                                                     array('0'=>
+                                                          array('id_personne' => $personne->getId(),
+                                                                'Nom' => $personne->getNomPrenom(),
+                                                                'Pole' => array('libelle' =>$personne->getPole()->getLibelle(),'value'=> $personne->getPole()->getId()),
+                                                                'Entite' => array('libelle'=>$personne->getEntite()->getLibelle(),'value' => $personne->getEntite()->getId()),
+                                                                'Fonction'=> array('libelle' => $personne->getFonction()->getLibelle(),'value'=> $personne->getFonction()->getId()),
+                                                                'cs' => $personne->getEntite()->getCs(),
+                                                                'conge'=>  $conges )),
+                                                        
+                                                     
+                                                       'Ferie'=> $jferies['joursFerie']);
+                    
+                       // renvoie de la structure à la vue en format json .
+                      $this->_helper->json($ressourcesArray);
+                      
+                      
+                      
+                      
+                  } 
+                  else if (isset($data['id_personne']) && $data['id_personne'] === 'x') // id personne non sélectionné toutes les ressources.
+                  {	
+                    $congeObj   = new Default_Model_Conge();
+                    $congeArray = array();
+                    
+                    $congeArray = $congeObj->fetchAll($str = array());
+                    $i = 0;
+                    
+                    
+                    foreach($congeArray as $v)
+                    {
+                        $conge = array(); //réinitialisation de $conge (table temp)
+                     
+                     		$idPersonne = $v->getId_personne();
+                     		$personne = new Default_Model_Personne();
+                     	
+	                     	$personne->find($idPersonne);
+	                      	$cs = $personne->getEntite()->getCs() ;
+                             if ($cs == '1')
+	                          $cs = true;
+	                    	  else
+	                          $cs = false;
+                        
+                              $congeObj   = new Default_Model_Conge();
+		                      $congeArray = array();
+		                      
+		                      $outils  = new Default_Controller_Helpers_outils();
+		                    
+		                      
+		                     $dd =  $v->getDate_debut();
+		                     $df = $v->getDate_fin();
+		                   
+		                      
+				            
+		                              
+		                /*
+                           * récupéation du détail de la période de congé
+                           * 
+                           */
+		                  $idTypeConge = $v->getId_type_conge();
+		                  $typeConge = new Default_Model_TypeConge();
+		                  $tc = $typeConge->find($idTypeConge);
+		                  $codeTypeConge = $tc->getCode();
+                          $conge = $outils->getPeriodeDetails($dd , $df,$codeTypeConge, $cs, false);
+                          $conge['nombreJours'] = $v->getNombre_jours(); 
+                           
+                          // indice congé sous format : annee-mois
+                          $indiceConge = explode("-", $dd);
+                          $indiceConge = $indiceConge['0'] . '-' . $indiceConge['1']; // indice conge sous format Annee-mois
+                         
+                          // compter le nombre de congé posés séparemment sur un moi
+                          if (isset($keysIndiceConge[$idPersonne]) && isset($keysIndiceConge[$idPersonne][$indiceConge])) {
+                              $keysIndiceConge[$idPersonne][$indiceConge] = $keysIndiceConge[$idPersonne][$indiceConge] + 1;
+                          } else {
+                              $keysIndiceConge[$idPersonne][$indiceConge] = 0;
+                              
+                          }
+                          
+                          // stocker les congés dans la table sous l'indice [annee-mois][numConge]
+                          $conges[$idPersonne][$indiceConge][$keysIndiceConge[$idPersonne][$indiceConge]] = (array) $conge;
+                         
+                              
+                          
+                    }
+               
+                   foreach ($conges as $k => $v)
+                    {
+                    	
+                      	$personne = new Default_Model_Personne();
+                     	
+                     	$personne->find($k);
+                      	$cs = $personne->getEntite()->getCs() ;
+                         $nomPrenom = $personne->getNomPrenom();
+                         $fonction = $personne->getFonction()->getLibelle();
+                         $entite = $personne->getEntite()->getLibelle();
+                         $pole = $personne->getPole()->getLibelle(); 	
 
-				}
+                         if ($cs == '1')
+                          $cs = true;
+                    	  else
+                          $cs = false;
+                          
+                         // structure envoyé au navigateur pour alimenter le calendrier
+                     $ressources[$i] =   array('id_personne' => $k,
+                                                                'Nom' => $nomPrenom,
+                                                                'Pole' => array('libelle' =>$personne->getPole()->getLibelle(),'value'=> $personne->getPole()->getId()),
+                                                                'Entite' => array('libelle'=>$personne->getEntite()->getLibelle(),'value' => $personne->getEntite()->getId()),
+                                                                'Fonction'=> array('libelle' => $personne->getFonction()->getLibelle(),'value'=> $personne->getFonction()->getId()),
+                                                                'cs' => $cs,
+                                                                'conge'=>  $conges[$k] );
+                          
+                          
+		                         $i++;
+                    }
 
-				$tableau_personnes = array();
-				$reponse= array();
-				foreach($set_personnes as $p)
-				{
-					$tableau_personnes[] = $p->getId();
-				}
-				
-				if (count($tableau_personnes) == 0)
-				{
-					echo'<strong ><span style="color:red">Tous le monde bosse ce mois </span ></strong>';
-					
-				}
-				else 
-				
-				$reponse = $this->_helper->validation->calendrier($tableau_personnes,$debut_mois,$fin_mois); 
-				$this->view->calendrierArray = $reponse;
-				$this->view->mois = $_SESSION['salut']['mois'];
-				$this->view->annee = $_SESSION['salut']['annee'];
-			}
-	 		else 
-	 		{
-		 			if (array_key_exists('num_mois', $data))
-		 			{
-		 				$_SESSION['salut']['mois'] = $data['num_mois'];
-		 			}
-		 			
-		 			if (array_key_exists('num_annee', $data))
-		 			{
-		 				$_SESSION['salut']['annee'] = $data['num_annee'];
-		 			}
-	 	
-				 	
-	 				$fin_mois=date('Y-m-d',mktime(0,0,0,$_SESSION['salut']['mois']+1,0,$_SESSION['salut']['annee']));
-					$debut_mois=date('Y-m-d',mktime(0,0,0,$_SESSION['salut']['mois'],1,$_SESSION['salut']['annee']));
-					$personne = new Default_Model_Personne();
-					$reponse = $this->_helper->validation->calendrier($str=array(),$debut_mois,$fin_mois);
-	 				
-					if (count($reponse)==0)
-					{
-						echo'<strong ><span style="color:red">il n y a personne qui ne bosse pas ce mois </span ></strong>';
-						
-					}
+                     $jferiesCSM = $outils->setJoursFerie($data['annee'], true, false);
+		             $jferiesCSM = (array) $jferiesCSM;
+		             
+		             $jferiesFR = $outils->setJoursFerie($data['annee'], true, false);
+		             $jferiesFR = (array) $jferiesFR;
+                     
+		             $ressourcesArray = array('ressources'=> $ressources,
+                                              'Ferie'=> array_merge($jferiesCSM['joursFerie'],$jferiesFR['joursFerie']));
+		                 
+                     $this->_helper->json($ressourcesArray);
+                    
+                     
+                  }
+                  else
+                  {
+                  	   $this->view->error = 'Choisissez une personne !';
+                  }
+                  
+              }
+                  
+               } else { // affichage du formulaire .
+          	
+              $form = new Default_Form_CalendrierForm();
+              $form->setDbOptions('personne', new Default_Model_Personne(), 'getId', 'getNomPrenom');
+              
+              $this->view->form = $form;
+            
+          }
+          
+      }
+      
+      public function calculNombreJoursCongeAction()
+      {
+          
+          //création du fomulaire
+          $form = new Default_Form_OutilsForm();
+          //indique l'action qui va traiter le formulaire
+          $form->setAction($this->view->url(array(
+              'controller' => 'outils',
+              'action' => 'calculNombreJoursConge'
+          ), 'default', true));
+          
+          //assigne le formulaire à la vue
+          $this->view->form  = $form;
+          $this->view->title = "Créer un conge";
+          /*************************************/
+          $conge             = new Default_Model_Conge();
+          
+          // requete POST 
+          if ($this->_request->isPost()) {
+              
+              
+              // récupération des donnéees envoyées par le formulaire
+              $data = $this->_request->getPost();
+              
+              
+              // si date(s) non renseignée(s)
+              if ($data['dateDebut'] == '' || $data['dateFin'] == '') {
+                  if ($data['dateDebut'] == '') {
+                      $this->view->error = 'saisissez la date de début !!';
+                      $form->populate($data);
+                  } else {
+                      $this->view->error = 'saisissez la date de fin !!';
+                      $form->populate($data);
+                  }
+              } else if ($data['dateDebut'] > $data['dateFin']) {
+                  $this->view->error = 'date fin doit être supèrieure ou égale à date debut';
+                  $form->populate($data);
+              } else {
+                  
+                  $dateDebut      = $data['dateDebut'];
+                  $dateFin        = $data['dateFin'];
+                  $debutMidi      = $data['DebutMidi'];
+                  $finMidi        = $data['FinMidi'];
+                  $csm            = $data['csm'];
+                  $am             = $data['AlsaceMoselle'];
+                  
+                  
+                  $outilsb = new Default_Controller_Helpers_outilsb();
+                  $dateTime = $outilsb->makeDatetime($dateDebut,$dateFin,$debutMidi,$finMidi);
 
-					$this->view->calendrierArray = $reponse;
-					$this->view->mois = $_SESSION['salut']['mois'];
-					$this->view->annee = $_SESSION['salut']['annee'];
-	 		
-	 		}
-		}
-
-	}
-
-	public function calendrierannuelAction()
-	{
-	
-		$id_personne =$this ->_getParam ('id');
-		for ($mois_A=1;$mois_A<=12;$mois_A++)
-		{	
-			$fin_mois=date('Y-m-d',mktime(0,0,0,$mois_A+1,0,$_SESSION['salut']['annee']));
-			$debut_mois=date('Y-m-d',mktime(0,0,0,$mois_A,1,$_SESSION['salut']['annee']));
-			$personne = new Default_Model_Personne();
-			$reponse = $this->_helper->validation->calendrier($id_personne,$debut_mois,$fin_mois);
-			$conge = new Default_Model_Conge();
-			$propostion = new Default_Model_Proposition();
-			$tableau_jours_feries=$conge->chercher_jours_feriers($debut_mois, $fin_mois);
-			$ferie = new Default_Model_Ferie();
-			$jours_feries_marocain = $ferie->RecupererLesJoursFeries( $_SESSION['salut']['annee']);
-			$nb= count($jours_feries_marocain );
-			$tableau = array();
-			for ($i=0;$i<$nb;$i++)
-			{
-				$tableau[$i]=$jours_feries_marocain[$i]['date_debut'];
-				
-			}
-					
-			$vac= new Default_Model_Vacances();
-			$vac = $vac->jours_vacances( $debut_mois, $fin_mois);
-			$comp = 0;
-			$resultat[$mois_A]['A']=array();
-			$resultat[$mois_A]['B']=array();
-			$resultat[$mois_A]['C']=array();
-			for ($comp =0;$comp<count($vac);$comp++)
-			{
-				
-				if ($vac[$comp]['date_debut']>=$debut_mois && $vac[$comp]['date_fin']<=$fin_mois)
-				{
-					$debut=	new Zend_Date($vac[$comp]['date_debut']);	
-					$fin = new Zend_Date($vac[$comp]['date_fin']);
-					$resultat [$mois_A][$vac[$comp]['zone']]=($this->_helper->validation->CompteurJours($debut,$fin));
-				
-				}
-				elseif ($vac[$comp]['date_debut']< $debut_mois && $vac[$comp]['date_fin']<$fin_mois)
-				{
-					$fin = new Zend_Date($vac[$comp]['date_fin']);
-					$debut =  new Zend_Date($debut_mois);
-					$resultat[$mois_A][$vac[$comp]['zone']]=($this->_helper->validation->CompteurJours($debut,$fin));
-				}
-				elseif ($vac[$comp]['date_debut']< $fin_mois && $vac[$comp]['date_fin']>$fin_mois && $vac[$comp]['date_debut']> $debut_mois )
-				{
-					$fin =  new Zend_Date($fin_mois);
-					$debut =  new Zend_Date($vac[$comp]['date_debut']);
-					$resultat [$mois_A][$vac[$comp]['zone']]=($this->_helper->validation->CompteurJours($debut,$fin));
-				}
-				elseif ($vac[$comp]['date_debut']< $debut_mois && $vac[$comp]['date_fin']>$fin_mois)
-				{
-					$fin = new Zend_Date($fin_mois);
-					$debut =  new Zend_Date($debut_mois);
-					$resultat [$mois_A][$vac[$comp]['zone']]=($this->_helper->validation->CompteurJours($debut,$fin));
-				}
-					
-			}
-			
-			
-			$timestamp = mktime (0, 0, 0,$mois_A, 01, $_SESSION['salut']['annee']);
-			 $nombreDeJoursDeMois = intval(date("t",$timestamp));
-			
-			
-			$feries=array();
-			$k=1;
-			$var = strtotime($debut_mois );
-			for($k==1;$k<=$nombreDeJoursDeMois;$k++)
-			{
-				
-				
-				if(in_array(date('w', $var), array(0, 6)))
-				{
-					$feries[$k]='<div class="colorgrisA">WE</div>';
-				}
-				elseif((((in_array(date('j_n_'.date('Y', $var), $var), $tableau_jours_feries))&&($reponse[0][0]['centre_service']== 0))||((in_array(date(date('Y', $var).'-m-d', $var), $tableau))&&($reponse[0][0]['centre_service']==1))) && !(in_array(date('w', $var), array(0, 6))) ) 
-				{
-					if ((in_array(date('j_n_'.date('Y', $var), $var), $tableau_jours_feries))&&(in_array(date(date('Y', $var).'-m-d', $var), $tableau)))
-					{
-						$feries[$k] = '<div class="FCA">FC</div>';
-						
-					}
-					if((in_array(date('j_n_'.date('Y', $var), $var), $tableau_jours_feries))&&($reponse[0][0]['centre_service']==0))
-					{
-						$feries[$k]=  '<div class="FFA"> FF</div>';
-						
-					}
-					if((in_array(date(date('Y', $var).'-m-d', $var), $tableau))&&($reponse[0][0]['centre_service']==1))
-					{
-						$feries[$k]=   '<div class="FFA">FM</div>';
-						
-					}
-				}
-			
-			 $var = mktime(date('H', $var), date('i', $var), date('s', $var), date('m', $var), date('d', $var)+1, date('Y', $var));
-			}
-			
-			
-			$i=0;
-			$t=0;
-			$tab =array();
-			$conge_type =array();
-			for($i==0;$i<count ($reponse[0]);$i++) 
-			{
-				$date1[$i] = $reponse[0][$i]['date_debut']->get(Zend_Date::DAY);
-				$date2[$i] = $reponse[0][$i]['date_fin']->get(Zend_Date::DAY);
-				$type_conge[$i]= $reponse[0][$i]['id_type_conge'];
-				$mi_debut_journee[$i]= $reponse[0][$i]['mi_debut_journee'];
-				$mi_fin_journee[$i]= $reponse[0][$i]['mi_fin_journee'];
-				
-				$j=0;
-				for($j==1;$j<=($date2[$i]-$date1[$i]);$j++)
-				{
-					$tab[$t]=  $date1[$i]+$j;
-					
-					if ($mi_debut_journee[$i]==1 && $mi_fin_journee[$i]==0)
-					{
-						$conge_type[$t]="<div class=".$type_conge[$i]."A_1>".$type_conge[$i]."</div>";
-					}
-					elseif ($mi_debut_journee[$i]==0 && $mi_fin_journee[$i]==1)
-					{
-						$conge_type[$t]="<div class=".$type_conge[$i]."A_2>".$type_conge[$i]."</div>";
-					}
-					elseif ($mi_debut_journee[$i]==1 && $mi_fin_journee[$i]==1)
-					{
-						$type_conge[$i]= "<div class=".$reponse[0][$i]['id_type_conge']."A_1>".$reponse[0][$i]['id_type_conge']."</div>"."<div class=".$reponse[0][$i]['id_type_conge2']."A_22>".$reponse[0][$i]['id_type_conge2']."</div>";
-						$conge_type[$t]= $type_conge[$i];
-					}
-					elseif($mi_debut_journee[$i]==0 && $mi_fin_journee[$i]==0) {$conge_type[$t]="<div class=".$type_conge[$i]."A>".$type_conge[$i]."</div>";}
-					$t++;
-				
-				}
-			}
-			$resultat[$mois_A]['conge']=array_flip($tab);
-			$resultat[$mois_A]['type_conge']= $conge_type;
-			$resultat[$mois_A]['feries']= $feries;
-		}
-		
-		$this->view->calendrierArray =  $resultat;
-		
-		
-		
-	}
-}
+                  $conge->setDate_debut($dateTime[0]);
+                  $conge->setDate_fin($dateTime[1]);
+                
+                  
+                  
+                 
+                  if ($csm == '0' && $am == '0') { //si CSM et Alsace Moselle non checkés
+                      $conge->CalculNombreJoursConge();
+                  } else {
+                       //CSM checké
+                      if ($csm == '1') {
+                          $csm = true;
+                      }
+                       //Alsace Moselle checké
+                      if ($am == '1') {
+                          $am = true;
+                      }
+                      
+                      $conge->CalculNombreJoursConge($csm, $am);
+                  }
+                  
+                  
+                  $form->populate($data);
+              }
+             
+          }
+         
+      }
+      
+      
+      
+  }

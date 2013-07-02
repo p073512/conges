@@ -5,7 +5,7 @@ class CongeController extends Zend_Controller_Action
     {
 	    $doctypeHelper = new Zend_View_Helper_Doctype();
         $doctypeHelper->doctype('HTML5');	
-        $this->_helper->layout->setLayout('mylayout');      
+       
     }
 	
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::// ACTION INDEX //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://

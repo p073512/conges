@@ -8,18 +8,18 @@ echo $this->doctype() ?>
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
 <head>
    <meta charset="utf-8" />
-   <!-- Toujours forcer le dernier IE (même en Intra) et le Chrome Frame -->
+   <!-- Toujours forcer le dernier IE (m�me en Intra) et le Chrome Frame -->
    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
    <!-- Mobile viewport optimized: h5bp.com/viewport -->
    <meta name="viewport" content="width=device-width">
 
    <title>Application de gestion de congés</title>
    <meta name="robots" content="index, nofollow">
-   <meta name="description" content="Application de gestion de congé : Application qui gére les congés du csm et france du projet Presstalis." />
+   <meta name="description" content="Application de gestion de congé : Application qui g�re les cong�s du csm et france du projet Presstalis." />
    <meta name="keywords" content="Application gestion congé,congé,calendrier,Presstalis" />
    <meta name="author" content="MedB"/>
    
-   <!-- ligne à supprimer en cas d'utilisation de font locals -->
+   <!-- ligne � supprimer en cas d'utilisation de font locals -->
    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
    <!-- Le fav and touch icons -->
    <link rel="shortcut icon" href="<?php echo $this->baseUrl();?>./content/ico/favicon.ico">
@@ -164,8 +164,8 @@ echo $this->doctype() ?>
                              <li class="divider"></li>
                              <li class="nav-header">CSM</li>
                              <li><a href="<?php echo $this->url(array('controller' => 'personne', 'action' => 'createp'), 'default', true) ?>">Ajouter Personne</a></li>
-                             <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'create'), 'default', true) ?>">Declarer jours feries CSM</a></li>
-                             <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'index'), 'default', true) ?>">Afficher jours feries CSM</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'create'), 'default', true) ?>">Declarer jours fériés CSM</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'ferie', 'action' => 'index'), 'default', true) ?>">Afficher jours fériés CSM</a></li>
                            </ul>
                          </li>
                          
@@ -173,7 +173,7 @@ echo $this->doctype() ?>
                          <li class="dropdown">
                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Calendrier<b class="caret"></b></a>
                            <ul class="dropdown-menu">
-                             <li><a href="<?php echo $this->url(array('controller' => 'calendrier', 'action' => 'calendriermensuel'), 'default', true) ?>">Calendrier mensuel</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'calendrier', 'action' => 'index'), 'default', true) ?>">Calendrier mensuel</a></li>
                              <li><a href="#">Calendrier annuel</a></li>
                              
                            </ul>

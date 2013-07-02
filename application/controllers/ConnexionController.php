@@ -94,10 +94,9 @@ class ConnexionController extends Zend_Controller_Action
 							$this->view->success = " Bienvenue a vous membre guest ";
 
                             // affichage du message d'acceuil et redirection apres 1 sec
-							header("Refresh:1;URL=http://localhost/eclipse/conges/public/calendrier/calendriermensuel");
-							
-							//redirection
-					        //$this->_helper->_redirector('calendriermensuel', 'calendrier');
+							 $baseUrl = new Zend_View_Helper_BaseUrl();
+							$this->getResponse()->setHeader('Refresh', '2; ' . $baseUrl->baseUrl(). '/index');
+                           
 
 						}
 

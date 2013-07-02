@@ -65,7 +65,14 @@
                       // récupération des congés 
                       $congeArray = $congeObj->conges_existant($personne->getId(), $dateDebut, $dateFin, '0');
                      
-                      
+	                  $resultCount = count($congeArray);
+	                    
+	                   if($resultCount == 0) // si aucun congé
+	                   {
+	                   	 $this->_helper->json(null);
+	                   	 return;
+	                   }
+	                   
                       foreach ($congeArray as $k => $v) {
                            
                           $idTypeConge = $congeArray[$k]['id_type_conge'];
@@ -128,11 +135,20 @@
                     $congeArray = array();
                     
                     $congeArray = $congeObj->fetchAll($str = array());
+                  
                     $i = 0;
+                   
+                   $resultCount = count($congeArray);
                     
-                    
+                   if($resultCount == 0) // si aucun congé
+                   {
+                   	 $this->_helper->json(null);
+                   	 return;
+                   }
+                    	  
                     foreach($congeArray as $v)
                     {
+                 
                         $conge = array(); //réinitialisation de $conge (table temp)
                      
                      		$idPersonne = $v->getId_personne();

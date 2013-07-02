@@ -1035,10 +1035,35 @@ function getCalendarContent(idPersonne, mois, annee) {
                 "From": parseInt(mois),
                 "To": parseInt(mois)
             };
-
+            
+            jQuery('.hero-unit')
+            .remove();
+            
+            if(data == null)
+            	{
+			    	if(idPersonne == 'x')
+			    		{
+			    		  $('#myModal')
+			              .modal('hide');
+			        	  jQuery('#wrapper')
+			              .append('<div class="hero-unit" ><h1>Pas de congés</h1><p>Aucun congé dans la base</p></div>');
+			        	
+			    		}
+			    	else
+			    		{
+			    		 $('#myModal')
+			              .modal('hide');
+			        	  jQuery('#wrapper')
+			              .append('<div class="hero-unit" ><h1>Pas de congés</h1><p>'+ jQuery('#personne option[value=' + idPersonne + '] ').text() + ' travaille ce mois</p></div>');
+			        	
+			    		}
+            	
+            	}
+            else
+            	{
             // on dessine le calendrier
             DrawMonthCalendar(periode, calendarOptions, data);
-
+            	}
             // setTimeout(function(data){calendarData = null;alert('Finito'+ calendarData);},60000);
             $('#myModal')
                 .modal('hide');

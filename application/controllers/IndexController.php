@@ -87,6 +87,14 @@ class IndexController extends Zend_Controller_Action
                       // récupération des congés 
                       $congeArray = $congeObj->conges_existant($personne->getId(), $dateDebut, $dateFin, '0');
                      
+                     
+	                    $resultCount = count($congeArray);
+	                    
+		                   if($resultCount == 0)  // si aucun congé n'est retourné.
+		                   {
+		                   	 $this->_helper->json(null);
+		                   	 return;
+		                   }
                       
                       foreach ($congeArray as $k => $v) {
                            
@@ -150,6 +158,17 @@ class IndexController extends Zend_Controller_Action
                     $congeArray = array();
                     
                     $congeArray = $congeObj->fetchAll($str = array());
+                    
+                    
+                    $resultCount = count($congeArray);
+                    
+                   if($resultCount == 0)// si aucun congé
+                   {
+                   	 $this->_helper->json(null);
+                   	 return;
+                   }
+                    
+                    
                     $i = 0;
                     
                     

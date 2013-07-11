@@ -16,22 +16,25 @@ echo $this->headScript();
 		<button class="btn  btn-info" id="suppButton">Confirmer</button>
 	</div>
 </div>
-<div class="row-fluid offset1">
+	<div class="row-fluid offset1">
 		<div id="header-container">
             
 			<div class="dropdown">
-                  <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown"  >
-                     Conge
+                  <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
+                  	cong&eacute; <b class="caret"></b>
                   </a>
-                 
+					<ul class="dropdown-menu">
+						<li><a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'creer'), 'default', true) ?>">Cr&eacute;er</a></li>
+						<li><a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'afficher'), 'default', true) ?>">Afficher</a></li>
+					</ul>
+              
 			</div><!--MBA : fermeture dropdown -->
-          
 		</div><!-- MBA : fermeture div="header-container" -->
 	</div><!-- MBA : fermeture div="row-fluid -->
          <br/>
 <div class="container">
 		<div class="well row-fluid">
-		<h2>Liste des Conges :</h2><br/>
+		<h4>Liste des Congés :</h4><br/>
 <?php
 	/*
 	 * Si erreurs de traitements* renvoyé depuis le controlleur 
@@ -90,14 +93,12 @@ echo $this->headScript();
     <table  class="table table-hover " >
         <thead> 
         <tr>
-            <th>Id</th>
+            <!--<th>Id</th>-->
             <th>Nom Prenom</th>
             <th>Type de conge</th>
             <th>Annee Reference</th>
             <th>Date Debut</th>
             <th>Date Fin</th>
-            <th>Debut Journee</th>
-            <th>Fin Journee</th>
             <th>Nombre Jours</th>
             <th>Ferme</th>
             <?php 
@@ -117,7 +118,7 @@ echo $this->headScript();
         </tr>
          </thead> 
         <?php
-
+            $helper = new Default_Controller_Helpers_outils();
             //$this->usersArray est une variable qui peut être garnie par le controller
             //elle doit recevoir un tableau contenant des objets de type Default_Model_Users
             //le tableau est parcouru par foreach pour afficher les propiétés des objets contenus dans le tableau
@@ -126,18 +127,18 @@ echo $this->headScript();
 			$result_set_personnes = $personne->find($conge->id_personne);
 			$type = new Default_Model_TypeConge();
 			$result_set_types = $type->find($conge->id_type_conge);
-         
+			
+			$date = $helper->makeMidi($conge->date_debut, $conge->date_fin);
+       
          ?>
         <tbody> 
         <tr id="<?php echo $conge->id; ?>">
-            <td><?php echo $conge->id_personne; ?></td>
+        <!--    <td><?php //echo $conge->id_personne; ?></td>  --> 
             <td><?php echo $result_set_personnes->getNom().'  '.$result_set_personnes->getPrenom(); ?></td>  
             <td><?php echo $result_set_types->getCode(); ?></td>
             <td><?php echo $conge->annee_reference; ?></td>
-            <td><?php echo $conge->date_debut; ?></td>
-            <td><?php echo $conge->date_fin; ?></td>
-            <td><?php echo $conge->mi_debut_journee; ?></td>
-            <td><?php echo $conge->mi_fin_journee; ?></td>
+            <td><?php echo $date[0].'  '.$date[1]; ?></td>
+            <td><?php echo $date[2].'  '.$date[3]; ?></td>
             <td><?php echo $conge->nombre_jours; ?></td>
             <td><?php echo $conge->ferme; ?></td>
             <?php 

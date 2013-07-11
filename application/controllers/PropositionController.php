@@ -46,7 +46,7 @@ class PropositionController extends Zend_Controller_Action
 
 		//assigne le formulaire é la vue
 		$this->view->form = $form;
-		$this->view->title = "Creer une Proposition";
+		$this->view->title = "<h4>Créer une Proposition :</h4><br/>";
 
 		// creer proposition    
 		$this->_helper->viewRenderer('creer');  
@@ -78,15 +78,16 @@ class PropositionController extends Zend_Controller_Action
 				}
 				elseif ($data['Debut'] > $data['Fin']) // si date debut > date fin 
 				{	
-					$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";
+					$this->view->error = "La date de début doit étre inférieure ou égale é la date de fin";
 				}	
+				// si on a coché dans une journée les deux cases debut_midi et fin_midi 
 			    elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1))
 				{
 				     $this->view->error = "Sur un meme jour vous ne pouvez selectionner que 'Debut midi' ou 'Fin midi' !";
 				     $form->getElement('DebutMidi')->setValue('0');
 				     $form->getElement('FinMidi')->setValue('0');
 				}
-				else       
+				else // sinon 
 				{     
 								  
 
@@ -96,21 +97,16 @@ class PropositionController extends Zend_Controller_Action
 			    		      //qui sera enregistré dans la base de données
 	    		                $proposition = new Default_Model_Proposition();   
 	    		  
-                                $outils = new Default_Controller_Helpers_outils();
-	    		              
-                                     
+                                $outils = new Default_Controller_Helpers_outils();   
                                      
 	    		              //************** gerer les datetimes en fonction des demis journées *****************************// 
 			     			    $date = $outils->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
-			     	          //***********************************************************************************************// 		   
-                               
-			     
-			     			    
+			     	          //***********************************************************************************************// 		   		        
 
 	    		              //************** Normaliser date debut et date fin ***************//
 				        	    $tab = $outils->normaliser_date($date[0],$date[1],true);          // maroc = true   
 	                  	      //****************************************************************//    
-	    		                
+	    		             
 				        	    if($tab == null)
 				        	    {
 				        	       $this->view->warning = $pers->getNomPrenom()." a posé une proposition sur une periode non ouvrable date debut : ".$date[0]." date fin :".$date[1];  
@@ -122,12 +118,11 @@ class PropositionController extends Zend_Controller_Action
 									$proposition->setDate_fin($tab[1]);     // date_fin normaliser 
 									$proposition->setMi_debut_journee($data['DebutMidi']);
 									$proposition->setMi_fin_journee($data['FinMidi']);
-	
-									
+
 									//////////////////////////////////calcul nombre de jours/////////////////////////// 
 								 	$proposition->calcul_periode_proposition($tab[0],$tab[1]);                              
 									///////////////////////////////////////////////////////////////////////////////////
-	
+
 									$proposition->setEtat('NC');
 	                                
 							      //****************/// Gestion des chevauchements de propositions ///****************//			
@@ -141,7 +136,7 @@ class PropositionController extends Zend_Controller_Action
 		                          //****************************************************************************//	    
 								    
 								    
-					                // pour l'affichage de  du : 2013-05-06 à Midi     au lieu de  du : 2013-02-06 12:00:00 
+					                // pour l'affichage de  " du : 2013-05-06 à Midi"     au lieu de  " du : 2013-02-06 12:00:00 " 
 									$Arr =  $outils->makeMidi($proposition->getDate_debut(),$proposition->getDate_fin());  	
 	    
 						          // proposition n'existe pas dans la base de donnée 
@@ -155,7 +150,7 @@ class PropositionController extends Zend_Controller_Action
 										    
 										      $this->view->success = "Cr&eacute;ation d'une proposition pour :   ".$pers->getNomPrenom()." 	&nbsp;&nbsp;&nbsp; du :   ".$Arr[0]."  ".$Arr[1]."	  &nbsp;&nbsp;&nbsp; au :   ".$Arr[2]."   ".$Arr[3];             
 	                                        
-		                   				    // vider le formulaire pour crée un autre congé
+		                   				    // vider le formulaire pour crée une autre proposition
 										    $form->getElement('Ressource')->setValue('');
 											$form->getElement('Debut')->setValue('');
 											$form->getElement('Fin')->setValue('');
@@ -172,8 +167,6 @@ class PropositionController extends Zend_Controller_Action
 									elseif($res_p <> null)    // chevauchement existe 
 								    {     
 								    	
-								    
-								
 								        if(count($res_p) == 1)  // doublon = 1 
 										{  
 											
@@ -200,13 +193,13 @@ class PropositionController extends Zend_Controller_Action
 										    $this->view->warning = $pers->getNomPrenom()."&nbsp;&nbsp; &agrave; d&eacute;ja pos&eacute; &nbsp;&nbsp;".count($res_p)." &nbsp; propositions sur la p&eacute;riode &nbsp;&nbsp;&nbsp; du : ".$Arr[0]."  ".$Arr[1]." &nbsp;&nbsp;&nbsp; au :  ".$Arr[2]."  ".$Arr[3]." &nbsp;!";
 										
 										}
-								    	       //$this->view->warning = $pers->getNomPrenom()." a déja posé une proposition sur cette periode !";
+								    	    
 								    }
 				        	     } // else if tab null
 					}
 					catch (Exception $e) 
 					{
-						  echo  $e->getMessage();
+						 // echo  $e->getMessage();
 						 $this->view->error = "Création de la proposition pour  : ".$pers->getNomPrenom()." a échoué !";	
 					}
 				}
@@ -221,22 +214,25 @@ class PropositionController extends Zend_Controller_Action
 				elseif($data['Debut'] == null || $data['Fin'] == null )
 				{       
 					   if($data['Debut'] == null )
-					   		$this->view->error = "Veuillez saisir une date de debut !";
+					   {	
+					   	    $this->view->error = "Veuillez saisir une date de debut !";
+					   }	
 					   elseif($data['Fin'] == null )
-					  	 	$this->view->error = "Veuillez saisir une date de fin !";
+					   {	 	
+					   	    $this->view->error = "Veuillez saisir une date de fin !";
+					   }
 				}
 				elseif ($data['Debut'] > $data['Fin'])
 					
-					$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";
+					$this->view->error = "La date de début doit étre inférieure ou égale é la date de fin";
 				else
 				
-				$this->view->error = "Formulaire invalide !";
+					$this->view->error = "Formulaire invalide !";
 			}
 		
 		}
 		else 
-		{
-		       
+		{      
 			//si erreur rencontrée, le formulaire est rempli avec les données
 		    //envoyées précédemment 
 			$form->populate($data);
@@ -344,7 +340,7 @@ class PropositionController extends Zend_Controller_Action
 				        	 	 $this->view->warning = "Aucun champ n'a été modifié !";
 				         	}
 						    elseif ($data['Debut'] > $data['Fin'])
-							$this->view->error = "La date de début doit être inférieure ou égale à la date de fin";
+							$this->view->error = "La date de début doit étre inférieure ou égale é la date de fin";
 				         	else 
 			                {       
                                        $this->view->title = "Modification de la proposition";
@@ -392,7 +388,7 @@ class PropositionController extends Zend_Controller_Action
 			                   		    	{   // oui 
 											    $proposition->save();
 			                   				    $this->view->success = " La proposition a été modifié avec succés !";
-										        header("Refresh:1.5;URL=".$baseurl."/proposition/affichercsm");              // URL dynamique 
+										        header("Refresh:1.5;URL=".$baseurl."/proposition/afficher");              // URL dynamique 
 		
 			                   			    }
 			                   			    // si le congé existe 
@@ -535,7 +531,7 @@ class PropositionController extends Zend_Controller_Action
 						}
 
 				    	//redirection
-				        $this->_helper->redirector('afficheradmin');
+				        $this->_helper->redirector('afficher');
 		 }  
  }
 
@@ -556,7 +552,7 @@ class PropositionController extends Zend_Controller_Action
 			$result = $proposition->find($id);
 			$result->setEtat("KO")->save();
 			//redirection
-			$this->_helper->redirector('afficheradmin');
+			$this->_helper->redirector('afficher');
 			
 		}
 		else
@@ -567,18 +563,19 @@ class PropositionController extends Zend_Controller_Action
 	
 	
     //:::::::::::::// ACTION AFFICHERADMIN //::::::::::::://
-	public function afficheradminAction ()
+	/*public function afficherAction ()
 	{
 		$proposition = new Default_Model_Proposition;
 		$paginator = Zend_Paginator::factory($proposition->fetchAll('Etat = "NC"'));
 		$paginator->setItemCountPerPage(10);
-		//récupére le numéro de la page à afficher
+		//récupére le numéro de la page é afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 		//on initialise la valeur PropositionArray de la vue
 		$this->view->propositionArray = $paginator;
 	}
+	*/
 	//:::::::::::::// ACTION AFFICHERCSM //::::::::::::://
-	public function affichercsmAction ()
+	public function afficherAction ()
 	{
 		$proposition = new Default_Model_Proposition;
 		$paginator = Zend_Paginator::factory($proposition->fetchAll($str = array()));
@@ -587,6 +584,7 @@ class PropositionController extends Zend_Controller_Action
 		$this->view->propositionArray = $paginator;
      		
 	}
+
 	
 	
     //:::::::::::::// ACTION REDIRIGERVERSINDEX //::::::::::::://

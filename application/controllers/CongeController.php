@@ -34,10 +34,6 @@ class CongeController extends Zend_Controller_Action
 		//(cf. application/views/scripts/users/index.phtml)
 		
 		$this->view->congeArray = $paginator;
-		
-		
-		
-		
 	}
 
 	
@@ -63,11 +59,10 @@ class CongeController extends Zend_Controller_Action
 
         // assigne le formulaire à la vue
 		$this->view->form = $form;
-		$this->view->title = "Deposer un conge";
+		$this->view->title = "<h4>Deposer un congé :</h4><br/>";
 
 
 		// remplir la list Année de reference par Annee , Annee + 1 , Annee - 1
-		
 	    $date_tmp = getdate(); // recuperer date system
 	    $annee = (string) $date_tmp['year']; // extraire l'année 
 	    
@@ -95,7 +90,7 @@ class CongeController extends Zend_Controller_Action
 			// récupération des données envoyés par le formulaire
 			$data = $this->_request->getPost();
 			$personne = new Default_Model_Personne();
-			$id_personne = $data['Ressource']; // id personne 
+			$id_personne = $data['Ressource'];       // id personne 
 
 	        $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
 			
@@ -109,16 +104,17 @@ class CongeController extends Zend_Controller_Action
 				elseif($data['TypeConge'] === 'x')     // si on a pas selectionné un type de conge
 				{$this->view->error = "Veuillez selectionner un Type de conge !";}
 				
-				elseif ($data['Debut'] > $data['Fin'])
+				elseif ($data['Debut'] > $data['Fin'])   // si la date_debut > date_fin          
 				{$this->view->error = "La date de d&eacutebut doit &ecirc;tre inf&eacuterieure ou &eacute;gale &agrave la date de fin";}
 				
-				elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1))
+				// si on a coché dans une journée les deux cases debut_midi et fin_midi 
+				elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1)) 
 				{   
 				    $this->view->error = "Sur un meme jour vous ne pouvez selectionner que ' Debut midi ' ou ' Fin midi ' !";
 				    $form->getElement('DebutMidi')->setValue('0');
 				    $form->getElement('FinMidi')->setValue('0');
 				}
-			    else   
+			    else   // sinon 
 				{   
 	                  try
 	                  {     
@@ -159,6 +155,7 @@ class CongeController extends Zend_Controller_Action
 									 
 								    //***********************************/// Gestion des chevauchements de congés ///*********************************//			
 										$c = new Default_Model_DbTable_Conge();
+
 										$res = $c->conges_en_double($conge->getId_personne(),$conge->getDate_debut(),$conge->getDate_fin(), null);
 									
 									    // pour l'affichage de  du : 2013-05-06 à Midi     au lieu de  du : 2013-02-06 12:00:00 
@@ -208,7 +205,6 @@ class CongeController extends Zend_Controller_Action
 										
 												$Arr =  $outils->makeMidi($t[0],$t[count($t)-1]);
 											    $this->view->warning = $pers->getNomPrenom()."&nbsp;&nbsp; &agrave; d&eacute;ja pos&eacute; &nbsp;&nbsp;".count($res)." &nbsp; cong&eacutes sur la p&eacute;riode &nbsp;&nbsp;&nbsp; du : ".$Arr[0]."  ".$Arr[1]." &nbsp;&nbsp;&nbsp; au :  ".$Arr[2]."  ".$Arr[3]." &nbsp;!";
-											
 											}
 		
 										}
@@ -404,6 +400,7 @@ class CongeController extends Zend_Controller_Action
 								 //****************/// Gestion des chevauchements de congés ///****************//	
 										
 									$c = new Default_Model_DbTable_Conge();
+
 									$res = $c->conges_en_double($conge->getId_personne(),$conge->getDate_debut(),$conge->getDate_fin(),$conge->getId());
 									
 									if($res == null)
@@ -431,7 +428,7 @@ class CongeController extends Zend_Controller_Action
 						} 
 						catch (Exception $e) 
 						{
-								$this->view->error = $e->getMessage();
+								//$this->view->error = $e->getMessage();
 								$this->view->error = "Modification du cong&eacute; pour : ".$pers->getNomPrenom()." &agrave; &eacute;chou&eacute; !";	
 						}
 				
@@ -485,7 +482,8 @@ class CongeController extends Zend_Controller_Action
 
 
 	public function afficherAction()
-	{
+	{   
+		
 		$conge = new Default_Model_Conge();
 		$paginator = Zend_Paginator::factory($conge->fetchAll($str = array()));
 		$paginator->setItemCountPerPage(10);

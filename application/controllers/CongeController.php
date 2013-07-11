@@ -278,9 +278,9 @@ class CongeController extends Zend_Controller_Action
  
  		 
  		 //***// stocker les anciennes valeurs du formulaire 
-		 $PreData['Debut']=  substr($conge->getDate_debut(),0,10);  	// extraire la datedebut du datetime 											
+		 $PreData['Debut']=  $conge->getDate_debut();  	// extraire la datedebut du datetime 											
 		 $PreData['DebutMidi'] = $conge->getMi_debut_journee();
-		 $PreData['Fin'] =  substr($conge->getDate_fin(),0,10);         // extraire la datefin du datetime 	
+		 $PreData['Fin'] =  $conge->getDate_fin();         // extraire la datefin du datetime 	
 		 $PreData['FinMidi'] = $conge->getMi_fin_journee();    
 		 $PreData['AnneeRef'] = $conge->getAnnee_reference();
 		 $PreData['TypeConge'] = $conge->getId_type_conge();
@@ -310,6 +310,16 @@ class CongeController extends Zend_Controller_Action
 		 $form->getElement('Ressource')->setValue($id_personne);
 		 $form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
 		 $form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
+
+		 if(substr($PreData['Debut'],11,19) == "12:00:00")
+		 { $PreData['DebutMidi'] = 1;  }
+		 else 
+		 { $PreData['DebutMidi'] = 0;}
+		 if(substr($PreData['Fin'],11,19) == "11:59:59")
+		 { $PreData['FinMidi'] = 1;}
+		 else 
+		 {$PreData['FinMidi'] = 0;}
+		 
 		 $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);  
 		 $form->getElement('FinMidi')->setValue($PreData['FinMidi']);
 		 $form->getElement('AnneeRef')->setValue($PreData['AnneeRef']);

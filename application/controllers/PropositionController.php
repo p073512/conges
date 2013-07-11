@@ -19,15 +19,15 @@ class PropositionController extends Zend_Controller_Action
 		$proposition = new Default_Model_Proposition;
 		//$this->view->propositionArray =$proposition->fetchAll('Etat = "NV"');
 
-		//crÃ©ation de notre objet Paginator avec comme paramÃ©tre la mÃ©thode
-		//rÃ©cupÃ©rant toutes les entrÃ©es dans notre base de donnÃ©es
+		//création de notre objet Paginator avec comme paramétre la méthode
+		//récupérant toutes les entrées dans notre base de données
 		$paginator = Zend_Paginator::factory($proposition->fetchAll($str=array()));
-		//indique le nombre dÃ©lÃ©ments Ã© afficher par page
+		//indique le nombre déléments é afficher par page
 		$paginator->setItemCountPerPage(20);
-		//rÃ©cupÃ©re le numÃ©ro de la page Ã© afficher
+		//récupére le numéro de la page é afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 
-		//$this->view permet d'accÃ©der Ã© la vue qui sera utilisÃ©e par l'action
+		//$this->view permet d'accéder é la vue qui sera utilisée par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
 		$this->view->propositionArray = $paginator;
@@ -39,14 +39,14 @@ class PropositionController extends Zend_Controller_Action
 	//:::::::::::::// ACTION CREER//::::::::::::://
 	public function creerAction()   
 	{   
-		//crÃ©ation du fomulaire
+		//création du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
 		//$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'create'), 'default', true));
 
-		//assigne le formulaire Ã© la vue
+		//assigne le formulaire é la vue
 		$this->view->form = $form;
-		$this->view->title = "<h4>CrÃ©er une Proposition :</h4><br/>";
+		$this->view->title = "<h4>Créer une Proposition :</h4><br/>";
 
 		// creer proposition    
 		$this->_helper->viewRenderer('creer');  
@@ -58,10 +58,10 @@ class PropositionController extends Zend_Controller_Action
 	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
 
 	    $data = array();
-		//si la page est POSTÃ©e = formulaire envoyÃ©
+		//si la page est POSTée = formulaire envoyé
 		if($this->_request->isPost())   
 		{    
-			//rÃ©cupÃ©ration des donnÃ©es envoyÃ©es par le formulaire
+			//récupération des données envoyées par le formulaire
 			$data = $this->_request->getPost();
 
             $personne = new Default_Model_Personne();
@@ -69,18 +69,18 @@ class PropositionController extends Zend_Controller_Action
 	        $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
 	        
 	   
-			//vÃ©rifie que les donnÃ©es rÃ©pondent aux conditions des validateurs
+			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))  // form valide 
 			{
-				if($data['Ressource'] === 'x')  // si on a pas selectionnÃ© une ressource  id = 'x'
+				if($data['Ressource'] === 'x')  // si on a pas selectionné une ressource  id = 'x'
 				{
 				   $this->view->error = "Veuillez selectionner une ressource !";
 				}
 				elseif ($data['Debut'] > $data['Fin']) // si date debut > date fin 
 				{	
-					$this->view->error = "La date de dÃ©but doit Ã©tre infÃ©rieure ou Ã©gale Ã© la date de fin";
+					$this->view->error = "La date de début doit étre inférieure ou égale é la date de fin";
 				}	
-				// si on a cochÃ© dans une journÃ©e les deux cases debut_midi et fin_midi 
+				// si on a coché dans une journée les deux cases debut_midi et fin_midi 
 			    elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1))
 				{
 				     $this->view->error = "Sur un meme jour vous ne pouvez selectionner que 'Debut midi' ou 'Fin midi' !";
@@ -93,13 +93,13 @@ class PropositionController extends Zend_Controller_Action
 
 					try 
 					{          
-						      //crÃ©ation et initialisation d'un objet Default_Model_Proposition
-			    		      //qui sera enregistrÃ© dans la base de donnÃ©es
+						      //création et initialisation d'un objet Default_Model_Proposition
+			    		      //qui sera enregistré dans la base de données
 	    		                $proposition = new Default_Model_Proposition();   
 	    		  
                                 $outils = new Default_Controller_Helpers_outils();   
                                      
-	    		              //************** gerer les datetimes en fonction des demis journÃ©es *****************************// 
+	    		              //************** gerer les datetimes en fonction des demis journées *****************************// 
 			     			    $date = $outils->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
 			     	          //***********************************************************************************************// 		   		        
 
@@ -109,7 +109,7 @@ class PropositionController extends Zend_Controller_Action
 	    		             
 				        	    if($tab == null)
 				        	    {
-				        	       $this->view->warning = $pers->getNomPrenom()." a posÃ© une proposition sur une periode non ouvrable date debut : ".$date[0]." date fin :".$date[1];  
+				        	       $this->view->warning = $pers->getNomPrenom()." a posé une proposition sur une periode non ouvrable date debut : ".$date[0]." date fin :".$date[1];  
 				        	    }
 				        	    else 
 				        	    {
@@ -130,7 +130,7 @@ class PropositionController extends Zend_Controller_Action
 								    $res_p = $p->propositions_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getMi_debut_journee(),$proposition->getMi_fin_journee(), null);
 		                          //****************************************************************************//	
 									
-								  //****************/// Gestion des chevauchements de congÃ©s ///****************//			
+								  //****************/// Gestion des chevauchements de congés ///****************//			
 								    $c = new Default_Model_DbTable_Conge();
 								    $res_c = $c->conges_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getMi_debut_journee(),$proposition->getMi_fin_journee(), null);
 		                          //****************************************************************************//	    
@@ -139,10 +139,10 @@ class PropositionController extends Zend_Controller_Action
 					                // pour l'affichage de  " du : 2013-05-06 Ã  Midi"     au lieu de  " du : 2013-02-06 12:00:00 " 
 									$Arr =  $outils->makeMidi($proposition->getDate_debut(),$proposition->getDate_fin());  	
 	    
-						          // proposition n'existe pas dans la base de donnÃ©e 
+						          // proposition n'existe pas dans la base de donnée 
 		                    	    if($res_p == null)
 		                   			{    
-		                   				// si le congÃ© n'existe pas 
+		                   				// si le congé n'existe pas 
 		                   				if($res_c == null)
 		                   		    	{   
 		                   		    		 // oui 
@@ -150,14 +150,14 @@ class PropositionController extends Zend_Controller_Action
 										    
 										      $this->view->success = "Cr&eacute;ation d'une proposition pour :   ".$pers->getNomPrenom()." 	&nbsp;&nbsp;&nbsp; du :   ".$Arr[0]."  ".$Arr[1]."	  &nbsp;&nbsp;&nbsp; au :   ".$Arr[2]."   ".$Arr[3];             
 	                                        
-		                   				    // vider le formulaire pour crÃ©e une autre proposition
+		                   				    // vider le formulaire pour crée une autre proposition
 										    $form->getElement('Ressource')->setValue('');
 											$form->getElement('Debut')->setValue('');
 											$form->getElement('Fin')->setValue('');
 											$form->getElement('DebutMidi')->setValue('');
 											$form->getElement('FinMidi')->setValue('');	
 		                   			    }
-		                   			    // si le congÃ© existe 
+		                   			    // si le congé existe 
 									    elseif($res_c <> null)
 								        {   
 								        	  // non 
@@ -179,7 +179,7 @@ class PropositionController extends Zend_Controller_Action
 											
 											// Responsable sur l'affichage de la periode total des propositions ( 'date_debut' de la "1ere proposition"     et 'date_fin' de la "derniere proposition" )
 											// remplir un tableau par toute les dates (debut et fin) de toute les propositions de cette personne 
-											// triÃ© le tableau rempli et afficher la premiere et la derniere valeur 
+											// trié le tableau rempli et afficher la premiere et la derniere valeur 
 											$j = 0;
 											for($i=0; $i < count($res_p); $i++ )
 											{
@@ -187,7 +187,7 @@ class PropositionController extends Zend_Controller_Action
 										    	$t[$j+1] = $res_p[$i]['date_fin'];
 										    	$j = $j+2;
 											}
-								   		    sort($t);   // triÃ© ASC par default 
+								   		    sort($t);   // trié ASC par default 
 	                                        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 											$Arr =  $outils->makeMidi($t[0],$t[count($t)-1]);
 										    $this->view->warning = $pers->getNomPrenom()."&nbsp;&nbsp; &agrave; d&eacute;ja pos&eacute; &nbsp;&nbsp;".count($res_p)." &nbsp; propositions sur la p&eacute;riode &nbsp;&nbsp;&nbsp; du : ".$Arr[0]."  ".$Arr[1]." &nbsp;&nbsp;&nbsp; au :  ".$Arr[2]."  ".$Arr[3]." &nbsp;!";
@@ -200,14 +200,14 @@ class PropositionController extends Zend_Controller_Action
 					catch (Exception $e) 
 					{
 						 // echo  $e->getMessage();
-						 $this->view->error = "CrÃ©ation de la proposition pour  : ".$pers->getNomPrenom()." a Ã©chouÃ© !";	
+						 $this->view->error = "Création de la proposition pour  : ".$pers->getNomPrenom()." a échoué !";	
 					}
 				}
 			}
 			else  // form invalide 
 			{   
 				$form->populate($data);
-				if($data['Ressource'] === 'x')     // si on a pas selectionnÃ© une ressource  id = 'x'
+				if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
 				{
 				   $this->view->error = "Veuillez selectionner une ressource !";
 				}
@@ -224,7 +224,7 @@ class PropositionController extends Zend_Controller_Action
 				}
 				elseif ($data['Debut'] > $data['Fin'])
 					
-					$this->view->error = "La date de dÃ©but doit Ã©tre infÃ©rieure ou Ã©gale Ã© la date de fin";
+					$this->view->error = "La date de début doit étre inférieure ou égale é la date de fin";
 				else
 				
 					$this->view->error = "Formulaire invalide !";
@@ -233,8 +233,8 @@ class PropositionController extends Zend_Controller_Action
 		}
 		else 
 		{      
-			//si erreur rencontrÃ©e, le formulaire est rempli avec les donnÃ©es
-		    //envoyÃ©es prÃ©cÃ©demment 
+			//si erreur rencontrée, le formulaire est rempli avec les données
+		    //envoyées précédemment 
 			$form->populate($data);
 			
 		}
@@ -245,22 +245,22 @@ class PropositionController extends Zend_Controller_Action
 	public function modifierAction()
 	{
         $this->_helper->viewRenderer('creer'); // creer proposition
-		//crÃ©ation du fomulaire
+		//création du fomulaire
 		$form = new Default_Form_Proposition();
 		//indique l'action qui va traiter le formulaire
 		//$form->setAction($this->view->url(array('controller' => 'proposition', 'action' => 'edit'), 'default', true));
 		$form->Valider->setLabel('Modifier');
-		//assigne le formulaire Ã© la vue
+		//assigne le formulaire é la vue
 		$this->view->form = $form;
 		$this->view->title = "Modifier Proposition"; //MTA
 		
-		//rÃ©cupÃ©ration des donnÃ©es envoyÃ©es par le formulaire
+		//récupération des données envoyées par le formulaire
 		 $data_id =  $this->getRequest()->getParams();
 
          $proposition = new Default_Model_Proposition();
          $personne = new Default_Model_Personne();
          
-         // recupere l'id personne qui a posÃ© la proposition  
+         // recupere l'id personne qui a posé la proposition  
          $prop = $proposition->find($data_id['id']);
 	     $id_personne =  $prop->getId_personne();  // id personne 
 	  
@@ -268,9 +268,9 @@ class PropositionController extends Zend_Controller_Action
 	     
 	     
 	    // stocker les anciennes valeurs du formulaire 
-		 $PreData['Debut']=  substr($proposition->getDate_debut(),0,10);  // extraire la datedebut du datetime
+		 $PreData['Debut']=  $proposition->getDate_debut(); 
 		 $PreData['DebutMidi'] = $proposition->getMi_debut_journee();
-		 $PreData['Fin']=  substr($proposition->getDate_fin(),0,10);      // extraire la datefin du datetime
+		 $PreData['Fin']=  $proposition->getDate_fin();    
 		 $PreData['FinMidi'] = $proposition->getMi_fin_journee();
 	     
 	     // stocker les nouvelles valeurs du formulaire 
@@ -285,26 +285,40 @@ class PropositionController extends Zend_Controller_Action
 		 $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
 
 		 
-		 // placeholder 
+		 // placeholders
 		 $form->getElement('Debut')->setAttrib('placeholder', 'Saisissez une date debut ...');
 		 $form->getElement('Fin')->setAttrib('placeholder', 'Saisissez une date fin ...');
 		 
 		 
-		// remplir le formulaire par les donnÃ©es recupÃ©rer 
+		 
+		 
+		// remplir le formulaire par les données recupérer 
 		$form->getElement('Ressource')->setValue($id_personne);
 		$form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
 		$form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
+
+		if(substr($PreData['Debut'],11,19) == "12:00:00")
+		{ $PreData['DebutMidi'] = 1;  }
+		else 
+		{ $PreData['DebutMidi'] = 0;}
+		if(substr($PreData['Fin'],11,19) == "11:59:59")
+		{ $PreData['FinMidi'] = 1;}
+		else 
+		{$PreData['FinMidi'] = 0;}
+		
 		$form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);
 		$form->getElement('FinMidi')->setValue($PreData['FinMidi']);
-		
 
-		//si la page est POSTÃ©e = formulaire envoyÃ©
+		
+		
+		
+		//si la page est POSTée = formulaire envoyé
 		if($this->getRequest()->isPost())
 		{ 
-			//rÃ©cupÃ©ration des donnÃ©es envoyÃ©es par le formulaire
+			//récupération des données envoyées par le formulaire
 			$data =  $this->getRequest()->getParams();
 			
-			// rÃ©cupÃ©ration de l'url 
+			// récupération de l'url 
 			$requete = $this->getRequest();
 			if ($requete instanceof Zend_Controller_Request_Http)
 			{ 
@@ -312,12 +326,12 @@ class PropositionController extends Zend_Controller_Action
 			}
 
             
-			//vÃ©rifie que les donnÃ©es rÃ©pondent aux conditions des validateurs
+			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))
 			{
 				     
 				           $i = 1;
-					       // vÃ©rifie si les donnÃ©es ont subit une modification
+					       // vérifie si les données ont subit une modification
 					        foreach($PreData as $k=>$v)
 					        {
 					        	if((string)$PreData[$k] != (string)$data[$k])
@@ -325,7 +339,7 @@ class PropositionController extends Zend_Controller_Action
 					        		$i*=0;
 					        	}
 					        }
-							if($data['Ressource'] === 'x')     // si on a pas selectionnÃ© une ressource  id = 'x'
+							if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
 							{
 							   $this->view->error = "Veuillez selectionner une ressource !";
 							}
@@ -337,10 +351,10 @@ class PropositionController extends Zend_Controller_Action
 							}
 							elseif($i == 1)
 				        	{
-				        	 	 $this->view->warning = "Aucun champ n'a Ã©tÃ© modifiÃ© !";
+				        	 	 $this->view->warning = "Aucun champ n'a été modifié !";
 				         	}
 						    elseif ($data['Debut'] > $data['Fin'])
-							$this->view->error = "La date de dÃ©but doit Ã©tre infÃ©rieure ou Ã©gale Ã© la date de fin";
+							$this->view->error = "La date de début doit étre inférieure ou égale é la date de fin";
 				         	else 
 			                {       
                                        $this->view->title = "Modification de la proposition";
@@ -349,7 +363,7 @@ class PropositionController extends Zend_Controller_Action
 									try 
 						 			{       
 						 		        
-			    		                //************** gerer les datetimes en fonction des demis journÃ©es *****************************// 
+			    		                //************** gerer les datetimes en fonction des demis journées *****************************// 
 					     			        $date =  $outils->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
 					     	            //***********************************************************************************************// 	
 						 				
@@ -357,7 +371,7 @@ class PropositionController extends Zend_Controller_Action
 					        	   	    	$tab = $outils->normaliser_date($date[0],$date[1],true);      // maroc = true 
 		                  	    	    //****************************************************************//
 			
-						        	    // remplir l'objet proposition par les valeurs modifiÃ©es     
+						        	    // remplir l'objet proposition par les valeurs modifiées     
 					                	 $proposition->setId($data_id['id']);
 					                     $proposition->setId_personne($id_personne);
 					                	 $proposition->setDate_debut($tab[0]);
@@ -375,31 +389,34 @@ class PropositionController extends Zend_Controller_Action
 										 $res_p = $p->propositions_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getId());
 						                
 										 
-						 			    //****************/// Gestion des chevauchements de congÃ©s ///****************//			
+						 			    //****************/// Gestion des chevauchements de congés ///****************//			
 							               $c = new Default_Model_DbTable_Conge();
 							               $res_c = $c->conges_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(), null);
 	                                    //****************************************************************************//	    
 							    
-							            // proposition n'existe pas dans la base de donnÃ©e 
+							            // proposition n'existe pas dans la base de donnée 
 			                    	    if($res_p == null)
-			                   			{    
-			                   				// si le congÃ© n'existe pas 
+			                   			{   
+			                   				// si le congé n'existe pas 
 			                   				if($res_c == null)
 			                   		    	{   // oui 
 											    $proposition->save();
-			                   				    $this->view->success = " La proposition a Ã©tÃ© modifiÃ© avec succÃ©s !";
+			                   				    $this->view->success = " La proposition a été modifié avec succés !";
 										        header("Refresh:1.5;URL=".$baseurl."/proposition/afficher");              // URL dynamique 
 		
 			                   			    }
-			                   			    // si le congÃ© existe 
+			                   			    // si le congé existe 
 										    elseif($res_c <> null)
 									        {   
 									        	  // non 
-			                   				     $this->view->warning = "Avec cette modification vous touchez un congÃ© existant !";
-			                   				     // remplir le formulaire par les donnÃ©es recupÃ©rer 
+			                   				     $this->view->warning = "Avec cette modification vous touchez un congé existant !";
+			                   				     // remplir le formulaire par les données recupérer 
 												$form->getElement('Ressource')->setValue($id_personne);
 												$form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
 												$form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
+												
+													
+												
 												$form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);
 												$form->getElement('FinMidi')->setValue($PreData['FinMidi']);
 			                   				     
@@ -409,7 +426,7 @@ class PropositionController extends Zend_Controller_Action
 										elseif($res_p <> null)
 									    {    
 											$this->view->warning = "Avec cette modification vous touchez une proposition existante !";
-											// remplir le formulaire par les donnÃ©es recupÃ©rer 
+											// remplir le formulaire par les données recupérer 
 											$form->getElement('Ressource')->setValue($id_personne);
 											$form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
 											$form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
@@ -420,7 +437,7 @@ class PropositionController extends Zend_Controller_Action
 				                }
 								catch (Exception $e) 
 								{
-										$this->view->error = "Modification de la proposition pour : ".$pers->getNomPrenom()." a Ã©chouÃ© !";	
+										$this->view->error = "Modification de la proposition pour : ".$pers->getNomPrenom()." a échoué !";	
 								}
 			              }
 		              }
@@ -433,18 +450,18 @@ class PropositionController extends Zend_Controller_Action
 	{
 		 if($this->getRequest()->isXmlHttpRequest())
 		 {     
-		 	//rÃ©cupÃ©re les paramÃ©tres de la requÃ©te Ajax 
+		 	//récupére les paramétres de la requéte Ajax 
 		 	$data = $this->getRequest()->getPost();
 			$id = $data['id'];   
 		        
 
-			//crÃ©ation du modÃ©le pour la suppression
+			//création du modéle pour la suppression
 			$proposition = new Default_Model_Proposition();
           
             
 			try 
 			{     //appel de la fcontion de suppression avec en argument,
-				  //la clause where qui sera appliquÃ©e
+				  //la clause where qui sera appliquée
 				  $result = $proposition->delete("id=$id");   
 			}
 			catch (Zend_Db_Exception $e)
@@ -456,8 +473,8 @@ class PropositionController extends Zend_Controller_Action
 	       				      
 	       			echo $content;
 			}
-				        	 //en cas de succÃ©s envoie de reponse avec code succÃ©s [200]
-					         $this->view->success = "La proposition a bien Ã©tÃ© supprimer !";
+				        	 //en cas de succés envoie de reponse avec code succés [200]
+					         $this->view->success = "La proposition a bien été supprimer !";
 				        	 $content = array("status"=>"200","result"=> "1");
 	       					
 	                         // envoi de reponse en format Json
@@ -466,14 +483,14 @@ class PropositionController extends Zend_Controller_Action
 
 }
 		/*
-		 * cette fonction permet Ã© l'admin de valider les propositions et les enregistrÃ© dans 
+		 * cette fonction permet é l'admin de valider les propositions et les enregistré dans 
 		 * la table :conge
 		 */
 
 	//:::::::::::::// ACTION Valider //::::::::::::://
 	public function validerAction()
 	{
-		//rÃ©cupÃ©re les paramÃ©tres de la requÃ©te	
+		//récupére les paramétres de la requéte	
 		$params = $this->getRequest()->getParams();
 
 		$proposition = new Default_Model_Proposition();
@@ -481,7 +498,7 @@ class PropositionController extends Zend_Controller_Action
 
         if(isset($params['id']))
 		{   
-						// sauvegarder les donnÃ©es recus de la requete 
+						// sauvegarder les données recus de la requete 
 				    	$id_proposition = $proposition->getId(); 
 				    	$id_personne = $proposition->getId_personne(); 
 				    	$date_debut =$proposition->getDate_debut(); 
@@ -489,10 +506,10 @@ class PropositionController extends Zend_Controller_Action
 				    	$debut_midi = $proposition->getMi_debut_journee();
 				    	$fin_midi = $proposition->getMi_fin_journee();
 				    	
-				    	// mettre l'etat de la proposition Ã© OK
+				    	// mettre l'etat de la proposition é OK
 				    	$etat = $proposition->setEtat("OK")->save();  
 			            
-				    	// extraire l'annÃ©e de reference depuis la date de debut 
+				    	// extraire l'année de reference depuis la date de debut 
 				    	$time = strtotime($date_debut);
 		                $annee_ref = date('Y',$time);
 		                $id_type_conge = '1';
@@ -539,14 +556,14 @@ class PropositionController extends Zend_Controller_Action
  	//:::::::::::::// ACTION REFUSER //::::::::::::://
 	public function refuserAction()
 	{
-		//rÃ©cupÃ©re les paramÃ©tres de la requÃ©te
+		//récupére les paramétres de la requéte
 		$params = $this->getRequest()->getParams();
-		//vÃ©rifie que le paramÃ©tre id existe
+		//vérifie que le paramétre id existe
 		if(isset($params['id']))
 		{
 			$id = $params['id'];
 
-			//crÃ©ation du modÃ©le pour le refus
+			//création du modéle pour le refus
 			$proposition = new Default_Model_Proposition();
 						
 			$result = $proposition->find($id);
@@ -568,7 +585,7 @@ class PropositionController extends Zend_Controller_Action
 		$proposition = new Default_Model_Proposition;
 		$paginator = Zend_Paginator::factory($proposition->fetchAll('Etat = "NC"'));
 		$paginator->setItemCountPerPage(10);
-		//rÃ©cupÃ©re le numÃ©ro de la page Ã© afficher
+		//récupére le numéro de la page à afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 		//on initialise la valeur PropositionArray de la vue
 		$this->view->propositionArray = $paginator;

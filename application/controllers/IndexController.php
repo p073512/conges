@@ -261,7 +261,7 @@ class IndexController extends Zend_Controller_Action
                      $jferiesCSM = $outils->setJoursFerie($data['annee'], true, false);
 		             $jferiesCSM = (array) $jferiesCSM;
 		             
-		             $jferiesFR = $outils->setJoursFerie($data['annee'], true, false);
+		             $jferiesFR = $outils->setJoursFerie($data['annee'], false, false);
 		             $jferiesFR = (array) $jferiesFR;
                      
 		             $ressourcesArray = array('ressources'=> $ressources,

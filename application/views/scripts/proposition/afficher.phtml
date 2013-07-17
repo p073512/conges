@@ -91,7 +91,7 @@ echo $this->headScript();
             <th>modifier</th>
             <th>supprimer</th>
      <?php  if($profil == 'admin')
-            {
+            {  	     
       ?>
             <th>Valider</th>
             <th>Refuser</th>
@@ -109,9 +109,9 @@ echo $this->headScript();
             foreach ($this->propositionArray as $proposition) :
             $personne = new Default_Model_Personne();
 			$result_set_personnes = $personne->find($proposition->id_personne);
-			$date = $helper->makeMidi($proposition->date_debut,$proposition->date_fin);
+			$date = $helper->makeMidi($proposition->date_debut,$proposition->date_fin);	
 
-		    ?>
+			?>
 
      <tbody>   
             <tr id="<?php  /* gestion des couleur des ligne selon l'etat de la proposition */
@@ -121,9 +121,9 @@ echo $this->headScript();
 						    case 'KO':{echo 'class="error"';break;}
 							case 'NC':{echo 'class="info"';break;}}?> >
  
-            <td><?php echo$result_set_personnes->getNom().'  '.$result_set_personnes->getPrenom(); ?></td>
-            <td><?php echo $date[0].'  '.$date[1]; ?></td>
-            <td><?php echo $date[2].'  '.$date[3]; ?></td>
+            <td><?php echo $result_set_personnes->getNomPrenom(); ?></td>
+            <td><?php echo $date[0].'&nbsp;&nbsp;&nbsp;'.$date[1]; ?></td>
+            <td><?php echo $date[2].'&nbsp;&nbsp;&nbsp;'.$date[3]; ?></td>
             <td><?php echo $proposition->nombre_jours; ?></td>
             <td><?php echo $proposition->etat; ?></td>
 

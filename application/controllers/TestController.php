@@ -2,7 +2,7 @@
 class TestController extends Zend_Controller_Action
 {
 	public function indexAction()
-	{ 
+	{  /*
 	    $fileHandle = fopen("C:\\Documents and Settings\\Administrateur\\Bureau\\Template.docx", "r");
     	$line = @fread($fileHandle, filesize($userDoc));   
 	    $lines = explode(chr(0x0D),$line);
@@ -18,6 +18,28 @@ class TestController extends Zend_Controller_Action
 	      }
 	     $outtext = preg_replace("/[^a-zA-Z0-9\s\,\.\-\n\r\t@\/\_\(\)]/","",$outtext);
 	    return $outtext;
+	    */
+		
+		
+		$date = new DateTime("2013-05-01");
+		
+		var_dump($date);
+		
+		$date1 = $date->format("d-m-Y");
+		echo "</br>Format 1 :  jj-mm-aaaa   :";
+		var_dump($date1);
+
+		$date2 = $date->format("m-d-Y");
+		echo "</br>Format 2 : mm-jj-aaaa   :";
+		var_dump($date2);
+
+		$date3 = $date->format("m/d/Y");
+		echo "</br>Format 3 : mm/jj/aaaa   :";
+		var_dump($date3);
+
+		$date4 = $date->format("d/m/Y");
+		echo "</br>Format 4 :  jj/mm/aaaa   :";
+		var_dump($date4);
 	} 
 	
 

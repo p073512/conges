@@ -35,7 +35,7 @@ class Default_Form_Proposition extends Default_Form_MyForm
 		$iDebut = new ZendX_JQuery_Form_Element_DatePicker('Debut');
 		$iDebut->setJQueryParam('dateFormat', 'yy-mm-dd');
 		$iDebut->setLabel('Debut ');
-		$iDebut->addValidator('date',true,array('date' => 'yy-MM-dd'));
+		$iDebut->addValidator('date',true,array('date' => 'yy-mm-dd'));
 		$iDebut->addDecorator('Ftextinput', array('label'));  
 		$iDebut->setRequired(true);   
 		$iDebut->setErrorMessages(array("Date Debut invalide !"));
@@ -57,7 +57,7 @@ class Default_Form_Proposition extends Default_Form_MyForm
 		$iFin = new ZendX_JQuery_Form_Element_DatePicker('Fin');
 		$iFin->setJQueryParam('dateFormat', 'yy-mm-dd');
 		$iFin->setLabel('Fin ');
-		$iFin->addValidator('date',true,array('date' => 'yy-MM-dd'));
+		$iFin->addValidator('date',true,array('date' => 'yy-mm-dd'));
 		$iFin->addDecorator('Ftextinput', array('label'));
         $iFin->setRequired(true); 
         $iFin->setErrorMessages(array("Date Fin invalide !"));

@@ -653,8 +653,7 @@
 			{
 				// Loguer les jours ouvrés (tous les jours sauf les samedi, dimanche, fériés)
 				$weekday = date_format($date_iterator, 'l');       
-	
-				                            																			   // alsacmoselle = false 
+					                            																			   // alsacmoselle = false 
 				if (in_array($weekday,array('Saturday','Sunday'))  || $this->est_ferie(date_format($date_iterator,"Y-m-d"),false,$maroc)) 
 				{     																											
 			 	      $nbj -- ;  // si on trouve un weekend ou férié entre la periode donnée on décremente le nombre de jours 
@@ -693,10 +692,9 @@
 	 */
 	////////////////////////////// Fonction reglage des dates en fonction des demis journées ////////////////////////////////
 	public function makeDatetime($date_debut,$date_fin,$debut_midi,$fin_midi) 
-	{
-			 	
+	{	 	
 		    $date_deb = new DateTime($date_debut);
-		    $date_fi = new DateTime($date_fin);
+		   $date_fi = new DateTime($date_fin);
 	
 			// gérer les datetimes 			
 			if($debut_midi == 1)
@@ -712,36 +710,36 @@
 				 $date_fi =  $date_fi->add(new DateInterval('PT23H59M59S'));
 			}
 		 
-			 $date[0] = $date_deb->format('Y-m-d H:i:s');
-	   		 $date[1] = $date_fi->format('Y-m-d H:i:s');
-	   		 
+            $date[0] =  $date_deb->format("Y-m-d H:i:s");
+		    $date[1] =  $date_fi->format("Y-m-d H:i:s");
+
 	    return $date;
 	} //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	
-	
-	
-	
+
 	
 	/** 
 	 *  @desc  Fonction responsable de l'affichage du message succés et warning
      *         qui remplace " 12:00:00 "   ou  " 11:59:59 "   par   " à Midi " 
      *         et  remplace " 00:00:00 "   ou  " 23:59:59 "   par   "" (chaine vide)
+     *         
+     *         et formatage de la date depuis yyyy-mm-jj hh:mm:ss  à  jj/mm/yyyy hh:mm:ss
+     *            depuis "2013-05-22 12:00:00" 		à 		"22/05/2013 12:00:00" 
      *               
      *  @name  makeMidi
      *
 	 *  @param string $date_debut
 	 *  @param string $date_fin
 	 * 
-	 *  @return array() de strings $date[0] = $date_debut format "Y-m-d"
+	 *  @return array() de strings $date[0] = $date_debut format "d-m-Y"
 	 *                             $date[1] = $debut_midi  soit " "  ou  "à Midi"
-	 *                             $date[2] = $date_fin format "Y-m-d"
+	 *                             $date[2] = $date_fin format "d-m-Y"
 	 *                             $date[3] = $fin_midi   soit " "  ou  "à Midi"
 	 *  
 	 *  @example  makeMidi('2013-05-22 12:00:00','2013-05-25 23:59:59')
-	 *            return $date[0] = '2013-05-22'
+	 *            return $date[0] = '22/05/2013'
 	 *                   $date[1] = 'à Midi' 
-	 *                   $date[2] = '2013-05-25'
+	 *                   $date[2] = '25/05/2013'
 	 *                   $date[3] = ' ';
 	 *                   
 	 *  @author Mohamed khalil TAKAFI
@@ -749,7 +747,6 @@
 	/////////////////////fonction responsable de l'affichage du message succés,warning////////////////////////////  
 	public function makeMidi($date_debut,$date_fin)
 	{
-	
 		$date[0] = substr($date_debut,0,10); // extraire la date_debut
 		$t_deb = substr($date_debut,11,18);   // extraire le time de la date_debut
 	
@@ -757,16 +754,25 @@
 		$t_fin = substr($date_fin,11,18);     // extraire le time de la date_fin
 			
 	    $chaine[0] = '';      $chaine[1] = '';
-							        
+
+	    // formatage time (remplacer "12:00:00" ou "11:59:59" par "à Midi")
 		if($t_deb == '12:00:00' || $t_deb == '11:59:59') 	{$chaine[0] = '&agrave; Midi';}
 		if($t_fin == '12:00:00' || $t_fin == '11:59:59')    {$chaine[1] = '&agrave; Midi';}
-	
-	    return array($date[0], $chaine[0],$date[1],$chaine[1]);
-			    
+		
+		// formatage date " jj/mm/aaaa " 
+		$dd = new DateTime($date[0]);
+		$dd = $dd->format("d/m/Y");
+	    $df = new DateTime($date[1]);
+		$df = $df->format("d/m/Y");
+		
+	    return array($dd, $chaine[0],$df,$chaine[1]);	    
 	}  //////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	
 
 
+	
+	
+	
  }
  
   

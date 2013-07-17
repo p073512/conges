@@ -133,12 +133,12 @@ echo $this->headScript();
          ?>
         <tbody> 
         <tr id="<?php echo $conge->id; ?>">
-        <!--    <td><?php //echo $conge->id_personne; ?></td>  --> 
-            <td><?php echo $result_set_personnes->getNom().'  '.$result_set_personnes->getPrenom(); ?></td>  
+                                                <!--    <td><?php //echo $conge->id_personne; ?></td>  --> 
+            <td><?php echo $result_set_personnes->getNomPrenom(); ?></td>  
             <td><?php echo $result_set_types->getCode(); ?></td>
             <td><?php echo $conge->annee_reference; ?></td>
-            <td><?php echo $date[0].'  '.$date[1]; ?></td>
-            <td><?php echo $date[2].'  '.$date[3]; ?></td>
+            <td><?php echo $date[0].'&nbsp;&nbsp;&nbsp;'.$date[1]; ?></td>
+            <td><?php echo $date[2].'&nbsp;&nbsp;&nbsp;'.$date[3]; ?></td>
             <td><?php echo $conge->nombre_jours; ?></td>
             <td><?php echo $conge->ferme; ?></td>
             <?php 

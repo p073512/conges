@@ -159,8 +159,7 @@ class Default_Model_DbTable_Conge extends Zend_Db_Table_Abstract
 	        }
     
 		       $select->where('('.$db->quoteInto('c.date_debut >= ?', $date_debut).'&&'.$db->quoteInto('c.date_debut <= ?', $date_fin).') OR  
-	  					       ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).') OR
-		       				   ('.$db->quoteInto('c.date_debut <= ?', $date_fin).'&&'.$db->quoteInto('c.date_debut >= ?', $date_debut).') OR  
+	  					       ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).') OR 
 	                           ('.$db->quoteInto('c.date_fin >= ?', $date_debut).'&&'.$db->quoteInto('c.date_fin <= ?', $date_fin).')');
      
 			return  $select->query()->fetchAll(); 

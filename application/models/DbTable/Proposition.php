@@ -29,7 +29,6 @@ class Default_Model_DbTable_Proposition extends Zend_Db_Table_Abstract
 		    $select ->from((array('p' =>'proposition')),array('p.id','p.id_personne' ,'p.date_debut','p.date_fin')); 
 	        $select->where('p.id_personne ='.$id_personne);
             
-	        
 	        // lorsqu'on veut modifié une proposition
 	        // on neconsidére pas la proposition courante comme chevauchement 
 	        
@@ -37,11 +36,9 @@ class Default_Model_DbTable_Proposition extends Zend_Db_Table_Abstract
 	        {
 	           $select->where('p.id <>'.$id_proposition);
 	        }
-	      
     
 		       $select->where('('.$db->quoteInto('p.date_debut >= ?', $date_debut).'&&'.$db->quoteInto('p.date_debut <= ?', $date_fin).') OR  
 	  					       ('.$db->quoteInto('p.date_debut < ?', $date_debut).'&&'.$db->quoteInto('p.date_fin > ?', $date_fin).') OR
-		       					('.$db->quoteInto('p.date_debut <= ?', $date_fin).'&&'.$db->quoteInto('p.date_debut >= ?', $date_debut).') OR  
 	                           ('.$db->quoteInto('p.date_fin >= ?', $date_debut).'&&'.$db->quoteInto('p.date_fin <= ?', $date_fin).')');
      
 			return  $select->query()->fetchAll(); 

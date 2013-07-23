@@ -58,9 +58,12 @@ class IndexController extends Zend_Controller_Action
                       $congeArray = array();
                       
                       $outils  = new Default_Controller_Helpers_outils();
-                      $jferies = $outils->setJoursFerie($data['annee'], $cs, false);
-                      $jferies = (array) $jferies;
-                    
+
+                      $jferiesCSM = $outils->setJoursFerie($data['annee'], true, false);
+		              $jferiesCSM = (array) $jferiesCSM;
+		             
+		              $jferiesFR = $outils->setJoursFerie($data['annee']);
+		              $jferiesFR = (array) $jferiesFR;                  
 
                      
                       // composition de la date début a partir du mois et année saisie dans le form
@@ -143,7 +146,7 @@ class IndexController extends Zend_Controller_Action
                                                                 'conge'=>  $conges )),
                                                         
                                                      
-                                                       'Ferie'=> $jferies['joursFerie']);
+                                                       'Ferie'=> array_merge($jferiesCSM['joursFerie'],$jferiesFR['joursFerie']));
                     
                        // renvoie de la structure à la vue en format json .
                       $this->_helper->json($ressourcesArray);
@@ -261,7 +264,7 @@ class IndexController extends Zend_Controller_Action
                      $jferiesCSM = $outils->setJoursFerie($data['annee'], true, false);
 		             $jferiesCSM = (array) $jferiesCSM;
 		             
-		             $jferiesFR = $outils->setJoursFerie($data['annee'], true, false);
+		             $jferiesFR = $outils->setJoursFerie($data['annee']);
 		             $jferiesFR = (array) $jferiesFR;
                      
 		             $ressourcesArray = array('ressources'=> $ressources,

@@ -36,8 +36,12 @@
                       $congeArray = array();
                       
                       $outils  = new Default_Controller_Helpers_outils();
-                      $jferies = $outils->setJoursFerie($data['annee'], $cs, false);
-                      $jferies = (array) $jferies;
+                      
+                      $jferiesCSM = $outils->setJoursFerie($data['annee'], true, false);
+		              $jferiesCSM = (array) $jferiesCSM;
+		             
+		              $jferiesFR = $outils->setJoursFerie($data['annee']);
+		              $jferiesFR = (array) $jferiesFR;
                     
 
                      
@@ -120,7 +124,7 @@
                                                                 'conge'=>  $conges )),
                                                         
                                                      
-                                                       'Ferie'=> $jferies['joursFerie']);
+                                                       'Ferie'=> array_merge($jferiesCSM['joursFerie'],$jferiesFR['joursFerie']));
                     
                        // renvoie de la structure à la vue en format json .
                       $this->_helper->json($ressourcesArray);
@@ -236,7 +240,7 @@
                      $jferiesCSM = $outils->setJoursFerie($data['annee'], true, false);
 		             $jferiesCSM = (array) $jferiesCSM;
 		             
-		             $jferiesFR = $outils->setJoursFerie($data['annee'], true, false);
+		             $jferiesFR = $outils->setJoursFerie($data['annee']);
 		             $jferiesFR = (array) $jferiesFR;
                      
 		             $ressourcesArray = array('ressources'=> $ressources,
@@ -264,84 +268,10 @@
           
       }
       
-      public function calculNombreJoursCongeAction()
-      {
-          
-          //création du fomulaire
-          $form = new Default_Form_OutilsForm();
-          //indique l'action qui va traiter le formulaire
-          $form->setAction($this->view->url(array(
-              'controller' => 'outils',
-              'action' => 'calculNombreJoursConge'
-          ), 'default', true));
-          
-          //assigne le formulaire à la vue
-          $this->view->form  = $form;
-          $this->view->title = "Créer un conge";
-          /*************************************/
-          $conge             = new Default_Model_Conge();
-          
-          // requete POST 
-          if ($this->_request->isPost()) {
-              
-              
-              // récupération des donnéees envoyées par le formulaire
-              $data = $this->_request->getPost();
-              
-              
-              // si date(s) non renseignée(s)
-              if ($data['dateDebut'] == '' || $data['dateFin'] == '') {
-                  if ($data['dateDebut'] == '') {
-                      $this->view->error = 'saisissez la date de début !!';
-                      $form->populate($data);
-                  } else {
-                      $this->view->error = 'saisissez la date de fin !!';
-                      $form->populate($data);
-                  }
-              } else if ($data['dateDebut'] > $data['dateFin']) {
-                  $this->view->error = 'date fin doit être supèrieure ou égale à date debut';
-                  $form->populate($data);
-              } else {
-                  
-                  $dateDebut      = $data['dateDebut'];
-                  $dateFin        = $data['dateFin'];
-                  $debutMidi      = $data['DebutMidi'];
-                  $finMidi        = $data['FinMidi'];
-                  $csm            = $data['csm'];
-                  $am             = $data['AlsaceMoselle'];
-                  
-                  
-                  $outilsb = new Default_Controller_Helpers_outilsb();
-                  $dateTime = $outilsb->makeDatetime($dateDebut,$dateFin,$debutMidi,$finMidi);
-
-                  $conge->setDate_debut($dateTime[0]);
-                  $conge->setDate_fin($dateTime[1]);
-                
-                  
-                  
-                 
-                  if ($csm == '0' && $am == '0') { //si CSM et Alsace Moselle non checkés
-                      $conge->CalculNombreJoursConge();
-                  } else {
-                       //CSM checké
-                      if ($csm == '1') {
-                          $csm = true;
-                      }
-                       //Alsace Moselle checké
-                      if ($am == '1') {
-                          $am = true;
-                      }
-                      
-                      $conge->CalculNombreJoursConge($csm, $am);
-                  }
-                  
-                  
-                  $form->populate($data);
-              }
-             
-          }
-         
-      }
+     public function annuelAction(){
+     	
+     	
+     }
       
       
       

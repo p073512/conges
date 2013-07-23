@@ -87,7 +87,7 @@ class Default_Acl_MyAcl extends Zend_Acl
 		// Profil  :: CSM :: 
 		
 		$this->allow('csm','personne', array('index','afficher','createp','edit','delete'));
-		$this->allow('csm','proposition', array('index','creer','modifier','supprimer','valider','refuser','affichercsm','index'));
+		$this->allow('csm','proposition', array('index','creer','modifier','supprimer','valider','refuser','afficher','index'));
 		$this->allow('csm','ferie',array('index','create'));
 		$this->allow('equipe','index');
 		

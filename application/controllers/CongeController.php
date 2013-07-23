@@ -12,32 +12,28 @@ class CongeController extends Zend_Controller_Action
 	  
 	public function indexAction()
 	{
-		//crÃ©ation d'un d'une instance Default_Model_Users
+		//création d'un d'une instance Default_Model_Users
 		$conge = new Default_Model_Conge();
 
-		//$this->view permet d'accÃ©der Ã  la vue qui sera utilisÃ©e par l'action
+		//$this->view permet d'accéder Ã  la vue qui sera utilisée par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
-		//la valeur correspond Ã  un tableau d'objets de type Default_Model_Users rÃ©cupÃ©rÃ©s par la mÃ©thode fetchAll()
+		//la valeur correspond Ã  un tableau d'objets de type Default_Model_Users récupérés par la méthode fetchAll()
 		//$this->view->usersArray = $users->fetchAll();
 
-		//crÃ©ation de notre objet Paginator avec comme paramÃ©tre la mÃ©thode
-		//rÃ©cupÃ©rant toutes les entrÃ©es dans notre base de donnÃ©es
+		//création de notre objet Paginator avec comme paramétre la méthode
+		//récupérant toutes les entrées dans notre base de données
 		$paginator = Zend_Paginator::factory($conge->fetchAll($str =array()));
-		//indique le nombre dÃ©lÃ©ments Ã  afficher par page
+		//indique le nombre déléments Ã  afficher par page
 		$paginator->setItemCountPerPage(20);
-		//rÃ©cupÃ©re le numÃ©ro de la page Ã  afficher
+		//récupére le numéro de la page Ã  afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 
-		//$this->view permet d'accÃ©der Ã  la vue qui sera utilisÃ©e par l'action
+		//$this->view permet d'accéder Ã  la vue qui sera utilisée par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
 		
 		$this->view->congeArray = $paginator;
-		
-		
-		
-		
 	}
 
 	
@@ -55,7 +51,7 @@ class CongeController extends Zend_Controller_Action
 		// var_dump($r);
 	
 
-		// crÃ©ation du fomulaire
+		// création du fomulaire
 		 $form = new Default_Form_Conge();
 		 
 		//indique l'action qui va traiter le formulaire
@@ -63,13 +59,12 @@ class CongeController extends Zend_Controller_Action
 
         // assigne le formulaire Ã  la vue
 		$this->view->form = $form;
-		$this->view->title = "Deposer un conge";
+		$this->view->title = "<h4>Deposer un congé :</h4><br/>";
 
 
-		// remplir la list AnnÃ©e de reference par Annee , Annee + 1 , Annee - 1
-		
+		// remplir la list Année de reference par Annee , Annee + 1 , Annee - 1
 	    $date_tmp = getdate(); // recuperer date system
-	    $annee = (string) $date_tmp['year']; // extraire l'annÃ©e 
+	    $annee = (string) $date_tmp['year']; // extraire l'année 
 	    
 	    // remplir la list par annee-1 , annee , annee+1
 	    $list_annee = array((string)$annee-1=>(string)$annee-1,$annee=>$annee,(string)$annee+1=>(string)$annee+1);
@@ -92,40 +87,41 @@ class CongeController extends Zend_Controller_Action
 		if($this->_request->isPost())   
 		{
 			
-			// rÃ©cupÃ©ration des donnÃ©es envoyÃ©s par le formulaire
+			// récupération des données envoyés par le formulaire
 			$data = $this->_request->getPost();
 			$personne = new Default_Model_Personne();
-			$id_personne = $data['Ressource']; // id personne 
+			$id_personne = $data['Ressource'];       // id personne 
 
 	        $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
 			
 			
-			// VÃ©rifie si les donnÃ©es rÃ©pondent aux conditions de validateurs 
+			// Vérifie si les données répondent aux conditions de validateurs 
 			if($form->isValid($data)) // formulaire valide 
 			{
-	            if($data['Ressource'] === 'x')     // si on a pas selectionnÃ© une ressource  id = 'x'
+	            if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
 				{$this->view->error = "Veuillez selectionner une ressource !";}
 				
-				elseif($data['TypeConge'] === 'x')     // si on a pas selectionnÃ© un type de conge
+				elseif($data['TypeConge'] === 'x')     // si on a pas selectionné un type de conge
 				{$this->view->error = "Veuillez selectionner un Type de conge !";}
 				
-				elseif ($data['Debut'] > $data['Fin'])
+				elseif ($data['Debut'] > $data['Fin'])   // si la date_debut > date_fin          
 				{$this->view->error = "La date de d&eacutebut doit &ecirc;tre inf&eacuterieure ou &eacute;gale &agrave la date de fin";}
 				
-				elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1))
+				// si on a coché dans une journée les deux cases debut_midi et fin_midi 
+				elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1)) 
 				{   
 				    $this->view->error = "Sur un meme jour vous ne pouvez selectionner que ' Debut midi ' ou ' Fin midi ' !";
 				    $form->getElement('DebutMidi')->setValue('0');
 				    $form->getElement('FinMidi')->setValue('0');
 				}
-			    else   
+			    else   // sinon 
 				{   
 	                  try
 	                  {     
 						  	 $conge = new Default_Model_Conge();  
 						  	 $outils = new Default_Controller_Helpers_outils();
 						  	 
-						  	//************** gerer les datetimes en fonction des demis journÃ©es *****************************// 
+						  	//************** gerer les datetimes en fonction des demis journées *****************************// 
 			     			    $date = $outils->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
 			     	        //***********************************************************************************************// 		 
 
@@ -135,7 +131,7 @@ class CongeController extends Zend_Controller_Action
 
 	                            if($tab == null)
 				        	    {
-				        	       $this->view->warning = $pers->getNomPrenom()." a posÃ© un congÃ© sur une periode non ouvrable du : ".$date[0]." au :".$date[1];  
+				        	       $this->view->warning = $pers->getNomPrenom()." a posé un congé sur une periode non ouvrable du : ".$date[0]." au :".$date[1];  
 				        	    }    
 				        	    else 
 				        	    {
@@ -157,15 +153,16 @@ class CongeController extends Zend_Controller_Action
 									    
 									    
 									 
-								    //***********************************/// Gestion des chevauchements de congÃ©s ///*********************************//			
+								    //***********************************/// Gestion des chevauchements de congés ///*********************************//			
 										$c = new Default_Model_DbTable_Conge();
+
 										$res = $c->conges_en_double($conge->getId_personne(),$conge->getDate_debut(),$conge->getDate_fin(), null);
 									
 									    // pour l'affichage de  du : 2013-05-06 Ã  Midi     au lieu de  du : 2013-02-06 12:00:00 
 										$Arr =  $outils->makeMidi($conge->getDate_debut(),$conge->getDate_fin());
 		             
 											    
-										if($res == null)   // pas de chevachement de congÃ©s
+										if($res == null)   // pas de chevachement de congés
 										{  
 												// affichage du message de succÃ¨s 
 											    $this->view->success = "Cr&eacute;ation du cong&eacute; pour :   ".$pers->getNomPrenom()." 	 &nbsp;&nbsp;&nbsp; du :   ".$Arr[0]."  ".$Arr[1]."	  &nbsp;&nbsp;&nbsp; au :   ".$Arr[2]."   ".$Arr[3];                      
@@ -173,7 +170,7 @@ class CongeController extends Zend_Controller_Action
 											    // sauvegarder dans la BD 
 											    $conge->save(); 
 											
-											    // vider le formulaire pour crÃ©e un autre congÃ©
+											    // vider le formulaire pour crée un autre congé
 											     $form->getElement('Ressource')->setValue('');
 												 $form->getElement('TypeConge')->setValue('');
 												 $form->getElement('Debut')->setValue('');
@@ -193,9 +190,9 @@ class CongeController extends Zend_Controller_Action
 											} 
 											else           // doublons > 1 
 											{   
-												// Responsable sur l'affichage de la periode total des congÃ©s ( 'date_debut' du "1er congÃ©"     et 'date_fin' du "dernier congÃ©" )
-												// remplir un tableau par toute les dates (debut et fin) de tout les congÃ©s de cette personne 
-												// triÃ© le tableau rempli et afficher la premiere et la derniere valeur 
+												// Responsable sur l'affichage de la periode total des congés ( 'date_debut' du "1er congé"     et 'date_fin' du "dernier congé" )
+												// remplir un tableau par toute les dates (debut et fin) de tout les congés de cette personne 
+												// trié le tableau rempli et afficher la premiere et la derniere valeur 
 												$j = 0;
 												for($i=0; $i < count($res); $i++ )
 												{
@@ -203,12 +200,11 @@ class CongeController extends Zend_Controller_Action
 											    	$t[$j+1] = $res[$i]['date_fin'];
 											    	$j = $j+2;
 												}
-									   		    sort($t);   // triÃ© ASC par default 
+									   		    sort($t);   // trié ASC par default 
 		                                        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 										
 												$Arr =  $outils->makeMidi($t[0],$t[count($t)-1]);
 											    $this->view->warning = $pers->getNomPrenom()."&nbsp;&nbsp; &agrave; d&eacute;ja pos&eacute; &nbsp;&nbsp;".count($res)." &nbsp; cong&eacutes sur la p&eacute;riode &nbsp;&nbsp;&nbsp; du : ".$Arr[0]."  ".$Arr[1]." &nbsp;&nbsp;&nbsp; au :  ".$Arr[2]."  ".$Arr[3]." &nbsp;!";
-											
 											}
 		
 										}
@@ -219,16 +215,16 @@ class CongeController extends Zend_Controller_Action
 		       	      catch (Exception $e) 
 					  {      
 					  	 // echo  $e->getMessage();
-  						 $this->view->error = "La cr&eacuteation du cong&eacute pour : ".$pers->getNomPrenom()." &agrave; Ã©chou&eacute !";	
+  						 $this->view->error = "La cr&eacuteation du cong&eacute pour : ".$pers->getNomPrenom()." &agrave; échou&eacute !";	
 					  }
 		         } 
 	      }
 	      else  // forme invalide 
 	      {
-	            if($data['Ressource'] === 'x')     // si on a pas selectionnÃ© une ressource  id = 'x'
+	            if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
 				{$this->view->error = "Veuillez selectionner une ressource !";}    
 				
-			    elseif($data['TypeConge'] === 'x')     // si on a pas selectionnÃ© un type de conge
+			    elseif($data['TypeConge'] === 'x')     // si on a pas selectionné un type de conge
 				{$this->view->error = "Veuillez selectionner un type de conge !";}
 				
 	         	elseif($data['Debut'] == null )
@@ -251,7 +247,7 @@ class CongeController extends Zend_Controller_Action
 	public function modifierAction()
 	{
 		 $this->_helper->viewRenderer('creer'); // creer conge
-		 $form = new Default_Form_Conge();  	//crÃ©ation du fomulaire
+		 $form = new Default_Form_Conge();  	//création du fomulaire
 		 $form->Valider->setLabel('Modifier');  //indique l'action qui va traiter le formulaire
 		
 		 //***// assigne le formulaire Ã  la vue
@@ -261,10 +257,10 @@ class CongeController extends Zend_Controller_Action
   		 $conge = new Default_Model_Conge();
          $personne = new Default_Model_Personne();
 		
-         //***// rÃ©cupÃ©ration des donnÃ©es envoyÃ©es par le formulaire
+         //***// récupération des données envoyées par le formulaire
 	     $data_id =  $this->getRequest()->getParams();
           
-         //***// recupere l'id personne qui a posÃ© le conge
+         //***// recupere l'id personne qui a posé le conge
          $cong = $conge->find($data_id['id']);
 	     $id_personne =  $cong->getId_personne();  // id personne 
 	     
@@ -273,18 +269,18 @@ class CongeController extends Zend_Controller_Action
 	     $id_type_conge = $cong->getId_type_conge(); // id_type_conge
          
  		 
- 		 //***// remplir la liste AnnÃ©e de reference par Annee , Annee + 1 , Annee - 1
+ 		 //***// remplir la liste Année de reference par Annee , Annee + 1 , Annee - 1
  		 $date_debut = $cong->getDate_debut();  // recuperer date debut 
-	     $annee = substr($date_debut, 0,4);     // extraire l'annÃ©e 
+	     $annee = substr($date_debut, 0,4);     // extraire l'année 
  		 $list_annee = array($annee=>$annee,(string)$annee-1=>(string)$annee-1,(string)$annee+1=>(string)$annee+1);
  		 $anneeref = $form->getElement('AnneeRef');
  		 $anneeref->setMultiOptions($list_annee);
  
  		 
  		 //***// stocker les anciennes valeurs du formulaire 
-		 $PreData['Debut']=  substr($conge->getDate_debut(),0,10);  	// extraire la datedebut du datetime 											
+		 $PreData['Debut']=  $conge->getDate_debut();  	
 		 $PreData['DebutMidi'] = $conge->getMi_debut_journee();
-		 $PreData['Fin'] =  substr($conge->getDate_fin(),0,10);         // extraire la datefin du datetime 	
+		 $PreData['Fin'] =  $conge->getDate_fin();         
 		 $PreData['FinMidi'] = $conge->getMi_fin_journee();    
 		 $PreData['AnneeRef'] = $conge->getAnnee_reference();
 		 $PreData['TypeConge'] = $conge->getId_type_conge();
@@ -302,29 +298,52 @@ class CongeController extends Zend_Controller_Action
 	     $data['_ferme'] = $form->getElement('Ferme')->getValue();
 		 
 	     //***// remplie le select avec les types de conge qui existent
-		 $form->setDbOptions('TypeConge',new Default_Model_TypeConge(),'getId','getCode');
-	     
-	     
+	  /*   if($personne->getEntite()->getCs() == '0') // france == 0 
+	     {	*/
+	    
+	     	$form->setDbOptions('TypeConge',new Default_Model_TypeConge(),'getId','getCode');
+	   /*  }
+	     else 
+	     {  
+	     	echo "MAROC" ;
+	     	// remplie le select avec le libelle "CP" pour une ressource maroc 
+	       	 $id = 1;
+	         $cp = array('x'=>'Choisissez:','CP'=>'CP');
+ 		     $typeconge = $form->getElement('TypeConge');
+ 		     $typeconge->setMultiOptions($cp);
+	       	 //$where = array('id = ?' => $id );
+	         //$form->setDbOptions('TypeConge',new Default_Model_TypeConge(),'getId','getCode',$where);
+	     }
+	     */
+
 		 //***// remplie le select avec le  nom et prenom de la personne ayant id personne  
 	     $where = array('id = ?' => $id_personne);
 		 $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
-
 		 		 
-		 //***// remplir le formulaire par les donnÃ©es recupÃ©rer 
+		 //***// remplir le formulaire par les données recupérer 
 		 $form->getElement('Ressource')->setValue($id_personne);
 		 $form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
 		 $form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
+
+		 if(substr($PreData['Debut'],11,19) == "12:00:00")
+		 { $PreData['DebutMidi'] = 1;  }
+		 else 
+		 { $PreData['DebutMidi'] = 0;}
+		 if(substr($PreData['Fin'],11,19) == "11:59:59")
+		 { $PreData['FinMidi'] = 1;}
+		 else 
+		 {$PreData['FinMidi'] = 0;}
+		 
 		 $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);  
 		 $form->getElement('FinMidi')->setValue($PreData['FinMidi']);
 		 $form->getElement('AnneeRef')->setValue($PreData['AnneeRef']);
 		 $form->getElement('TypeConge')->setValue($id_type_conge); 
 		 $form->getElement('Ferme')->setValue($PreData['Ferme']);
 
-
-	  	  //si la page est POSTÃ©e = formulaire envoyÃ©
+	  	  //si la page est POSTée = formulaire envoyé
 		  if($this->getRequest()->isPost())
 		  { 
-		 		//rÃ©cupÃ©ration des donnÃ©es envoyÃ©es par le formulaire
+		 		//récupération des données envoyées par le formulaire
 		  	    $data = $this->_request->getPost();
 
 		  	    
@@ -334,22 +353,22 @@ class CongeController extends Zend_Controller_Action
 					$baseurl = $requete->getBaseUrl();
 				}
 
-			//vÃ©rifie que les donnÃ©es rÃ©pondent aux conditions des validateurs
+			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))
 			{      
 				    $i = 1;
-					// vÃ©rifie si les donnÃ©es ont subit une modification
+					// vérifie si les données ont subit une modification
 					foreach($PreData as $k=>$v)
 				    {
 				       if((string)$PreData[$k] != (string)$data[$k])
 				       { $i*=0; }  	
 				    }
 					 
-				    if($data['Ressource'] === 'x')     // si on a pas selectionnÃ© une ressource  id = 'x'
+				    if($data['Ressource'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
 					{
 						$this->view->error = "Veuillez selectionner une ressource !";
 					}
-					elseif($data['TypeConge'] === 'x')     // si on a pas selectionnÃ© un type conge  id = 'x'
+					elseif($data['TypeConge'] === 'x')     // si on a pas selectionné un type conge  id = 'x'
 					{
 						$this->view->error = "Veuillez selectionner un type cong&eacute; !";
 					}
@@ -359,13 +378,13 @@ class CongeController extends Zend_Controller_Action
 					       $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);   // afficher que la date du datetime 
 					       $form->getElement('FinMidi')->setValue($PreData['FinMidi']);       // afficher que la date du datetime
 					}
-					elseif($i == 1)  // pas de modification effectuÃ©
+					elseif($i == 1)  // pas de modification effectué
 				    {
 				        $this->view->warning = "Aucun champ n'a &eacute;t&eacute; modifi&eacute; !";
 				    }
 					elseif ($data['Debut'] > $data['Fin'])  // date debut > date fin 
 					{ 
-						$this->view->error = "La date de d&eacute;but doit Ã©tre inf&eacute;rieure ou &eacute;gale &agrave; la date de fin";
+						$this->view->error = "La date de d&eacute;but doit étre inf&eacute;rieure ou &eacute;gale &agrave; la date de fin";
 					}
 				    else       
 			        {           
@@ -375,7 +394,7 @@ class CongeController extends Zend_Controller_Action
 					            
 						try 
 					 	{        
-					            //************** gerer les datetimes en fonction des demis journÃ©es *****************************// 
+					            //************** gerer les datetimes en fonction des demis journées *****************************// 
 			     			        $date = $outils->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
 			     	            //***********************************************************************************************// 		 
 			     	            
@@ -384,7 +403,7 @@ class CongeController extends Zend_Controller_Action
                   	    	    //****************************************************************//
       
 			        	   	    	
-							        //***// remplir l'objet conge par les valeurs modifiÃ©es     
+							        //***// remplir l'objet conge par les valeurs modifiées     
 						            $conge ->setId($data_id['id']);
 						            $conge->setId_proposition($cong->getId_proposition());
 						            $conge->setId_personne($id_personne);
@@ -401,9 +420,10 @@ class CongeController extends Zend_Controller_Action
 								    $conge->setId_type_conge($data['TypeConge']);
 								    $conge->setFerme($data['Ferme']);    
 								    
-								 //****************/// Gestion des chevauchements de congÃ©s ///****************//	
+								 //****************/// Gestion des chevauchements de congés ///****************//	
 										
 									$c = new Default_Model_DbTable_Conge();
+
 									$res = $c->conges_en_double($conge->getId_personne(),$conge->getDate_debut(),$conge->getDate_fin(),$conge->getId());
 									
 									if($res == null)
@@ -416,7 +436,7 @@ class CongeController extends Zend_Controller_Action
 									{    
 										 $this->view->warning = "Avec cette modification vous touchez un cong&eacute; existant !";
                                          
-										 // remplir le formulaire par les donnÃ©es recupÃ©rer 
+										 // remplir le formulaire par les données recupérer 
 										 $form->getElement('Ressource')->setValue($id_personne);
 										 $form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // extraire la datedebut du datetime
 										 $form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // extraire la datefin du datetime
@@ -431,7 +451,7 @@ class CongeController extends Zend_Controller_Action
 						} 
 						catch (Exception $e) 
 						{
-								$this->view->error = $e->getMessage();
+								//$this->view->error = $e->getMessage();
 								$this->view->error = "Modification du cong&eacute; pour : ".$pers->getNomPrenom()." &agrave; &eacute;chou&eacute; !";	
 						}
 				
@@ -448,16 +468,16 @@ class CongeController extends Zend_Controller_Action
 	{
 		 if($this->getRequest()->isXmlHttpRequest())
 		 {     
-		 	 //rÃ©cupÃ©re les paramÃ©tres de la requÃªte Ajax 
+		 	 //récupére les paramétres de la requÃªte Ajax 
 		 	$data = $this->getRequest()->getPost();
 			$id = $data['id'];   
 		        
-			//crÃ©ation du modÃ©le pour la suppression
+			//création du modéle pour la suppression
 			$conge = new Default_Model_Conge();
 
 			try 
 			{     //appel de la fcontion de suppression avec en argument,
-				  //la clause where qui sera appliquÃ©e
+				  //la clause where qui sera appliquée
 				  $result = $conge->delete("id=$id");   
 			}
 			catch (Zend_Db_Exception $e)
@@ -469,8 +489,8 @@ class CongeController extends Zend_Controller_Action
 	       				      
 	       			echo $content;
 			}
-				        	 //en cas de succÃ©s envoie de reponse avec code succÃ©s [200]
-					         $this->view->success = "Le congÃ© a bien Ã©tÃ© supprimer !";
+				        	 //en cas de succés envoie de reponse avec code succés [200]
+					         $this->view->success = "Le congé a bien été supprimer !";
 				        	 $content = array("status"=>"200","result"=> "1");
 	       					
 	                         // envoi de reponse en format Json
@@ -485,7 +505,8 @@ class CongeController extends Zend_Controller_Action
 
 
 	public function afficherAction()
-	{
+	{   
+		
 		$conge = new Default_Model_Conge();
 		$paginator = Zend_Paginator::factory($conge->fetchAll($str = array()));
 		$paginator->setItemCountPerPage(10);

@@ -123,31 +123,48 @@ class Default_Model_DbTable_Conge extends Zend_Db_Table_Abstract
        
         return $this->fetchAll($select)->toArray();
     }
-   
-////////////////////////////////////////////////////////////////////MTA///////////////////////////////////////////////////////////////////// 
+
+    
+    
+    
+    
+    
+   /** 
+     *  @desc  Fonction qui vérifie l'existance d'un congé en double dans la Base de données ( gestion des chevauchements )
+	 * 
+     *  @name  conges_en_double
+     *  
+	 *  @param int     $id_personne
+	 *  @param string  $date_debut
+	 *  @param string  $date_fin 
+	 *  @param int     $id_conge
+	 * 
+	 *  @return les lignes dans la base de données qui sont en intersection avec le congé en question 
+	 *                                           
+	 *  @author Mohamed khalil TAKAFI
+	 */    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
     public function conges_en_double($id_personne,$date_debut,$date_fin,$id_conge) 
     {
 	        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 		    $select = new Zend_Db_Select($db);
 		    $select ->from((array('c' =>$this->_name)),array('c.id','c.id_personne' ,'c.date_debut','c.date_fin')); 
 	        $select->where('c.id_personne ='.$id_personne);
-
-	        // pour la modification 
+	        
+	        // lorsqu'on veut modifié un congé 
+	        // on ne considére pas le congé courant comme chevauchement  
 	        if(isset($id_conge))
 	        {
 	           $select->where('c.id <>'.$id_conge);
 	        }
-	        ///////////////////////
     
 		       $select->where('('.$db->quoteInto('c.date_debut >= ?', $date_debut).'&&'.$db->quoteInto('c.date_debut <= ?', $date_fin).') OR  
-	  					       ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).') OR
-		       				   ('.$db->quoteInto('c.date_debut <= ?', $date_fin).'&&'.$db->quoteInto('c.date_debut >= ?', $date_debut).') OR  
+	  					       ('.$db->quoteInto('c.date_debut < ?', $date_debut).'&&'.$db->quoteInto('c.date_fin > ?', $date_fin).') OR 
 	                           ('.$db->quoteInto('c.date_fin >= ?', $date_debut).'&&'.$db->quoteInto('c.date_fin <= ?', $date_fin).')');
      
 			return  $select->query()->fetchAll(); 
 			
-    }// fin fonction 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    }////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
     
     

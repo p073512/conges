@@ -1,12 +1,9 @@
 <?php
-//"Default" correspond au namespace que nous avons dï¿½fini dans le bootstrap
+//"Default" correspond au namespace que nous avons défini dans le bootstrap
 class Default_Model_Conge
 {
 
-	//////////////////////////////variables correspondant ï¿½ chacun des champs de notre table users/////////////////////////////////
-
-
-	
+	//////////////////////////////variables correspondant é chacun des champs de notre table users/////////////////////////////////
 	protected  $_id;
 	protected  $_id_personne;
 	protected  $_id_proposition;
@@ -18,14 +15,14 @@ class Default_Model_Conge
 	protected  $_id_type_conge;
 	protected  $_annee_reference;
 	protected  $_ferme;
-
-	//le mapper va nous fournir les mï¿½thodes pour interagir avec notre table (objet de type Default_Model_CongeMapper)
-
+	//le mapper va nous fournir les méthodes pour interagir avec notre table (objet de type Default_Model_CongeMapper)
 	protected $_mapper;
 
+	
+	
 	//***// constructeur
 
-	//le tableau d'options peut contenir les valeurs des champs ï¿½ utiliser
+	//le tableau d'options peut contenir les valeurs des champs é utiliser
 
 	//pour l'initialisation de l'objet
 	public function __construct(array $options = null)
@@ -36,7 +33,7 @@ class Default_Model_Conge
 		}
 	}
 
-	//cette mï¿½thode permet d'appeler n'importe quel settor en fonction
+	//cette méthode permet d'appeler n'importe quel settor en fonction
 	//des arguments
 	public function __set($name, $value)
 	{
@@ -48,8 +45,8 @@ class Default_Model_Conge
 		$this->$method($value);
 	}
 
-	//cette mï¿½thode permet d'appeler n'importe quel gettor en fonction
-	//du nom passï¿½ en argument
+	//cette méthode permet d'appeler n'importe quel gettor en fonction
+	//du nom passé en argument
 	public function __get($name)
 	{
 		$method = 'get' . $name;
@@ -60,8 +57,8 @@ class Default_Model_Conge
 		return $this->$method();
 	}
 
-	//permet de gï¿½rer un tableau d'options passï¿½ en argument au constructeur
-	//ce tabelau d'options peut contenir la valeur des champs ï¿½ utiliser
+	//permet de gérer un tableau d'options passé en argument au constructeur
+	//ce tabelau d'options peut contenir la valeur des champs é utiliser
 	//pour l'initialisation de l'objet
 	public function setOptions(array $options)
 	{
@@ -78,7 +75,7 @@ class Default_Model_Conge
 	}
 
 
-	//gettors and settors d'accï¿½s aux variables//
+	//gettors and settors d'accé aux variables//
 
 	public function setId($id)
 	{
@@ -219,7 +216,7 @@ class Default_Model_Conge
 	}
 	public function getMapper()
 	{
-		//si la valeur $_mapper n'est pas initialisï¿½e, on l'initialise (
+		//si la valeur $_mapper n'est pas initialisée, on l'initialise (
 		if(null == $this->_mapper)
 		{
 			$this->setMapper(new Default_Model_CongeMapper());
@@ -230,10 +227,9 @@ class Default_Model_Conge
 
 	
 	
-	//////////////////////////////mï¿½thodes de classe utilisant les mï¿½thodes du mapper//////////////////////////////
+	//////////////////////////////méthodes de classe utilisant les méthodes du mapper//////////////////////////////
 	
-	//crï¿½e ou met ï¿½ jour une entrï¿½e dans la table
-	
+	//crée ou met à jour une entrée dans la table
 
 	public function save()
 	{
@@ -243,7 +239,7 @@ class Default_Model_Conge
 	
 	
 
-	//rï¿½cupï¿½re une entrï¿½e particuliï¿½re
+	//récupére une entrée particuliére
 
 	public function find($id)
 	{
@@ -252,7 +248,7 @@ class Default_Model_Conge
 	}
 
 
-	//rï¿½cupï¿½re toutes les entrï¿½es de la table
+	//récupére toutes les entrées de la table
 
 	public function fetchAll($str)
 	{
@@ -262,7 +258,7 @@ class Default_Model_Conge
 	
 	
 
-	// rï¿½cupï¿½re les congï¿½s sur une pï¿½riode donnï¿½e.
+	// récupére les congé sur une période donnée.
 
    public function conges_existant($id_personne,$date_debut,$date_fin,$flag) 
 	{
@@ -356,22 +352,22 @@ class Default_Model_Conge
 	public function joursOuvresDuMois($debut_mois,$fin_mois)
 	{
 
-			// tu peut utiliser cette fonction pour afficher les nombre totale ouvere pour un mois donnï¿½
+			// tu peut utiliser cette fonction pour afficher les nombre totale ouvere pour un mois donné
 	
 			$date_debut = strtotime($debut_mois );
 	    	$date_fin = strtotime($fin_mois );
 			
-	    	$tableau_jours_feries = array(); // Tableau des jours feriï¿½s
+	    	$tableau_jours_feries = array(); // Tableau des jours ferié
 
 
 
-	    	// On boucle dans le cas oï¿½ l'annï¿½e de dï¿½part serait diffï¿½rente de l'annï¿½e d'arrivï¿½e
+	    	// On boucle dans le cas oé l'année de départ serait différente de l'année d'arrivée
 	    	$difference_annees = date('Y', $date_fin) - date('Y', $date_debut);
 	    	
 			    for ($i = 0; $i <= $difference_annees; $i++) 
 			    {
 				    $annee = (int)date('Y', $date_debut) + $i;
-				    // Liste des jours feriï¿½s
+				    // Liste des jours ferié
 				    $tableau_jours_feries[] = '1_1_'.$annee; // Jour de l'an
 				    $tableau_jours_feries[] = '1_5_'.$annee; // Fete du travail
 				    $tableau_jours_feries[] = '8_5_'.$annee; // Victoire 1945
@@ -380,7 +376,7 @@ class Default_Model_Conge
 				    $tableau_jours_feries[] = '1_11_'.$annee; // Toussaint
 				    $tableau_jours_feries[] = '11_11_'.$annee; // Armistice 1918
 				    $tableau_jours_feries[] = '25_12_'.$annee; // Noel
-				    // Rï¿½cupï¿½ration de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
+				    // Récupération de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
 				    $easter = easter_date($annee);
 				    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + 86400); // Paques
 				    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + (86400*39)); // Ascension
@@ -390,10 +386,10 @@ class Default_Model_Conge
 			  //print_r($tableau_jours_feries);
 	  		  $nb_jours_ouvres = 0;
 	  		  
-				    // Mettre <= si on souhaite prendre en compte le dernier jour dans le dï¿½compte
+				    // Mettre <= si on souhaite prendre en compte le dernier jour dans le décompte
 				    while ($date_debut <= $date_fin) 
 				    {
-				    // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour fï¿½riï¿½, on incrï¿½mente les jours ouvrï¿½s
+				    // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvré
 
 					    if (!in_array(date('w', $date_debut), array(0,6)) && !in_array(date('j_n_'.date('Y', $date_debut), $date_debut), $tableau_jours_feries)) 
 					    {
@@ -405,20 +401,30 @@ class Default_Model_Conge
 			return $nb_jours_ouvres; 
 	}
 	
-	
-	
-	/*
-	 * cette fonction a pour role de chercher les jours feries d'un mois 
-	 * elle est utilisï¿½e afin de valoriser les jours feries au niveau du 
-	 * calendrier mensuel
+
+	   
+   /** 
+     *  @desc  cette fonction a pour role de chercher les jours feries d'un mois
+     *         elle est utilisée afin de valoriser les jours feries au niveau du
+     *         calendrier mensuel
+	 * 
+     *  @name  chercher_jours_feriers
+     *
+	 *  @param string  $date_debut
+	 *  @param string  $date_fin
+	 *  
+	 *  @return array() de string des jours fériés dans cette periode 
+	 *  
+	 *  @author : Pierre Trifol
 	 */
+	///////////////////////////////////////////////////////////////////////////////
 	public function chercher_jours_feriers($debut_mois,$fin_mois)
 	{
 		$date_debut = strtotime($debut_mois );
     	$date_fin = strtotime($fin_mois );
-		
+		 
 
-    	$tableau_jours_feries = array(); // Tableau des jours feriï¿½s
+    	$tableau_jours_feries = array(); // Tableau des jours ferié
 
     	$difference_annees = date('Y', $date_fin) - date('Y', $date_debut);
     	
@@ -426,7 +432,7 @@ class Default_Model_Conge
 	    {
 		    $annee = (int)date('Y', $date_debut) + $i;
 
-		    // Liste des jours feriï¿½s
+		    // Liste des jours ferié
 		    $tableau_jours_feries[] = '1_1_'.$annee;   // Jour de l'an
 		    $tableau_jours_feries[] = '1_5_'.$annee;   // Fete du travail
 		    $tableau_jours_feries[] = '8_5_'.$annee;   // Victoire 1945
@@ -435,7 +441,7 @@ class Default_Model_Conge
 		    $tableau_jours_feries[] = '1_11_'.$annee;  // Toussaint
 		    $tableau_jours_feries[] = '11_11_'.$annee; // Armistice 1918
 		    $tableau_jours_feries[] = '25_12_'.$annee; // Noel
-		    // Rï¿½cupï¿½ration de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
+		    // Récupération de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
 
 		    $easter = easter_date($annee);
 		    $tableau_jours_feries[] = date('j_n_'.$annee, $easter + 86400); // Paques
@@ -444,87 +450,49 @@ class Default_Model_Conge
 	    }
 	    
     	return $tableau_jours_feries;
-     }
+     }///////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * @method : Fonction responsable du calcul de nombre de jours (pour csm et france)
+     
+     
+   /** 
+     *  @desc  Fonction qui calcul le nombre de jours de conges (csm ou front)
+     *         a travers l'appel à la fonction   outils->calculer_jours($date_debut,$date_fin,$maroc)
+     *         et enregistre le nombre de jours calculés dans l'objet congé via le setter setNombreJours()
 	 * 
-	 * @param : $date_debut 
-	 * @param : $date_fin
-	 * 
-	 * @author : Mohamed khalil TAKAFI
+     *  @name  calcul_periode_conge
+     *
+	 *  @param Datetime $date_debut
+	 *  @param Datetime $date_fin
+	 *  
+	 *  @author : Mohamed khalil TAKAFI
 	 */
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function calcul_periode_conge($date_debut,$date_fin)
 	{
 	        $outils = new Default_Controller_Helpers_outils();  
-	
 	        $date_depart =  date_timestamp_get($date_debut);
-
-	        $annee = (string)date('Y', $date_depart);              // annï¿½e 
-
-	
+	        $annee = (string)date('Y', $date_depart);              // anneé
 	        $maroc = false;                                        // France 
-	
 
-	        // mettre les jours fï¿½riï¿½s maroc dans session TEST 
+	        // mettre les jours férié maroc dans session TEST 
 			$jours_feries_maroc = new Zend_Session_Namespace('TEST',false);
 	        $jours_feries_maroc->jfm = $outils->jours_feries_maroc($annee);
 	        
-	        //verifiï¿½ si c'est un CSM ou France     
+	        //verifié si c'est un CSM ou France     
 	        $personne = new Default_Model_Personne();
 	        $per = $personne->find($this->getId_personne());
 	       
-	        
+	        // verifier si la personne est csm ou front
 	        if ($per->getEntite()->getCs() == 1) 
 	        {
 			 	$maroc = true;     // maroc 
 	        }
-	    
-	        $nbj = $outils->calculer_jours($date_debut,$date_fin,$maroc); 
-	        $this->setNombre_jours($nbj);
-	
-	
+	        
+	        // calcul nombre de jours 
+	        $nbj = $outils->calculer_jours($date_debut,$date_fin,$maroc);  
+	        // enregistrement du nombre de jours dans l'objet congé via le setter 
+	        $this->setNombre_jours($nbj);                                  
 	}////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	
-	   /*
-		  Fonction qui retourne le calcul de nombre de jour de congï¿½
-		  en affichant (pour test) le tableau de dï¿½tails pï¿½riode congï¿½
-		  et le table des compteurs jours de congï¿½
-	
-		
-	    / MBA /// calcul nombre de jours 
-		 
-	    public function CalculNombreJoursConge($csm = false,$alsaceMoselle = false)
-		{
-		//rï¿½cupï¿½ration des propriï¿½tï¿½s de l'objet congï¿½	
-		$dateDebut = $this->getDate_debut();   
-	    $dateFin = $this->getDate_fin(); 
-	    $annneeReference = $this->getAnnee_reference();
-	
-	    // instance de la classe helper Outils
-	     $outils = new Default_Controller_Helpers_outils();
-		 //ici changer les dates de congï¿½:
-	     $conge = $outils->getPeriodeDetails($annneeReference,$dateDebut , $dateFin,$this->getMi_debut_journee(),$this->getMi_fin_journee(),$csm,$alsaceMoselle );
-	
-	     // affichage tableau de calcul jours de congï¿½
-	     echo'Nombre jours congï¿½ : </br>';
-	     var_dump($outils->calculNombreJourConge($conge));
-	     
-	     //affichage du tableau du dï¿½tails de la pï¿½riode de congï¿½
-	     echo'Le dï¿½tails du congï¿½ ci-dessous :</br>';
->>>>>>> branch 'refs/heads/CSM' of https://github.com/p073512/conges.git
-	     var_dump($conge);
-	     
-	     $this->_nombreJoursT = $outils->CalculNombreJourConge($conge);
-	
-	     return $this;
-			
-		}    */
-	
-
-
 
 	
 }

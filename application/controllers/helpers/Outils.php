@@ -1,7 +1,7 @@
 <?php
    class Default_Controller_Helpers_outils extends Zend_Controller_Action_Helper_Abstract
   {
-
+        
 		public $joursFerie = array();
 		
 		
@@ -56,13 +56,13 @@
 			,    $this->lundi_pentecote($annee)
 
 			,    "$annee-01-01"        //    Nouvel an
-			,    "$annee-05-01"        //    F�te du travail
+			,    "$annee-05-01"        //    Féte du travail
 			,    "$annee-05-08"        //    Armistice 1945
 			,    "$annee-08-15"        //    Assomption
-			,    "$annee-07-14"        //    F�te nationale
+			,    "$annee-07-14"        //    Féte nationale
 			,    "$annee-11-11"        //    Armistice 1918
 			,    "$annee-11-01"        //    Toussaint
-			,    "$annee-12-25"        //    No�l
+			,    "$annee-12-25"        //    Noél
 			);
 			
 			if($alsacemoselle)
@@ -77,6 +77,8 @@
 			return $this->jours_feries_maroc($annee);
 		}
 	}
+	
+	
 	
   	function jours_feries_maroc($annee) 
 	{
@@ -96,6 +98,10 @@
 
 		return $jours_feries_csm_dates;
 	}
+		
+	
+	
+	
 		public function setJoursFerie($annee,$maroc = false,$alsacemoselle = false)
 		{
 			
@@ -108,13 +114,13 @@
 				,$this->lundi_paques($annee) => 'Lundi P&agrave;ques'
 				,$this->jeudi_ascension($annee) => 'Jeudi ascension'
 				,$this->lundi_pentecote($annee) => 'Lundi pentecote'
-	            ,"$annee-05-01" => 'F&ecirc;te du travail'      //    F�te du travail
+	            ,"$annee-05-01" => 'F&ecirc;te du travail'      //    Féte du travail
 				,"$annee-05-08" =>'Armistice 1945'              //    Armistice 1945
-				,"$annee-07-14" =>'F&ecirc;te nationale'        //    F�te nationale
+				,"$annee-07-14" =>'F&ecirc;te nationale'        //    Féte nationale
 				,"$annee-08-15" =>'Assomption'                  //    Assomption
 				,"$annee-11-11" => 'Armistice 1918'             //    Armistice 1918
 				,"$annee-11-01" => 'Toussaint'                  //    Toussaint
-				,"$annee-12-25" => 'No&euml;l'                  //    No�l
+				,"$annee-12-25" => 'No&euml;l'                  //    Noél
 				
 				));
 				
@@ -124,7 +130,7 @@
 					$this->joursFerie['France'][$this->vendredi_saint($annee)] = 'Vendredi Saint';
 				}
 				
-				return $this; // retourne tableau de jours f�ri�s français
+				return $this; // retourne un tableau de jours fériés français
 			}
 			else 
 			{
@@ -139,40 +145,36 @@
 				
 				}
 	
-			      return $this; // retourne tableau de jours f�ri�s marocain
+			      return $this; // retourne un tableau de jours fériés marocain
 		       }
 				
 			}
 		// fin setJoursFerie
 		
-		/**
+			
+		
+   /**
 	 * @desc : La fonction getPeriodeDetails retourne un tableau associatif contenant
 	 *		   tous les jours de la période ,renseignée en paramétre, avec leur type : 
 	 *          -N : jour ordinaire (ni Férié ni Weekend)
-	 *          -F : jour férié (selon le $cs indiqué en paramétre sinon jours férié�s Français)
+	 *          -F : jour férié (selon le $cs indiqué en paramétre sinon jours fériéés Français)
 	 *          -WE : les weekends sur la période donnée.
 	 *          -DM : si une période de congé , et le congé démarre à midi.
 	 * 			-FM : si une période de congé , et le congé prend fin à midi ./.
-	 * 
-	 * 
-	 * 
 	 * @param :
 	 *        (String) $annee  : année référence;
 	 * 		  (String)$dateDebut : date debut Période/congé
 	 * 		  (String)$dateFin : date fin Période/congé
 	 * 		  (bool) $cs [optionnel] : $cs à true pour le csm , à false pour la France
 	 *		  (bool) $alsacemoselle ;
-	 * 
-	 * 
-	 * 
-	 * 
+	 *
 	 * @return : (Array) $conge : $conge[date] = typeJour
+	 * 
+	 * @author Mohamed BAINA 
 	 */
 	
 	public function getPeriodeDetails($dateDebut,$dateFin,$typeConge=null,$cs=false,$alsacemoselle = false)
 	{
-		
-		
 		$dateD = substr($dateDebut,0,10); // extraire la date_debut
 		$dm = substr($dateDebut,11,18);   // extraire le time de la date_debut
 	
@@ -215,15 +217,14 @@
 			   $anneet = $date->format("Y");
 				 if($setJferie != 1) // flag pour changer les jours férié de l'année référence une seule fois 
 				 {
-				 if($annee !==$anneet )
-				 {
-				 	$jFerie =  $this->setJoursFerie($anneet,$cs,$alsacemoselle);
-				 	$jFerie =(array) $jFerie;
-				 
-				 	$setJferie = 1;
-				 	
-				 }
-				 }
+					 if($annee !==$anneet )
+					 {
+					 	$jFerie =  $this->setJoursFerie($anneet,$cs,$alsacemoselle);
+					 	$jFerie =(array) $jFerie;
+					 
+					 	$setJferie = 1;
+				 	 }
+				  }
 			  	
 			  	//formatage de la date 
 				$dDate = $date->format('Y-m-d');
@@ -257,25 +258,25 @@
   }
 	  
 	  
-		/**
-		 * 
-		 * Fonction qui prend en paramètre le tableau de d�tails p�riode et retourne 
-		 * les compteurs jours normaux(N),weekends(WE),F�ri�s(FE) dans un tableau.
-		 * @param (Array) $conge[]
-		 * @return (Array) $nombreJour[]
-		 */
+    /**
+ 	  * Fonction qui prend en paramètre le tableau de détails période et retourne 
+  	  * les compteurs jours normaux(N),weekends(WE),Fériés(FE) dans un tableau.
+      * @param (Array) $conge[]
+   	  * @return (Array) $nombreJour[]
+	  * @author Mohamed BAINA
+      */
 		
 	  public function calculNombreJourConge($conge)
 	 {     
 			  // initialisation des compteurs
 			  $n = $f = $we = $cpt =  0;
-			  // dernier indice du tableau cong�
+			  // dernier indice du tableau congé
 			  $fin = (count($conge) -2)/2;
 				
 				$dateDebut = $conge['0']['Date'];
 				$dateFin = $conge[$fin]['Date'];
 	
-				// parcourir le tableau de la p�riode de cong�
+				// parcourir le tableau de la période de congé
 				foreach ($conge as $k=>$v)
 				  {
 				  	// compteur jour 
@@ -293,7 +294,6 @@
 							$we++;
 				    }
 				   
-				
 				  }
 				  
 			   if($conge['0']['DebutMidi'] == true && $conge[$dateDebut]['TypeJour'] != 'F' && $conge[$dateDebut]['TypeJour'] != 'WE')
@@ -313,40 +313,40 @@
 			  $nbrej = $n -($dm + $fm); 
 			
 			  $nombreJour = array('Total' => $cpt-($dm + $fm),
-			                      'F�ri�s' => $f,
+			                      'Fériés' => $f,
 								  'Weenkends'=> $we,
-								  'Nombre Jours cong�s' => $nbrej)	;
+								  'Nombre Jours congés' => $nbrej)	;
 		    return $nombreJour;
 		}
 
 		
 		
 	/*
-	 * PTRI - Calculer les droits � cong�s d'une ressource
+	 * PTRI - Calculer les droits à congés d'une ressource
 	 */
 	function calculer_droits_a_conges($ressource,$annee_reference) 
 	{
 		/*
 		 * si annee_entree = annee_reference
-		 * 	si date_entree < 1er juin : cp = nb_mois depuis date_entr�e * 2.25
+		 * 	si date_entree < 1er juin : cp = nb_mois depuis date_entrée * 2.25
 		 * 	sinon cp = 0
 		 * sinon si annee_entree = annee_reference - 1
 		 * 	si date_entree < 1er juin : cp = 27
-		 * 	sinon cp = nb_mois depuis date_entr�e * 2.25
+		 * 	sinon cp = nb_mois depuis date_entrée * 2.25
 		 * sinon cp = 27 + anciennete
 		 * 
-		 * anciennet�($annee_reference)
+		 * ancienneté($annee_reference)
 		 * 	switch 01/06/annee_reference - date_entree
 		 * 		case 2<=n<3 : anciennete = 1
 		 * 		case 3<=n<5 : anciennete = 2
 		 * 		case 5<=n<8 : anciennete = 3
 		 * 		case n>=8 : anciennete = 4
 		 * 	
-		 * rtt d�pend de la modalite
+		 * rtt dépend de la modalite
 		 * 
 		 * temps partiel (pourcentage)
 		 * 
-		 * Q2 : initialis� � l'�cran de gestion des soldes
+		 * Q2 : initialisé é l'écran de gestion des soldes
 		 * 
 		 */
 		
@@ -361,8 +361,8 @@
 		$date_entree = new DateTime($ressource->getDate_entree());
 		
 		$annee_entree = date_format($date_entree, 'Y'); // annee au format 2013
-		$mois_entree = date_format($date_entree, 'n'); // mois au format 1 � 12
-		$jour_entree = date_format($date_entree, 'j'); // mois au format 1 � 31
+		$mois_entree = date_format($date_entree, 'n'); // mois au format 1 é 12
+		$jour_entree = date_format($date_entree, 'j'); // mois au format 1 é 31
 
 		// Calcul des CP
 		if ($annee_entree == $annee_reference) 
@@ -401,7 +401,7 @@
 			$cp = 27;
 		}
 		
-		// Calcul des CP Anciennet�
+		// Calcul des CP Ancienneté
 		$annee_reference = new DateTime($annee_reference.'-06-01');
 		echo date_format($annee_reference, 'd-m-Y').'<BR>';
 		$interval = $date_entree->diff($annee_reference);
@@ -497,17 +497,17 @@
 		$cpt = 0;
 		$i = 0;
 		$setJferie = 0;
-		$annee = substr($dateDebut, 0, 4); // annee r�f�rence d�but
+		$annee = substr($dateDebut, 0, 4); // annee référence début
 		
 		
 		
 		$dateTimeFin = new DateTime($dateF);
 		$dateTimeFin->add(new DateInterval('P1D'));
 		$jFerie =  $this->setJoursFerie($annee,$maroc,$alsacemoselle);
-		// calcul de la p�riode , et subdivision en jours .
+		// calcul de la période , et subdivision en jours .
 		$period = new DatePeriod(new datetime($dateD),new DateInterval('P1D'),$dateTimeFin);
 	
-		// r�cup�ration des jours f�ri�s sur l'ann�e r�f�rence.
+		// récupération des jours fériés sur l'année référence.
 		
         $jFerie =(array) $jFerie;
       
@@ -522,12 +522,12 @@
 					}
 		
 		
-        //r�cup�ration des jours de la p�riode.
+        //récupération des jours de la période.
 			  foreach ($period as $k=>$date)
 			  {
 			  
 			 $anneet = $date->format("Y");
-			 if($setJferie != 1) // flag pour changer les jours f�ri� de l'ann�e r�f�rence une seule fois 
+			 if($setJferie != 1) // flag pour changer les jours férié de l'année référence une seule fois 
 			 {
 			 if($annee !==$anneet )
 			 {
@@ -545,9 +545,7 @@
 			  		$conge[$i]['TypeJour'] = 'N';
 			  		$conge[$i]['Date'] = $dDate;
 					$cpt++;
-					if($k >0) $dm = false;
-				
-				  
+					if($k >0) $dm = false;				  
 			  	}
 			  	
 			  	else if($cpt > 0)
@@ -558,7 +556,7 @@
 					
 						
 					}
-				// v�rif si le date est f�ri�e
+				// vérif si le date est fériée
 				    elseif(isset($jFerie['joursFerie'][$iCs][$dDate]))
 				    {
 				    	$typeJour ='F';
@@ -604,15 +602,38 @@
 		return $dateNormalisee;
 
 	}		
-		
-			/**
+
+   /** 
+     *  @desc  Fonction qui calcul le nombre de jours ouvrable entre deux dates ($date_debut et $date_fin) 
+     *         en tenant compte des jours fériés csm ou france a travers le parametre $maroc
 	 * 
-	 * MTA : calcul nombre jours cong�  (modifi� 18-06-2013) 
-	 * @param Datetime $date_debut
-	 * @param Datetime $date_fin
-	 * @param boolean $maroc
-	 */	
-	//////////////////////////////////////////////////Calcul nombre de jours (Propositions et cong�s)//////////////////////////////////////////////////////////////
+     *  @name  calculer_jours
+     *
+	 *  @param Datetime $date_debut
+	 *  @param Datetime $date_fin
+	 *  @param boolean  $maroc 
+	 * 
+	 *  @return float   $nbj
+	 *                                             
+	 *  @example calculez_jours pour un membre de l'equipe front (france)    $maroc == false
+	 *     
+	 *           calculer_jours( 2013-05-02 12:00:00 , 2013-05-10 23:59:59 , false)   
+	 *          
+	 *            2013-05-02   -  à Midi
+	 *            2013-05-03   -
+	 *            2013-05-04   We
+	 *            2013-05-05   We
+	 *            2013-05-06   -
+	 *            2013-05-07   -
+	 *            2013-05-08   Férié
+	 *            2013-05-09   Férié 
+	 *            2013-05-10   - 
+	 *      
+	 *            return  4.5 ;
+	 *                   
+	 *  @author Mohamed khalil TAKAFI
+	 */
+	   //////////////////////////////////////////////Calcul nombre de jours (Propositions et congés)//////////////////////////////////////////////
 		function calculer_jours($date_debut,$date_fin,$maroc) 
 		{
 		    $tab = array();
@@ -630,67 +651,102 @@
 			$date_iterator = $date_debut;
 			while ($date_iterator <= $date_fin) 
 			{
-				// Loguer les jours ouvr�s (tous les jours sauf les samedi, dimanche, f�ri�s)
+				// Loguer les jours ouvrés (tous les jours sauf les samedi, dimanche, fériés)
 				$weekday = date_format($date_iterator, 'l');       
-	
-				                            																			   // alsacmoselle = false 
+					                            																			   // alsacmoselle = false 
 				if (in_array($weekday,array('Saturday','Sunday'))  || $this->est_ferie(date_format($date_iterator,"Y-m-d"),false,$maroc)) 
 				{     																											
-			 	      $nbj -- ;  // si on trouve un weekend ou f�ri� entre la periode donn�e on d�cremente le nombre de jours 
+			 	      $nbj -- ;  // si on trouve un weekend ou férié entre la periode donnée on décremente le nombre de jours 
 			    }
-			   // Incr�menter l'iterator
+			   // Incrémenter l'iterator
 			   $date_iterator->add(new DateInterval("P1D"));
 		
 			}
 			return  $nbj;
-		}//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		}//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 	
-
-	/**
-	 * Description : 
-	 * Fonction qui ajoute 12h00m00s � la date_debut si debut_midi == 1   
-	 * 			 et qui ajoute 11h59m59s � la date_fin si fin_midi == 1
+    /** 
+     *  @desc  Fonction qui prend en parametre une date 
+     *         et en fonction des $debut_midi et $fin_midi 
+     *         nous retourne une date format Y-m-d H:i:s
+	 * 
+     *  @name  makeDatetime
+     *
+	 *  @param string $date_debut
+	 *  @param string $date_fin
+	 *  @param int $debut_midi
+	 *  @param int $fin_midi
+	 * 
+	 *  @return array() de strings $date[0] = $date_debut format "Y-m-d H:i:s"
+	 *                             $date[1] = $date_fin format "Y-m-d H:i:s"
+	 *                           
+	 *                           
+	 *  @example  makeDatetime('2013-05-22','2013-05-25',1,0)
+	 *            return $date[0] = '2013-05-22 12:00:00'
+	 *                   $date[1] = '2013-05-25 23:59:59' ;
+	 *                   
+	 *                   
+	 *  @author Mohamed khalil TAKAFI
 	 */
-	////////////////////////////// Fonction reglage des dates en fonction des demis journ�es ////////////////////////////////
+	////////////////////////////// Fonction reglage des dates en fonction des demis journées ////////////////////////////////
 	public function makeDatetime($date_debut,$date_fin,$debut_midi,$fin_midi) 
-	{
-			 	
+	{	 	
 		    $date_deb = new DateTime($date_debut);
-		    $date_fi = new DateTime($date_fin);
+		   $date_fi = new DateTime($date_fin);
 	
-			// gerer les datetimes 			
+			// gérer les datetimes 			
 			if($debut_midi == 1)
-			{    // ajouter 12h00m00s � la date 
+			{    // ajouter 12h00m00s à la date 
 				 $date_deb =  $date_deb->add(new DateInterval('PT12H00M00S'));				    
 			} 					    
 			if($fin_midi == 1)
-			{    // ajouter 11h59m59s � la date 
+			{    // ajouter 11h59m59s à la date 
 				 $date_fi =   $date_fi->add(new DateInterval('PT11H59M59S'));	     			    
 			}
 			else //  $fin_midi == 0
-			{    // ajouter 23h59m59s � la date 
+			{    // ajouter 23h59m59s à la date 
 				 $date_fi =  $date_fi->add(new DateInterval('PT23H59M59S'));
 			}
 		 
-			 $date[0] = $date_deb->format('Y-m-d H:i:s');
-	   		 $date[1] = $date_fi->format('Y-m-d H:i:s');
-	   		 
+            $date[0] =  $date_deb->format("Y-m-d H:i:s");
+		    $date[1] =  $date_fi->format("Y-m-d H:i:s");
+
 	    return $date;
 	} //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 	
-	
-	/**
-	 * Description : 
-	 * Fonction responsable de l'affichage du message succ�s , warning
-	 * qui remplace " 12:00:00 "   ou  " 11:59:59 "   par   " � Midi "
+	/** 
+	 *  @desc  Fonction responsable de l'affichage du message succés et warning
+     *         qui remplace " 12:00:00 "   ou  " 11:59:59 "   par   " à Midi " 
+     *         et  remplace " 00:00:00 "   ou  " 23:59:59 "   par   "" (chaine vide)
+     *         
+     *         et formatage de la date depuis yyyy-mm-jj hh:mm:ss  à  jj/mm/yyyy hh:mm:ss
+     *            depuis "2013-05-22 12:00:00" 		à 		"22/05/2013 12:00:00" 
+     *               
+     *  @name  makeMidi
+     *
+	 *  @param string $date_debut
+	 *  @param string $date_fin
+	 * 
+	 *  @return array() de strings $date[0] = $date_debut format "d-m-Y"
+	 *                             $date[1] = $debut_midi  soit " "  ou  "à Midi"
+	 *                             $date[2] = $date_fin format "d-m-Y"
+	 *                             $date[3] = $fin_midi   soit " "  ou  "à Midi"
+	 *  
+	 *  @example  makeMidi('2013-05-22 12:00:00','2013-05-25 23:59:59')
+	 *            return $date[0] = '22/05/2013'
+	 *                   $date[1] = 'à Midi' 
+	 *                   $date[2] = '25/05/2013'
+	 *                   $date[3] = ' ';
+	 *                   
+	 *  @author Mohamed khalil TAKAFI
 	 */
-	/////////////////////fonction responsable de l'affichage du message succ�s,warning////////////////////////////  
+	/////////////////////fonction responsable de l'affichage du message succés,warning////////////////////////////  
 	public function makeMidi($date_debut,$date_fin)
 	{
-	
 		$date[0] = substr($date_debut,0,10); // extraire la date_debut
 		$t_deb = substr($date_debut,11,18);   // extraire le time de la date_debut
 	
@@ -698,17 +754,25 @@
 		$t_fin = substr($date_fin,11,18);     // extraire le time de la date_fin
 			
 	    $chaine[0] = '';      $chaine[1] = '';
-							        
+
+	    // formatage time (remplacer "12:00:00" ou "11:59:59" par "à Midi")
 		if($t_deb == '12:00:00' || $t_deb == '11:59:59') 	{$chaine[0] = '&agrave; Midi';}
 		if($t_fin == '12:00:00' || $t_fin == '11:59:59')    {$chaine[1] = '&agrave; Midi';}
-	
-	    return array($date[0], $chaine[0],$date[1],$chaine[1]);
-			    
+		
+		// formatage date " jj/mm/aaaa " 
+		$dd = new DateTime($date[0]);
+		$dd = $dd->format("d/m/Y");
+	    $df = new DateTime($date[1]);
+		$df = $df->format("d/m/Y");
+		
+	    return array($dd, $chaine[0],$df,$chaine[1]);	    
 	}  //////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	
-	
-	
 
+
+	
+	
+	
  }
  
   

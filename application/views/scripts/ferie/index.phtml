@@ -1,7 +1,7 @@
 <div class="container">
 	
 		<div class="well row-fluid">
-		<h2>Les jours fériés du CSM :</h2><br/>
+		<h4>Les jours fériés du CSM :</h4><br/>
 	
     <table class="table table-hover ">
        <thead> 
@@ -16,9 +16,9 @@
         </thead>
         <?php
         
-            //$this->usersArray est une variable qui peut �tre garnie par le controller
+            //$this->usersArray est une variable qui peut étre garnie par le controller
             //elle doit recevoir un tableau contenant des objets de type Default_Model_Proposition
-            //le tableau est parcouru par foreach pour afficher les propi�t�s des objets contenus dans le tableau
+            //le tableau est parcouru par foreach pour afficher les propiétés des objets contenus dans le tableau
             foreach ($this->ferieArray as $ferie) :
 
         ?>
@@ -35,7 +35,7 @@
         <?php endforeach; ?></tbody>
     </table>
     <?php
-    //nous affichons, � la suite du tableau (aprés la balise </table>), notre template qui permettra de g�rer la pagination
+    //nous affichons, é la suite du tableau (aprés la balise </table>), notre template qui permettra de gérer la pagination
     //la méthode pginationControl() prend, ici, 3 arguments:
     //  - l'instane paginator
     //  - le style de défilement

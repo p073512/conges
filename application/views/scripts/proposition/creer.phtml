@@ -12,14 +12,18 @@
 	  ?> 
  
  
-	<div class="row-fluid offset1">
+		<div class="row-fluid offset1">
 		<div id="header-container">
             
 			<div class="dropdown">
                   <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
-                  Proposition
+                  Proposition <b class="caret"></b>
                   </a>
-
+					<ul class="dropdown-menu">
+						<li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'creer'), 'default', true) ?>">Cr&eacute;er</a></li>
+						<li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'afficher'), 'default', true) ?>">Afficher</a></li>
+					</ul>
+              
 			</div><!--MBA : fermeture dropdown -->
           
 		</div><!-- MBA : fermeture div="header-container" -->

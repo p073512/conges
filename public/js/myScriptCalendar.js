@@ -596,7 +596,6 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
                         var thisDate = periode.Year + "-" + month + "-" + day;
 
 
-
                         title = data[i] + ' ' + (i + 1) + ' ' + mois[data['mm']] + ' ' + periode.Year;
                         typeConge = null;
 
@@ -735,8 +734,8 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
 
                 });
 
-               // console.log('dataJson');
-               // console.log(dataJson);
+                console.log('dataJson');
+                console.log(dataJson);
 
                 width = opt.dimensions.svg.w; //Largeur calendrier
                 height = opt.dimensions.svg.h; //Hauteur calendrier
@@ -1073,6 +1072,12 @@ function getCalendarContent(idPersonne, mois, annee,filtred) {
 			    		{
 			    		  $('#myModal')
 			              .modal('hide');
+			    		  d3.selectAll('svg')
+			              .style("opacity", 1)
+			              .transition()
+			              .duration(400)
+			              .style("opacity", 0)
+			              .remove();
 			        	  jQuery('#wrapper')
 			              .append('<div class="hero-unit" ><h1>Pas de congés</h1><p>Aucun congé dans la base</p></div>');
 			        	
@@ -1081,6 +1086,12 @@ function getCalendarContent(idPersonne, mois, annee,filtred) {
 			    		{
 			    		 $('#myModal')
 			              .modal('hide');
+			    		 d3.selectAll('svg')
+			             .style("opacity", 1)
+			             .transition()
+			             .duration(400)
+			             .style("opacity", 0)
+			             .remove();
 			        	  jQuery('#wrapper')
 			              .append('<div class="hero-unit" ><h1>Pas de congés</h1><p>'+ jQuery('#personne option[value=' + idPersonne + '] ').text() + ' travaille ce mois</p></div>');
 			        	

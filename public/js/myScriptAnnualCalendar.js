@@ -31,8 +31,8 @@
 				    "color": { // Couleur Case selon code congé ou type jour 
 				        "AU": "#E6AE00",
 				        "N": "#FFFFFF",
-				        "WE": "#D1D1D1", //"#327CCB",
-				        "FE": "#B2655D", //"#A74143",
+				        "WE": "#EDEDED", //"#327CCB",
+				        "FE": "#A74143", //"#A74143",
 				        "FECSM" : "#F38630",
 				        "CP": "#14B694", //,#9ED9C7
 				        "Q1": "#F3CD08",
@@ -344,15 +344,16 @@
       
          function DrawAnnualCalendar(year,opt,dataset)
          {
-        	 
+        	jQuery('.smoothie').remove();
              d3.selectAll('svg')
              .style("opacity", 1)
              .transition()
              .duration(400)
              .style("opacity", 0)
              .remove();
-
+             jQuery('#wrapper').html('<span class="smoothie">'+year+'</span>');
         	 
+          
         	 
         	 var dataj = myCalendar(year); 
         	 
@@ -374,7 +375,8 @@
                */
               for (var i = 0; i < 32; i++) {
 
-                      svgContainer.append('path') // ronds jours mois
+                      svgContainer.append('path')
+                      // ronds jours mois
                       .attr('fill', function () {
                               return '#ededed';
                       })
@@ -387,7 +389,13 @@
                               .duration(1500)
                               .ease('cubic')
                               .attr('d', function () {
-                                      dPathy = i * 20;
+                            	    dPathy = i * 20;
+                            	  if(i == 0)
+                            		  {
+                            		  return '';
+                            		   //return dPath(0, 0, 20, 20,11, 11, 0, 11);
+                            		  }
+                                  
                                       return dPath(0, dPathy, 20, 20, 11, 11, 11, 11);
                               });
 
@@ -395,23 +403,36 @@
                               .transition()
                               .delay(1600)
                               .duration(200) // texte n jours mois 
-                      .style('fill', 'black')
+                             
+                              .style('fill', '#413D3D')
                               .text(function () {
-                                      if (i == 0) return year;
+                                      if (i == 0) return '';
 
                                       i = i > 9 ? i : '0' + i;
                                       return i;
                               })
                               .attr('dx', function () {
+                            	  
                                       return (5);
                               })
                               .attr('dy', function () {
-                                      return i * 20 + 10;
+                            	  
+                            	
+                                      return i * 20 + 12;
                               })
-                              .style('font', '8px sans-serif');
+                              .style('font', function(){
+                            	  if(i == 0)
+                            		  {
+                            		  return 'none';
+                            		  }
+                            	  return '10px  Tahoma,Lucida grande, Verdana, Arial, Sans-serif';}
+                            	  );
+                             
 
 
               }
+           
+              
 
               /*
   		       * 12 groupe contenant chacun :
@@ -420,7 +441,7 @@
   		     
   		       */
               gr = svgContainer.selectAll('g')
-                      .data(data) // data contenant les informations pour l'affichage du calendrier (voir myCalendar())
+                      .data(data) // data[1] == 1 à data[12] == 12  
               .enter()
                       .append('g');
 
@@ -430,7 +451,7 @@
                               return (i + 1) * 200;
                       })
                       .attr('fill', 'none')
-                      .attr('stroke', 'gray')
+                      .attr('stroke', '#C2CBCE')
                       .attr('x', function (d, i) {
                               return i * 57 + 22;
                       })
@@ -440,7 +461,7 @@
 
 
               gr.append("text") // text mois
-              .style('fill', 'black')
+              .style('fill', '#413D3D')
                       .text(function (d, i) {
                               return mois[i];
                       })
@@ -448,8 +469,8 @@
               .attr('dx', function (d, i) {
                       return i * 57 + 27;
               })
-                      .attr('dy', 10)
-                      .style('font', '8px sans-serif');
+                      .attr('dy', 12)
+                      .style('font', '10px Lucida grande,Tahoma, Verdana, Arial, Sans-serif');
 
               gr.append('rect')
                       .transition()
@@ -457,7 +478,7 @@
                               return (i + 1) * 260;
                       })
                       .attr('fill', '#ffffff')
-                      .attr('stroke', 'gray')
+                      .attr('stroke', '#ededed')
                       .attr('x', function (d, i) {
                               return i * 57 + 22;
                       })
@@ -466,52 +487,208 @@
                       .attr('height', function(d,i){
                     	  return 20*jMois[i];
                       });
+              
+              
+              
+              
+              /*
+               * On Parse les données de vancances récupérées depuis le serveur
+               * pour construire une structure "lisible" pour le dessin des bars vancances.
+               * 
+               */
+              vacancesArray = new Array();
+              
+              jQuery.each(dataset.Vacances['0'],function(i,d){
+          		console.log(i + '=>'+d['zone']+' '+ d['date_debut'] +' '+ d['date_fin']);
+          		
+          		monthD = d['date_debut'].split('-',3);
+          		monthF = d['date_fin'].split('-',3);
+          //		console.log(parseInt(monthD[1]) + '  '+ parseInt(monthF[1]));
+          		
+          		if(typeof vacancesArray[d['zone']] == 'undefined') 
+  				{
+  			    // Pas de tableau associatif en Javascript => solution :  tableau dans case tableau !
+  				vacancesArray[d['zone']]=[];
+  				}
+          		
+          		if(parseInt(monthD[1]) == parseInt(monthF[1]))
+          			{
+          			
+          		
+          			vacancesArray[d['zone']][parseInt(monthD[1])]=[];
+      				vacancesArray[d['zone']][parseInt(monthD[1])]['from'] = parseInt(monthD[2]) ;
+                    vacancesArray[d['zone']][parseInt(monthD[1])]['to'] = parseInt(monthF[2]) ;
+                    
+                 //   console.log( d['zone']+' '+parseInt(monthD[1])+'from '+vacancesArray[d['zone']][parseInt(monthD[1])]['from']+'To '+vacancesArray[d['zone']][parseInt(monthD[1])]['to']);
+                 
+          			
+          			}
+          		else
+          			{
+          		
+          			difMois = parseInt(monthF[1])-parseInt(monthD[1]);
+          			
+          			for(i=0;i<=difMois;i++)
+          				{
+          		
+          				if(i == 0)
+          					{
+          					vacancesArray[d['zone']][parseInt(monthD[1]) + i ] = [];   // Pas de tableau associatif en Javascript => solution :  tableau dans case tableau !
+          					vacancesArray[d['zone']][parseInt(monthD[1]) + i ]['from'] = parseInt(monthD[2]); 
+          					indiceMois = parseInt(monthD[1]) + (i-1);
+          					vacancesArray[d['zone']][parseInt(monthD[1]) + i ]['to'] = jMois[''+indiceMois+''];
+          					
+          					}
+          				
+          				else if( i == difMois )
+          					{
+          					vacancesArray[d['zone']][parseInt(monthD[1]) + i ] = [];   // Pas de tableau associatif en Javascript => solution :  tableau dans case tableau !
+          					vacancesArray[d['zone']][parseInt(monthD[1]) + i ]['from'] = 1;
+          					vacancesArray[d['zone']][parseInt(monthD[1]) + i ]['to'] = parseInt(monthF[2]);
+          					}
+          				else
+          					{
+          					vacancesArray[d['zone']][parseInt(monthD[1]) + i ] = [];   // Pas de tableau associatif en Javascript => solution :  tableau dans case tableau !
+          					vacancesArray[d['zone']][parseInt(monthD[1]) + i ]['from'] = 1;
+          					indiceMois = parseInt(monthD[1]) + (i-1);
+              				
+          					vacancesArray[d['zone']][parseInt(monthD[1]) + i ]['to'] = jMois[''+indiceMois+''];
+          					
+          					}
+          			//	console.log(d['zone'] + ' ' + (parseInt(monthD[1]) + i) +'from : '+ vacancesArray[d['zone']][parseInt(monthD[1]) + i ]['from'] + 'To : '+ vacancesArray[d['zone']][parseInt(monthD[1]) + i ]['to']);
+          				
+          				}
+          			
+          			
+          		
+          			
+          			
+          			
+          			}
+          		
+          		
+          	});
+              
+            
 
-              gr.append('rect')
+              //Barre vacances Zone A : 
+              gr.append('rect') .attr('fill', '#F56991').attr('y',20).attr('height',function(d,i){return 20 + 20*jMois[i];})
                       .transition()
                       .delay(function (d, i) {
                               return (i + 1) * 300;
                       })
+                      .duration(1500)
                       .ease('cubic')
-                      .attr('fill', 'blue')
+                      .attr('fill', '#F56991')
                       .attr('x', function (d, i) {
                               return i * 57 + 22;
                       })
-                      .attr('y', 20)
+                      .attr('y',function(d,i){
+                    	  if(typeof vacancesArray['A'] == 'undefined') // Pas d'informations de vacances ou Pas de vancances en ce mois
+                    		  {
+                    		  return 20;
+                    		  }
+                    	  if(typeof vacancesArray['A'][i+1] !== 'undefined')
+                    		  {
+                    		  return parseInt(vacancesArray['A'][i+1]['from']) * 20;
+                    	      
+                    		  }
+                                                 return 20 ; })
                       .attr('width', 4)
-                      .attr('height', 250);
+                      .attr('height', function(d,i){
+                    	  if(typeof vacancesArray['A'] == 'undefined') // Pas d'informations de vacances ou Pas de vancances en ce mois
+                		  {
+                		  return 0;
+                		  }
+                    	  
+                    	  if(typeof vacancesArray['A'][i+1] !== 'undefined')
+                		  {
+                		  barLength = vacancesArray['A'][i+1]['to'] - vacancesArray['A'][i+1]['from'] ; // Nombre de jour de vacances à partir du jour du début déterminera la hauteur de la barre , (awkward name of var :))!
+                		  return 20 + barLength * 20 ; // marge de 20 represente la taille du premier rectancgle du calendrier (l'entete mois)
+                	      
+                		  }
+                    	  return 0;
+                      });
 
-
-              gr.append('rect')
+            //Barre vacances Zone B : 
+              gr.append('rect')   .attr('fill', '#F9CDAD').attr('y',20).attr('height',function(d,i){return 20 + 20*jMois[i];})
                       .transition()
                       .delay(function (d, i) {
                               return (i + 1) * 340;
-                      })
+                      }).duration(1500)
                       .ease('cubic')
-                      .attr('fill', 'red')
+                      .attr('fill', '#F9CDAD')
                       .attr('x', function (d, i) {
                               return i * 57 + 26;
                       })
-                      .attr('y', 80)
+                      .attr('y',function(d,i){
+                    	  
+                    	  if(typeof vacancesArray['B'] == 'undefined') // Pas d'informations de vacances ou Pas de vancances en ce mois
+                		  {
+                		  return 20;
+                		  }
+                    	  
+                    	  if(typeof vacancesArray['B'][i+1] !== 'undefined')
+                		  {
+                		  return parseInt(vacancesArray['B'][i+1]['from']) * 20;
+                	      
+                		  }
+                                             return 20 ; })
                       .attr('width', 4)
-                      .attr('height', 180);
+                      .attr('height', function(d,i){
+                    	  if(typeof vacancesArray['B'] == 'undefined') // Pas d'informations de vacances ou Pas de vancances en ce mois
+                		  {
+                		  return 0;
+                		  }
+                    	  
+                    	  if(typeof vacancesArray['B'][i+1] !== 'undefined')
+                		  {
+                		  barLength = vacancesArray['B'][i+1]['to'] - vacancesArray['B'][i+1]['from'] ; // Nombre de jour de vacances à partir du jour du début déterminera la hauteur de la barre , (awkward name of var :))!
+                		  return 20 + barLength * 20 ; // marge de 20 represente la taille du premier rectancgle du calendrier (l'entete mois)
+                	      
+                		  }
+                    	  return 0;
+                      });
 
 
-
+            //Barre vacances Zone C : 
               gr.append('rect')
-                      .transition()
+                      .transition().attr('fill', '#EFFAB4').attr('y',20).attr('height',function(d,i){return 20 + 20*jMois[i];})
                       .delay(function (d, i) {
                               return (i + 1) * 380;
                       })
+                      .duration(1500)
                       .ease('cubic')
-                      .attr('fill', 'green')
+                      .attr('fill', '#EFFAB4')
                       .attr('x', function (d, i) {
                               return i * 57 + 30;
                       })
-                      .attr('y', 20)
+                      .attr('y',function(d,i){
+                    	  if(typeof vacancesArray['C'] == 'undefined') // Pas d'informations de vacances ou Pas de vancances en ce mois
+                		  {
+                		  return 20;
+                		  }
+                    	  
+                    	  if(typeof vacancesArray['C'][i+1] !== 'undefined')
+                		  {
+                		  return parseInt(vacancesArray['C'][i+1]['from']) * 20;
+                	      
+                		  }
+                                             return 20 ; })
                       .attr('width', 4)
                       .attr('height', function(d,i){
-                    	  return 20*jMois[i];
+                    	  if(typeof vacancesArray['C'] == 'undefined') // Pas d'informations de vacances ou Pas de vancances en ce mois
+                		  {
+                		  return 0;
+                		  }
+                    	  
+                    	  if(typeof vacancesArray['C'][i+1] !== 'undefined')
+                		  {
+                		  barLength = vacancesArray['C'][i+1]['to'] - vacancesArray['C'][i+1]['from'] ; // Nombre de jour de vacances à partir du jour du début déterminera la hauteur de la barre , (awkward name of var :))!
+                		  return 20 + barLength * 20 ; // marge de 20 represente la taille du premier rectancgle du calendrier (l'entete mois)
+                	      
+                		  }
+                    	  return 0;
                       });
 
 
@@ -726,8 +903,16 @@
                                       .transition()
                                       .delay((i + 1) * 250)
                                       .ease('cubic')
-                                      .attr('fill', 'none')
-                                      .attr('stroke', 'gray')
+                                      .attr('fill', function(){
+                                    	  
+                                    	if ( dataj[i+1][dataJson[j].jour] == 'S' || dataj[i+1][dataJson[j].jour] == 'D')
+                                    	  {
+                            	             return opt.color.WE;
+                                    	  }
+                                        return 'none';
+                                    	  
+                                      })
+                                      .attr('stroke', '#C2CBCE')
                                       .attr('d', function () {
                                     	  
                                     		  dPathy = dataJson[j].jour * 20;
@@ -735,7 +920,7 @@
                                     		
                                     		  if(dataj[i+1][dataJson[j].jour] == 'S' || dataj[i+1][dataJson[j].jour] == 'D')
                                     			  {
-                                    			  return dPath(57 * i + 34, dPathy + 20, 45, 20, 0, 0, 0, 0);
+                                    			  return '';
                                     			  }
                                     		  
                                     		  return dPath(57 * i + 34, dPathy + 20, 25, 20, 0, 0, 0, 0);
@@ -748,10 +933,16 @@
                                       .ease('cubic')
                                       .attr('stroke', function(){
                                     	  
-                                    	
-                                      	  if (dataJson[j].typeConge == null || dataJson[j].typeConge == 'NaN') {return 'gray';}
+                                    	  
+                                      	  if (dataJson[j].typeConge == null || dataJson[j].typeConge == 'NaN') {
+                                      		  if(dataJson[j].typeJour == 'FE')
+                                      			  {
+                                      			  return '#FFFFFF';
+                                      			  }
+                                      		return '#C2CBCE';
+                                      			  }
                                       	  else
-                                      		   {return '#FFFFFF';}
+                                      		   {return 'none';}
                                       })
                                       .attr('stroke-witdh', function(){
                                     	  
@@ -769,9 +960,7 @@
 
                                           if (dataJson[j].typeConge == null) {
 
-                                              if (dataJson[j].typeJour == 'SA' || dataJson[j].typeJour == 'DI') {
-                                                  return opt.color.WE;
-                                              } else if (dataJson[j].typeJour == 'FE') {
+                                              if (dataJson[j].typeJour == 'FE') {
                                                   return opt.color.FE;
                                               } else if (dataJson[j].typeJour == 'N') {
                                                   return opt.color.N;
@@ -812,9 +1001,9 @@
                                           if (d.typeConge == null) {
 
                                               if (d.typeJour == 'SA' || d.typeJour == 'DI') {
-                                                  return '';}
+                                                  return dPath(57 * i + 34, dPathy + 20, 45, 20, 0, 0, 0, 0);}
                                               else if (d.typeJour == 'FE') {
-                                                  return dPath(dPathx + opt.dimensions.conge.offset, dPathy + 20, opt.dimensions.conge.w, opt.dimensions.conge.h, 11, 11, 11, 11);
+                                                  return dPath(dPathx + opt.dimensions.conge.offset, dPathy + 20, opt.dimensions.conge.w, opt.dimensions.conge.h, 0, 0, 0, 0);
                                               } else if (d.typeJour == 'N') {
                                                   return dPath(dPathx + opt.dimensions.conge.offset, dPathy + 20, opt.dimensions.conge.w, opt.dimensions.conge.h, 0, 0, 0, 0);
                                               }
@@ -851,49 +1040,66 @@
                                              // return dPath(57 * i + 59, dPathy + 20, 20, 20, 0, 0, 0, 0);
                                       });
 
-                            
+                          
                             
                              svgContainer.append("text")
                               .transition()
                               .delay((i + 1) * 560)
                               .ease('elastic')
                               .style('fill', function(){
+                            	  
                             	  if (j == (dataJson.length - 1)) {
                                       return '#FFFFFF';
                                   } else
                                   if (dataJson[j].typeConge !== null) {
-                                      return '#4B000F';
+                                	 
+                                	   return '#4B000F';
                                   }
+                            	  if(d.typeJour =='SA' || d.typeJour =='DI')
+                            		  return '#413D3D';
                                   return '#FFFFFF';
                               })
                               
                               .text(function () {
                             	  if(j == dataJson.length -1)
                             		  {
-                            		  return d.nombreJours;
+                            		  return dataJson[j].nombreJours;
                             		  }
                             	 
-                            	  if (d.typeConge == null) {
-                                      if (d.typeJour == 'N') {
-                                          return '';
-                                      } else {
-                                          return d.typeJour;
-                                      }
+                            	  if (dataJson[j].typeConge == null) {
+                            		  
+                            		  if(dataJson[j].typeJour == 'FE' || dataJson[j].typeJour =='SA' || dataJson[j].typeJour == 'DI')
+                            			  {
+                            			  return dataJson[j].typeJour;
+                            			  }
+                            		  else if(dataJson[j].typeJour =='N'){
+                            			  return ''; // nom jour déjà affiché sur le path jour.
+                            		  }
+                            		  else  {
+                                          return dataJson[j].typeJour;
+                            		  }
 
 
                                   } else {
-                                      if (d.typeConge == 'NaN')
+                                      if (dataJson[j].typeConge == 'NaN')
                                           return '';
                                       else
-                                          return d.typeConge;
+                                          return dataJson[j].typeConge;
 
                                   }
                             	  
-                            	
+                            	  return dataJson[j].typeJour;
                             	  
                               })
                               .duration(500)
-                              .attr('x', i * 57 + 63)
+                              .attr('x', function(){
+                            	  if( d.typeJour == 'SA' || d.typeJour == 'DI')
+                     			 {
+                     			 return i * 57 + 37; 
+                     			 }
+                            	  return   i * 57 + 63;
+                              }
+                            )
                               .attr('y', function () {
                             	  if(j !== dataJson.length -1)
                             		  {
@@ -918,34 +1124,41 @@
                             		  }
                             	  else
                             		  {
+                            		 
                             		    return dataJson[j].indice * 20 + 30; 
                             		  }
                             		 
                             	 
                             	
                               })
-                              .style('font', '8px Verdana');
+                              .style('font', '10px  Tahoma,Lucida grande, Verdana, Arial, Sans-serif');
                              
                              svgContainer.append("text")
                              .transition()
                              .delay((i + 1) * 360)
                              .ease('elastic')
-                             .style('fill', function(){
-                            	 
-                             })
+                             .style('fill', '#413D3D')
                              .text(function () {
                            	  if(j == dataj[i+1].length -1)
-                                     return 'NJ';
-                                     return dataj[i + 1][j];
+                           		  {
+                                     return 'NJ';}
+                           	  else
+                           		  if(dataj[i+1][j] == 'S' || dataj[i+1][j] == 'D')
+                           			  {
+                           			  // on n'affiche pas les nom jours des weekend , ils seront affichés aprés sur le path congé.
+                           			  return '';
+                           			  }
+                           		  
+                                     return dataj[i+1][j];
                              })
                              .duration(500)
-                             .attr('dx',function(){if( j < jMois[i]) return  i * 57 + 36;})
+                             .attr('dx',function(){if( j < jMois[i]) return  i * 57 + 37;})
                              .attr('dy', function () {
                             	
                             	 if( j < jMois[i])
-                                     return j * 20 + 30;
+                                     return j * 20 + 33;
                              })
-                             .style('font', '8px Verdana');
+                             .style('font', '10px  Tahoma,Lucida grande, Verdana, Arial, Sans-serif');
 
           
                       }
@@ -1018,6 +1231,9 @@
         	            	}
         	            else
         	            	{
+        	            
+        	            	
+        	            	
 	        	            	// on dessine le calendrier
 	        	              	 DrawAnnualCalendar(periode.Year,calendarOptions,data);
         	            	
@@ -1030,7 +1246,7 @@
         	        },
 
         	        complete: function (data) {
-
+        	        	
         	            calendarData = JSON.parse(data.response);
         	           
 

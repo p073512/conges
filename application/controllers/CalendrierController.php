@@ -319,6 +319,10 @@
 	                   	 return;
 	                   }
 	                   
+	                   $vacances = new Default_Model_Vacances();
+	                   
+	               
+	                   
                       foreach ($congeArray as $k => $v) {
                            
                           $idTypeConge = $congeArray[$k]['id_type_conge'];
@@ -366,7 +370,8 @@
                                                                 'conge'=>  $conges )),
                                                         
                                                      
-                                                       'Ferie'=> array_merge($jferiesCSM['joursFerie'],$jferiesFR['joursFerie']));
+                                                       'Ferie'=> array_merge($jferiesCSM['joursFerie'],$jferiesFR['joursFerie']),
+                                                       'Vacances' => array ($vacances->jours_vacances($dateDebut,$dateFin)));
                     
                        // renvoie de la structure à la vue en format json .
                       $this->_helper->json($ressourcesArray);

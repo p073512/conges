@@ -29,6 +29,7 @@ var calendarOptions = {
         "N": "#EDEDED",
         "WE": "#D1D1D1", //"#327CCB",
         "FE": "#B2655D", //"#A74143",
+        "FECSM" : "#F38630",
         "CP": "#14B694", //,#9ED9C7
         "Q1": "#F3CD08",
         "Q2": "#FFC48C", //#FF9F80
@@ -177,13 +178,13 @@ function isExist(structure, date) {
                 if (structure[i]['0']['Date'] == structure[i][daysCount - 1]['Date']) { // date debut == date fin
                    
                 	if (structure[i]['0']['DebutMidi'] == 'false' && structure[i]['0']['FinMidi'] == 'false') {
-                         console.log(date +' => '+i+ ' dd == df | debutMidi : False, FinMidi false' );
+                  //       console.log(date +' => '+i+ ' dd == df | debutMidi : False, FinMidi false' );
                         data[date] = {};
                         data[date] = structure[i][date]['TypeConge'];
 
                     } else if (structure[i]['0']['DebutMidi'] == true) {
 
-                          console.log(date +' => '+i+ 'dd == df | debutMidi : true, FinMidi false' );
+                      //    console.log(date +' => '+i+ 'dd == df | debutMidi : true, FinMidi false' );
 
                         if (typeof data[date] == "undefined") {
                             data[date] = {};
@@ -195,7 +196,7 @@ function isExist(structure, date) {
                        
 
                     } else if (structure[i]['0']['FinMidi'] == true) {
-                          console.log(date +' => '+i+ 'dd == df | debutMidi : false, FinMidi true' );
+                     //     console.log(date +' => '+i+ 'dd == df | debutMidi : false, FinMidi true' );
 
                         if (typeof data[date] == "undefined") {
                             data[date] = {};
@@ -210,10 +211,10 @@ function isExist(structure, date) {
                 	//date == structure[i]['0']['Date'] && date !== structure[i][daysCount - 1]['Date']) || (date !== structure[i]['0']['Date'] && date == structure[i][daysCount - 1]['Date'])
                 	
                 } else if (structure[i]['0']['Date'] !== structure[i][daysCount - 1]['Date']) {
-                	 console.log(data);
+                //	 console.log(data);
 
                     if (structure[i]['0']['DebutMidi'] == true && date == structure[i]['0']['Date']) {
-                        	console.log(date +' => '+i+ 'dd !== df | debutMidi : true' );
+                      //  	console.log(date +' => '+i+ 'dd !== df | debutMidi : true' );
                     	
                         if (typeof data[date] == "undefined") {
                             data[date] = {};
@@ -233,7 +234,7 @@ function isExist(structure, date) {
                     }
                     
                     if (structure[i][daysCount - 1]['FinMidi'] == true && date == structure[i][daysCount - 1]['Date']) {
-                         console.log(date +' => '+i+ 'dd !== df | FinMidi : true' );
+                 //        console.log(date +' => '+i+ 'dd !== df | FinMidi : true' );
 
                         if (typeof data[date] == "undefined") {
                             data[date] = {};
@@ -245,7 +246,7 @@ function isExist(structure, date) {
 
 
                     } else if (structure[i][daysCount - 1]['FinMidi'] == false && date == structure[i][daysCount - 1]['Date']) {
-                        	console.log(date +' => '+i+ 'dd !== df | FinMidi : false' );
+                        //	console.log(date +' => '+i+ 'dd !== df | FinMidi : false' );
                         data[date] = {};
                         data[date].j = structure[i][date]['TypeConge'];
 
@@ -418,6 +419,24 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
         if (i == data.length - 1) {
             return '#327CCB';
         }
+        if(d == 'Samedi' || d == 'Dimanche')
+        	{
+        	return opt.color.WE;
+        	}
+        
+        day = i < 9 ? '0' + i  : day = i ;
+        month = periode.From < 9 ? '0' + (periode.From + 1) : (periode.From + 1);
+        date = periode.Year+'-'+month+'-'+day;
+       
+        
+        if(typeof dataset.Ferie.CSM[date] != 'undefined')
+        	return opt.color.FECSM;
+        if(typeof dataset.Ferie.France[date] != 'undefined')
+        	return opt.color.FE;
+        
+        
+        
+        
         return '#EDEDED';
     }) // couleur de fond
     .attr('d', function (d, i) {
@@ -472,6 +491,16 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
             if (i == data.length - 1) {
                 return '#EDEDED';
             }
+            
+            
+            day = i < 9 ? '0' + i  : day = i ;
+            month = periode.From < 9 ? '0' + (periode.From + 1) : (periode.From + 1);
+            date = periode.Year+'-'+month+'-'+day;
+            
+            if(typeof dataset.Ferie.CSM[date] != 'undefined' || typeof dataset.Ferie.France[date] != 'undefined')
+            	return '#FFFFFF';
+           
+            
             return 'gray';
         })
         .text(function (d, i) {
@@ -547,7 +576,7 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
                     count += parseFloat(dataset['ressources'][index]['conge'][indiceConge][iConge]['nombreJours']);
                 });
 
-                console.log('count => ' + jcount);
+             //   console.log('count => ' + jcount);
                 data[dataLength] = count;
 
                 var iCs; // indice centre de service pour puiser dans la structure dans les jours fériés selon l'indice CS.
@@ -565,7 +594,6 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
                         day = i < 9 ? '0' + (i + 1) : day = i + 1;
                         month = m < 9 ? '0' + (m + 1) : (m + 1);
                         var thisDate = periode.Year + "-" + month + "-" + day;
-
 
 
                         title = data[i] + ' ' + (i + 1) + ' ' + mois[data['mm']] + ' ' + periode.Year;
@@ -706,8 +734,8 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
 
                 });
 
-               // console.log('dataJson');
-               // console.log(dataJson);
+                console.log('dataJson');
+                console.log(dataJson);
 
                 width = opt.dimensions.svg.w; //Largeur calendrier
                 height = opt.dimensions.svg.h; //Hauteur calendrier
@@ -976,8 +1004,7 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
                     .append('<div class="hero-unit" ><h1>Pas de congés</h1><p>Aucun résultat ne correspond aux filtres</p></div>');
 
         } else {
-            $('.selectpicker')
-                .selectpicker('deselectAll');
+            
             if (jcount == 0)
                 jQuery('#wrapper')
                     .append('<div class="hero-unit" ><h1>Pas de congés</h1><p>Tous le monde bosse ce mois</p></div>');
@@ -1009,7 +1036,7 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
  * 
  * 
  */
-function getCalendarContent(idPersonne, mois, annee) {
+function getCalendarContent(idPersonne, mois, annee,filtred) {
 
 
     $('#myModal')
@@ -1045,6 +1072,12 @@ function getCalendarContent(idPersonne, mois, annee) {
 			    		{
 			    		  $('#myModal')
 			              .modal('hide');
+			    		  d3.selectAll('svg')
+			              .style("opacity", 1)
+			              .transition()
+			              .duration(400)
+			              .style("opacity", 0)
+			              .remove();
 			        	  jQuery('#wrapper')
 			              .append('<div class="hero-unit" ><h1>Pas de congés</h1><p>Aucun congé dans la base</p></div>');
 			        	
@@ -1053,6 +1086,12 @@ function getCalendarContent(idPersonne, mois, annee) {
 			    		{
 			    		 $('#myModal')
 			              .modal('hide');
+			    		 d3.selectAll('svg')
+			             .style("opacity", 1)
+			             .transition()
+			             .duration(400)
+			             .style("opacity", 0)
+			             .remove();
 			        	  jQuery('#wrapper')
 			              .append('<div class="hero-unit" ><h1>Pas de congés</h1><p>'+ jQuery('#personne option[value=' + idPersonne + '] ').text() + ' travaille ce mois</p></div>');
 			        	
@@ -1061,8 +1100,20 @@ function getCalendarContent(idPersonne, mois, annee) {
             	}
             else
             	{
-            // on dessine le calendrier
-            DrawMonthCalendar(periode, calendarOptions, data);
+            	// on dessine le calendrier
+            	if(filtred == true)
+            		{
+            		 DrawMonthCalendar(periode, calendarOptions, data,filtred);
+            		}
+            	else
+            		{
+            		 DrawMonthCalendar(periode, calendarOptions, data);
+            		}
+            	  
+            		 
+            		
+            
+          
             	}
             // setTimeout(function(data){calendarData = null;alert('Finito'+ calendarData);},60000);
             $('#myModal')
@@ -1074,6 +1125,7 @@ function getCalendarContent(idPersonne, mois, annee) {
         complete: function (data) {
 
             calendarData = JSON.parse(data.response);
+           
 
         },
         error: function () {
@@ -1209,11 +1261,95 @@ function setNavMonthMenu(action, month, year) {
     };
 }
 
+
+function filterCalendarData(calendarData,pole,fonction,entite,andOr){
+	
+	 var filtredRessources = {}; 
+   
+
+          // on filtre les ressources selon les criteres dans les tableau.
+        filtredRessources = jQuery.grep(calendarData.ressources, function (d, i) {
+            var resultPole; 
+            var resultFonction;
+            var resultEntite;
+
+                
+            if (pole.length > 0) { // si au moins 1 critere pole selectionne 
+                for (var i = 0; i < pole.length; i++) {
+                    if (pole[i] !== 'undefined')
+                        if (d.Pole.value == pole[i]) { // si critere pole correspond à une valeur pole de la structre
+                            resultPole = true; // on retourne la partie correspondante de la structure
+                            break;
+                                                     }
+                                     }
+		                        } else {
+		                            resultPole = true; 
+		                        }
+
+            if (fonction.length > 0)  { // si au moins 1 critere fonction selectionne 
+                    for (var i = 0; i < fonction.length; i++) {
+
+                        if (d.Fonction.value == fonction[i]) {
+                            resultFonction = true;
+                            break;
+                        }
+
+                                              }
+	                    } else {
+	                            resultFonction = true;
+	                    }
+
+             if (entite.length > 0) { // si au moins 1 critere entite selectionne 
+                 
+           	   for (var i = 0; i < entite.length; i++) {
+
+                       if (d.Entite.value == entite[i]) {
+                           resultEntite = true;
+                           break;
+                        }
+                       } // end for
+
+                       } else { // si aucune entite n'est sélectionée (true equivaut à tous les filtres selectionnés)
+                           resultEntite = true;
+                       }
+
+
+
+          
+
+              if (andOr == true) 
+	                     { // si ET est sélectionnée
+		                          
+	                         if (resultEntite == true && resultPole == true && resultFonction == true)
+	                             return true;
+	                         else
+	                             return false;
+	                     }
+	                     else  // si OU est sélectionnée
+	                     {
+	                  	 
+	                       if (resultEntite == true || resultPole == true || resultFonction == true)
+	                           return true;
+	                       else
+	                           return false;
+	                     }
+           	 
+
+          
+
+        });
+	
+	return filtredRessources;
+	
+	
+}
+
 jQuery(document)
     .ready(function () {
         var calendarData = null;
         var pole, fonction, entite = [];
         var currentDate;
+        var filtred = false;
 
 
 
@@ -1226,10 +1362,9 @@ jQuery(document)
          * du mois courant.
          */
         currentDate = setNavMonthMenu();
-        calendarData = getCalendarContent('x', currentDate.iMois, currentDate.annee);
+        calendarData = getCalendarContent('x', currentDate.iMois, currentDate.annee,filtred);
 
-        console.log('calendarData');
-        console.log(calendarData);
+        
 
 
         //Constructeur des liste déroulante select mutliple
@@ -1254,7 +1389,6 @@ jQuery(document)
 
 
 
-
         //Clic sur l'icone Fitlre . affichage du menu de paramétrage à droite
         jQuery("#filtres")
             .live('click', function (e) {
@@ -1270,14 +1404,11 @@ jQuery(document)
             });
 
 
-
-
         jQuery('button[id="recharger"]')
             .live('click', function () {
 
-
-                currentDate = setNavMonthMenu();
-                calendarData = getCalendarContent('x', currentDate.iMois, currentDate.annee);
+            	currentDate = setNavMonthMenu();
+                calendarData = getCalendarContent('x', currentDate.iMois, currentDate.annee,filtred);
 
             });
 
@@ -1287,7 +1418,7 @@ jQuery(document)
                 currentDate = setNavMonthMenu('next');
                 var idPersonne = jQuery('#personne')
                     .val();
-                calendarData = getCalendarContent(idPersonne, currentDate.iMois, currentDate.annee);
+                calendarData = getCalendarContent(idPersonne, currentDate.iMois, currentDate.annee,filtred);
 
             });
 
@@ -1298,7 +1429,7 @@ jQuery(document)
                 currentDate = setNavMonthMenu('prev');
                 var idPersonne = jQuery('#personne')
                     .val();
-                calendarData = getCalendarContent(idPersonne, currentDate.iMois, currentDate.annee);
+                calendarData = getCalendarContent(idPersonne, currentDate.iMois, currentDate.annee,filtred);
 
             });
 
@@ -1309,7 +1440,7 @@ jQuery(document)
                 currentDate = setNavMonthMenu('first');
                 var idPersonne = jQuery('#personne')
                     .val();
-                calendarData = getCalendarContent(idPersonne, currentDate.iMois, currentDate.annee);
+                calendarData = getCalendarContent(idPersonne, currentDate.iMois, currentDate.annee,filtred);
             });
 
         jQuery('button[id="last"]')
@@ -1318,10 +1449,8 @@ jQuery(document)
                 currentDate = setNavMonthMenu('last');
                 var idPersonne = jQuery('#personne')
                     .val();
-                calendarData = getCalendarContent(idPersonne, currentDate.iMois, currentDate.annee);
+                calendarData = getCalendarContent(idPersonne, currentDate.iMois, currentDate.annee,filtred);
             });
-
-
 
            
         jQuery('#chargerCalendrier')
@@ -1337,16 +1466,19 @@ jQuery(document)
                     .val();
 
                 currentDate = setNavMonthMenu('set', mois, annee);
-                calendarData = getCalendarContent(idPersonne, mois, annee);
+                calendarData = getCalendarContent(idPersonne, mois, annee,filtred);
 
 
 
             });
 
+        
+    
+         
         jQuery('#Filtrer') // au click sur le boutton filtrer
             .live('click', function () {
-            	// tableaux qui contiendront les filtres selectionnés.
-                entite = []; 
+            	
+            	entite = []; 
                 pole = [];
                 fonction = [];
                 
@@ -1363,90 +1495,57 @@ jQuery(document)
                     .each(function (i, element) {
                         fonction[i] = element.value;
                     });
+             
 
-                var filtredRessources = {}; 
-                if (calendarData == null) { // si les données du calendrier n'existent pas càd le calendrier n'a jamais été chargé avant.
-                    alert('charger le Calendrier d\'abord');
-                } else {
-                      // on filtre les ressources selon les criteres dans les tableau.
-                    filtredRessources = jQuery.grep(calendarData.ressources, function (d, i) {
-                        var resultPole;
-                        var resultFonction;
-                        var resultEntite;
-
-                            
-                        if (pole.length > 0) {
-                            for (var i = 0; i < pole.length; i++) {
-                                if (pole[i] !== 'undefined')
-                                    if (d.Pole.value == pole[i]) {
-                                        resultPole = true;
-                                        break;
-                                    }
-                            }
-                        } else {
-                            resultPole = true;
-                        }
-
-                        if (fonction.length > 0) {
-                            for (var i = 0; i < fonction.length; i++) {
-
-                                if (d.Fonction.value == fonction[i]) {
-                                    resultFonction = true;
-                                    break;
-                                }
-
-                            }
-                        } else {
-                            resultFonction = true;
-                        }
-
-                        if (entite.length > 0) {
-                            for (var i = 0; i < entite.length; i++) {
-
-                                if (d.Entite.value == entite[i]) {
-                                    resultEntite = true;
-                                    break;
-                                }
-                            }
-
-                        } else {
-                            resultEntite = true;
-                        }
-
-
-
-                        and = jQuery('.filtre input[id=and]')
-                            .attr('checked');
-                        or = jQuery('.filtre input[id=or]')
-                            .attr('checked');
-
-                        if (and == true) {
-                            /*
-    				  console.log(d.Entite.value+' Entite =>' + resultEntite);
-            		  console.log(d.Fonction.value+' Fonction =>'+ resultFonction);
-            		  console.log(d.Pole.value+' Pole =>'+ resultPole);
-    			        */
-                            if (resultEntite == true && resultPole == true && resultFonction == true)
-                                return true;
-                            else
-                                return false;
-                        }
-
-                        if (or == true) {
-                            /*
-    				  console.log(d.Entite.value+' Entite =>' + resultEntite);
-            		  console.log(d.Fonction.value+' Fonction =>'+ resultFonction);
-            		  console.log(d.Pole.value+' Pole =>'+ resultPole);
-    				   */
-                            if (resultEntite == true || resultPole == true || resultFonction == true)
-                                return true;
-                            else
-                                return false;
-                        }
-
-
-                    });
-
+            	if(entite.length == 0 && pole.length == 0 && fonction.length == 0)
+            		{
+            		
+            		$("#msgstate").html('<div class="alert span9"><button type="button" class="close " data-dismiss="alert"></button><strong>Alerte : </strong>Sélectionnez au moins un critère !</div>');
+            
+            		}
+            	else 
+            		{
+            		$("#msgstate").empty();
+              	
+            	
+	            	// tableaux qui contiendront les filtres selectionnés.
+	              
+	            	
+	            	$(this).toggleClass('disabled');
+	            	if($(this).hasClass('disabled')) // si désactiver filtre
+	            		{
+	            	    	filtred = true;
+	            	    	$(this).html('désativer Filtre');
+	            	    	$('.selectpicker').prop('disabled',true);
+           	    		    $('.selectpicker').selectpicker('refresh');
+	            	    		 
+	            	    	
+		              
+	            		}
+	            	else
+	            		{
+	            		   filtred = false;
+		            	   $(this).html('Filtrer');
+		            	   $('.selectpicker').selectpicker('deselectAll');
+			       	       $('.selectpicker').prop('disabled',false);
+		            	   $('.selectpicker').selectpicker('refresh');
+			       	 	   return;
+	       	        	}
+	            	
+            	
+            
+	          
+	            	  and = jQuery('.filtre input[id=and]')
+          			.attr('checked');
+			        
+            	
+	                var filtredRessources = {}; 
+	                if (calendarData == null) { // si les données du calendrier n'existent pas càd le calendrier n'a jamais été chargé avant.
+	                    alert('charger le Calendrier d\'abord');
+	                } else {
+                     
+                    filtredRessources = filterCalendarData(calendarData, pole, fonction, entite, and);
+                   
                     //console.log(filtredRessources);
                     filtredData = {
                         "ressources": filtredRessources,
@@ -1458,23 +1557,23 @@ jQuery(document)
                     // taille balise svg
                     width = 920;
                     height = 22;
-                    // balise svg incluse dans le div conteneur dont l'id est 'wrapper'
-                    svgContainer = d3.select('#wrapper')
-                        .append('svg')
-                        .attr('width', width)
-                        .attr('height', height);
+	                    // balise svg incluse dans le div conteneur dont l'id est 'wrapper'
+	                    svgContainer = d3.select('#wrapper')
+	                        .append('svg')
+	                        	.attr('width', width)
+	                        		.attr('height', height);
 
-                    periode = {
-                        "Year": parseInt(currentDate.annee),
-                        "From": parseInt(currentDate.iMois),
-                        "To": parseInt(currentDate.iMois)
-                    };
+	                    periode = {
+	                        "Year": parseInt(currentDate.annee),
+	                        	"From": parseInt(currentDate.iMois),
+	                        		"To": parseInt(currentDate.iMois)
+	                    };
 
                     DrawMonthCalendar(periode, calendarOptions, filtredData, 'filtre');
 
                 }
 
-
+            		}
             });
 
 

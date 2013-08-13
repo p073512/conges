@@ -2341,3 +2341,27 @@ Carousel
    padding: 0;
    vertical-align: top;
 }
+
+.smoothie {
+	background:rgba(248, 248, 255, 0.5);
+	
+	position:absolute;
+	margin-top:-7px;
+	margin-left:-7px;
+    color: #413D3D !important; 
+    font-family: 'Calibri' !important;
+    font-size: 15px !important;
+    font-weight: 100 !important; 
+    transform: rotate(45deg);
+    -moz-box-shadow: 0 0 2px 2px #EDEDED;
+	-webkit-box-shadow: 0 0 2px 2px#EDEDED;
+	box-shadow: 0 0 2px 2px #EDEDED;
+}
+
+
+svg
+{
+
+	margin-top : 0px !important;
+    margin-left : 0px !important;
+	}

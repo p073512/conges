@@ -71,9 +71,11 @@ public function init()
 									    'label'  => 'Annee',
 									    'name' => 'annee',));
 	
-	$selectAnnee->addMultiOptions(array(    '2012' => '2012',
-					                        '2013' => '2013',
-					                        '2014' => '2014'  ));
+	$date = new DateTime();
+	$year = $date->format('Y');
+	$selectAnnee->addMultiOptions(array(    $year -1 => $year -1,
+					                        $year => $year,
+					                        $year +1 => $year + 1  ));
 	
 	$this->_eSelectAnnee = $selectAnnee;
 	

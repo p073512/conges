@@ -9,15 +9,15 @@ class Default_Model_Personne
 	protected  $_date_entree;
 	protected  $_date_debut;
 	protected  $_date_fin;
-	protected  $entite;
-	protected  $pole;
-	protected  $modalite;
-    protected  $fonction;
-	protected  $_pourcent;
+	
+	protected  $entite;			   //
+	protected  $pole;              //
+	protected  $modalite;          //
+    protected  $fonction;          //
+    
+    protected  $_pourcent;
 	protected  $_stage;
-	
 
-	
 	
 	//le mapper va nous fournir les m�thodes pour interagir avec notre table (objet de type Default_Model_PersonneMapper)
 	protected $_mapper;
@@ -151,8 +151,8 @@ class Default_Model_Personne
 	{
 		return $this->_date_fin;
 	}
-	
-	
+
+
 	#region MBA 
 	/*
 	 * getters et setters de l'objet entité

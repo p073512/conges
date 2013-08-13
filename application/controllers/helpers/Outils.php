@@ -42,11 +42,19 @@
 		    $jour = date("Y-m-d", strtotime($jour));
 		    $annee = substr($jour, 0, 4);
 		
-		    return in_array($jour, $this->jours_feries($annee, $alsacemoselle, $maroc));
+		    try 
+		    {
+		    	$s = in_array($jour, $this->jours_feries($annee, $alsacemoselle, $maroc));
+		    } 
+		    catch (Exception $e) 
+		    {
+		    		   
+		    }
+		    return $s;
 		}
 		
 		function jours_feries($annee, $alsacemoselle=false, $maroc=false)
-	{
+	   {
 		if (!$maroc) 
 		{
 			$jours_feries = array
@@ -95,8 +103,11 @@
 		{
 			$jours_feries_csm_dates[] = $j->getDate_debut();
 		}
-
-		return $jours_feries_csm_dates;
+        
+		if($jours_feries_csm_dates == null)
+			return array();
+		else
+			return $jours_feries_csm_dates;
 	}
 		
 	
@@ -634,35 +645,38 @@
 	 *  @author Mohamed khalil TAKAFI
 	 */
 	   //////////////////////////////////////////////Calcul nombre de jours (Propositions et congés)//////////////////////////////////////////////
-		function calculer_jours($date_debut,$date_fin,$maroc) 
-		{
-		    $tab = array();
-			$nbj = 0;
-			$i = 0;
-	        foreach (new DatePeriod($date_debut,new DateInterval('PT1H'),$date_fin) as $d) 
-	        { 
-	           $tab[$i] =  $d->format('Y-m-d H:i:s'); 
-	           $i++;
-	        } 
-			$nbj =  count($tab)/ 24;   // resultat en Heurs / 24 = jours 
-	
-	
-			// Parcourir l'intervalle
-			$date_iterator = $date_debut;
-			while ($date_iterator <= $date_fin) 
-			{
-				// Loguer les jours ouvrés (tous les jours sauf les samedi, dimanche, fériés)
-				$weekday = date_format($date_iterator, 'l');       
-					                            																			   // alsacmoselle = false 
-				if (in_array($weekday,array('Saturday','Sunday'))  || $this->est_ferie(date_format($date_iterator,"Y-m-d"),false,$maroc)) 
-				{     																											
-			 	      $nbj -- ;  // si on trouve un weekend ou férié entre la periode donnée on décremente le nombre de jours 
-			    }
-			   // Incrémenter l'iterator
-			   $date_iterator->add(new DateInterval("P1D"));
+		public function calculer_jours($date_debut,$date_fin,$maroc) 
+		{  
+			
+			    $tab = array();
+				$nbj = 0;
+				$i = 0;
+		        foreach (new DatePeriod($date_debut,new DateInterval('PT1H'),$date_fin) as $d) 
+		        { 
+		           $tab[$i] =  $d->format('Y-m-d H:i:s'); 
+		           $i++;
+		        } 
+				$nbj =  count($tab)/ 24;   // resultat en Heurs / 24 = jours 
 		
-			}
-			return  $nbj;
+		
+				// Parcourir l'intervalle
+				$date_iterator = $date_debut;
+				while ($date_iterator <= $date_fin) 
+				{
+					// Loguer les jours ouvrés (tous les jours sauf les samedi, dimanche, fériés)
+					$weekday = date_format($date_iterator, 'l');       
+						                            																			   // alsacmoselle = false 
+					if (in_array($weekday,array('Saturday','Sunday'))  || $this->est_ferie(date_format($date_iterator,"Y-m-d"),false,$maroc)) 
+					{     																											
+				 	      $nbj -- ;  // si on trouve un weekend ou férié entre la periode donnée on décremente le nombre de jours 
+				    }
+				   // Incrémenter l'iterator
+				   $date_iterator->add(new DateInterval("P1D"));
+			
+				}
+			    return  $nbj;
+
+		
 		}//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -773,6 +787,69 @@
 	
 	
 	
- }
- 
-  
+	/** 
+	 *                   
+	 *  @author Mohamed khalil TAKAFI
+	 */
+	/////////////////////fonction responsable pour autorisé la création d'une proposition ou d'un congé ////////////////////////////  
+	
+    // Bool :   resultat fonction 
+    // code :   pour le message d'erreur 
+    // personne->getDate_debut() : date_debut dans le  projet 
+    // $personne_datefin : date_sortie du projet
+    // obj_dd : date_debut proposition 
+    // obj_df : date_fin  proposition 
+    
+	public function authorized($personne,$obj)
+	{   
+	   $bool = false ;
+	   
+	   $obj_dd = substr($obj->getDate_debut(),0,11);
+	   $obj_df = substr($obj->getDate_fin(),0,11);
+
+	   $personne_datefin = $this->makedate($personne->getDate_fin()); 
+
+        if($personne_datefin  == "-" || $personne_datefin  == "01/01/1970" || $personne_datefin  == "1970-01-01" || $personne_datefin  == "0000-00-00" || $personne_datefin  == "00-00-0000")   // date_fin non mensioné   soit 01/01/1970 (date unix par default) oubien  "" chaine vide 
+        {
+	            if($obj_dd >= $personne->getDate_debut())
+		        {
+		            $bool = true ;
+		        }
+        }
+        else                             // date_fin mentioné 
+        {
+            
+       		 if(($obj_dd <= $personne->getDate_fin() &&  $obj_df <= $personne->getDate_fin()) && ($obj_dd >= $personne->getDate_debut() &&  $obj_df >= $personne->getDate_debut()))
+	        {
+	            $bool = true ;
+	        }
+            
+            
+        }
+	      return array($bool,$personne->getDate_debut(),$personne_datefin,$obj_dd,$obj_df);
+	}
+	
+	
+	
+
+    //////////////////////// fonction pour l'affichage de la date de fin //////////////////////// 
+    // afficher "-" si date de fin non mensioné
+    // afficher la date si date de fin mensioné 
+    
+	public function makedate($date)
+	{
+	
+	    if($date == "1970-01-01" || $date == "01/01/1970" || $date == "" || $date == "0000-00-00" || $date == "00-00-0000" )
+	    {
+	        return "-";
+	    }
+	    else
+	    {
+	        return $date;
+	    }
+
+	}
+	
+
+	
+ }// End of class 

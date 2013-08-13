@@ -38,22 +38,22 @@ $(document).ready(function()
 		                  
 		                   if(data.result == "1")
 		                   {
-		                       $("#msgstate").html('<div class="alert alert-info"><button type="button" class="close " data-dismiss="alert"></button><strong>Succes!</strong> La suppression a été bien effectuée</div>');
+		                       $("#msgstate").html('<div class="alert alert-success"><button type="button" class="close " data-dismiss="alert"></button><strong>Succes :</strong>&nbsp;&nbsp;&nbsp; La suppression a &eacute;t&eacute; bien effectu&eacute;e !</div>');
 		                   }
 		                   else if(data.result == "0")
 		                   {
-		                	   $("#msgstate").html('<div class="alert alert-info"><button type="button" class="close " data-dismiss="alert"></button><strong>Succes!</strong> Aucune ligne affectée (vérifiez id)</div>');
+		                	   $("#msgstate").html('<div class="alert alert-success"><button type="button" class="close " data-dismiss="alert"></button><strong>Succes :</strong>&nbsp;&nbsp;&nbsp;Aucune ligne affect&eacute;e (v&eacute;rifiez id) !</div>');
 		                   }
 		                  }
 		               else if(data.status == "500")
 		                 {
-		            	   $("#msgstate").html('<div class="alert"><button type="button" class="close " data-dismiss="alert"></button><strong>Alerte!</strong> Erreur lors de la suppression</div>');
+		            	   $("#msgstate").html('<div class="alert"><button type="button" class="close " data-dismiss="alert"></button><strong>Alerte :</strong>&nbsp;&nbsp;&nbsp;Erreur lors de la suppression !</div>');
 		                 }
 		                      
 		
 		                 },
 		        error: function(){
-		        	$("#msgstate").html('<div class="alert"><button type="button" class="close " data-dismiss="alert"></button><strong>Alerte!</strong> Erreur lors de la suppression</div>');
+		        	$("#msgstate").html('<div class="alert"><button type="button" class="close " data-dismiss="alert"></button><strong>Alerte :</strong>&nbsp;&nbsp;&nbsp;Erreur lors de la suppression !</div>');
 		        } });
 
 

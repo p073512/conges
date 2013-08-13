@@ -13,16 +13,16 @@ class Default_Form_PersonneFr extends Default_Form_BasePersonne
 		//$this->setName('createPersonne');
 		//$this->setMethod('post');
  /*
-  * Champ en plus iModalité et iEntité il suffit de les créé avec createElement.
+  * Champ en plus iModalit� et iEnti� il suffit de les cr�er avec createElement.
   */
      $iModalite = $this->createElement('select','modalite',array(
-		    'label' => 'Modalités',
+		    'label' => 'Modalite',
             'name' => 'modalite'
 		    
      ));
     
       $iEntite = $this->createElement('select', 'entite', array(
-		    'label' =>'Entités',
+		    'label' =>'Entite',
 		    'name' => 'entite',
      ));
 	
@@ -33,10 +33,10 @@ class Default_Form_PersonneFr extends Default_Form_BasePersonne
 	 $iModalite,
 	 $this->getiFonction(),
 	 $this->getiPole(),
-	 $this->getiDateDebut(),
 	 $this->getiDateEntree(),
-	 $this->getiPourcentage(),
-	
+	 $this->getiDateDebut(),
+	 $this->getiDateFin(),
+	 $this->getiPourcentage(),	
 	 $this->getiStage(),
 	 $this->getiSubmit())); 
 	 

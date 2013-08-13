@@ -95,6 +95,8 @@ echo $this->headScript();
             <th>Nom</th>
             <th>Prenom</th>
             <th>Date Entree</th>
+            <th>Date debut</th>
+            <th>Date fin</th>
             <th>Entite</th>
             <th>Pole</th>
             <th>Fonction</th>
@@ -107,7 +109,13 @@ echo $this->headScript();
         </tr>
         </thead>
         <?php
+           /* <?php   if(date('d/m/Y',strtotime($personne->date_fin)) === '01/01/1970')
+                      {echo '-';}
+                    else 
+                      echo date('d/m/Y',strtotime($personne->date_fin));
+             ?> */
         
+            $outils = new Default_Controller_Helpers_outils();
             //$this->usersArray est une variable qui peut �tre garnie par le controller
             //elle doit recevoir un tableau contenant des objets de type Default_Model_Proposition
             //le tableau est parcouru par foreach pour afficher les propi�t�s des objets contenus dans le tableau
@@ -119,6 +127,23 @@ echo $this->headScript();
             <td><?php echo $personne->nom; ?></td>
             <td><?php echo $personne->prenom; ?></td>
             <td><?php echo date('d/m/Y',strtotime($personne->date_entree)); ?></td>
+            <td><?php echo date('d/m/Y',strtotime($personne->date_debut)); ?></td>
+            
+            <td>
+                <?php 
+                
+                $date = date('d/m/Y',strtotime($personne->date_fin));  
+                $res = $outils->makedate($date);
+                echo $res;
+                
+                ?>
+               <!-- ici --> 
+               
+               
+             </td>  
+            
+            
+            
             <td><?php echo $personne->getEntite()->getLibelle(); ?></td>
             <td><?php echo $personne->getPole()->getLibelle(); ?></td>
             <td><?php echo $personne->getFonction()->getLibelle(); ?></td>

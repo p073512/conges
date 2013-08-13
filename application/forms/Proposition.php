@@ -23,8 +23,6 @@ class Default_Form_Proposition extends Default_Form_MyForm
          															    
 																		) 
 	         							   ); 
-       
-	
 
 	         							   
         /*

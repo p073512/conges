@@ -7,13 +7,10 @@
 		// MBA : indique le fichier de script javascript à utliser avec jQuery UI
 		$this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
 		$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/i18n/jquery.ui.datepicker-fr.js');
-        
-      
-		
-		
+
 		?>
 				  
-				   <?php 
+   <?php 
 	  echo $this->jQuery(); 
 	  ?> 
  
@@ -45,7 +42,7 @@
          <br/>
 	
 	  
-	<?php
+	<?php	
 	/*
 	 * MBA : Appel au layout 'layouts/scripts/mylayout';
 	 * setAction : Le formulaire opère sur la page courante
@@ -55,46 +52,62 @@
 	$this->form->setAction($this->url());
 	?>
 
-
 	<div class="container">
 		<div class="well row-fluid">
 					
-	<?php 	if(!empty($this->error)){ 
-	?>
-
-      <!-- afficage alerte avec message d'erreur -->
-			<div class="alert">
-				<button type="button" class="close " data-dismiss="alert"></button>
-				<strong>Alerte!</strong>  <?php //Message d'erreur
-                                         echo "Erreur :".$this->error; ?>
-			</div>
-
-	<?php }
-    /*
+<?php
+	/*
 	 * Si erreurs de traitements* renvoyé depuis le controlleur 
 	 * traitemets : logique, ajout BD, Exception ...
 	 */
-	
-	 if(!empty($this->info)){
+
+	if(isset($this->error))
+	{ 
 	?>
 	
-	<!-- afficage message succés  -->
-            <div class="alert alert-info">
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert alert-error">
 				<button type="button" class="close " data-dismiss="alert"></button>
-				<strong>info :</strong> <?php //Message succes
-	                                      echo $this->info; ?>
+				<strong>Erreur :</strong>  <?php //Message d'erreur
+                                         echo "   ".$this->error; ?>
 			</div>
-			
-	<?php } if(!empty($this->success)){?>
+
+	<?php } ?>
+
+	<?php
 	
+	/*
+	 * Gestion des messages warnings 
+	 */
+
+	if(isset($this->warning)){ 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Alerte :</strong>  <?php //Message warning
+                                         echo "   ".$this->warning; ?>
+			</div>
+	
+	<?php } 
+	 
+	
+	
+ 	/*
+	 * Gestion des messages succès 
+	 */
+	
+	else if(isset($this->success))
+	{
+	?>
 	
 	<!-- afficage message succés  -->
             <div class="alert alert-success">
 				<button type="button" class="close " data-dismiss="alert"></button>
-				<strong>success :</strong> <?php //Message succes
-	                                      echo $this->success; ?>
+				<strong>Succes :</strong> <?php //Message succes
+	                                      echo "   ".$this->success ;?>
 			</div>
-			
 	<?php }?>
 	
 		<!-- ICI L'AFFICHAGE DU FORMULAIRE -->

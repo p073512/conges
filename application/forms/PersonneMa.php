@@ -18,8 +18,9 @@ class Default_Form_PersonneMa extends Default_Form_BasePersonne
 	                         $this->getiPrenom(),
 	                         $this->getiFonction(),
 	                         $this->getiPole(),
-	                         $this->getiDateDebut(),
 	                         $this->getiDateEntree(),
+	                         $this->getiDateDebut(),
+	                         $this->getiDateFin(),  // MTA
 	                         $this->getiPourcentage(),
 	                         $this->getiStage(),
 	                         $this->getiSubmit())); 

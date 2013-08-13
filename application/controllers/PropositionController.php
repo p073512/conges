@@ -48,7 +48,8 @@ class PropositionController extends Zend_Controller_Action
 	    $this->view->form = $form;
 	    
         // remplir le select avec les ressources CSM lors du chargement de la page 
-        $where = array('id_entite= ?' => '2');
+       
+	    $where =  array("id_entite = ?" => 2);
 	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
 
 	    $data = array();
@@ -57,10 +58,13 @@ class PropositionController extends Zend_Controller_Action
 		{    
 			//récupération des données envoyées par le formulaire
 			$data = $this->_request->getPost();
-
+         
             $personne = new Default_Model_Personne();
 			$id_personne = $data['Ressource'];       // id personne 
 	        $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
+
+	        $outils = new Default_Controller_Helpers_outils();   
+	
 	        
 			//vérifie que les données répondent aux conditions des validateurs
 			if($form->isValid($data))  // form valide 
@@ -88,8 +92,7 @@ class PropositionController extends Zend_Controller_Action
 				       //création et initialisation d'un objet Default_Model_Proposition
 			    	   //qui sera enregistré dans la base de données
 	    		       $proposition = new Default_Model_Proposition();   
-	    		  
-                        $outils = new Default_Controller_Helpers_outils();   
+ 
                  
 	    		       //************** gerer les datetimes en fonction des demis journées *****************************// 
 			     	    $date = $outils->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
@@ -101,8 +104,10 @@ class PropositionController extends Zend_Controller_Action
 	                   //****************************************************************//    
 
 				       if($tab == null)
-				       {
-				        	$this->view->warning = $pers->getNomPrenom()." a pos&eacute; une proposition sur une periode non ouvrable date debut : ".$date[0]." date fin :".$date[1];  
+				       {    
+				       	    // pour l'affichage de  " du : 2013-05-06 à  Midi"     au lieu de  " du : 2013-02-06 12:00:00 " 
+							$Arr =  $outils->makeMidi($date[0],$date[1]);  	
+				        	$this->view->warning = $pers->getNomPrenom()." a pos&eacute; une proposition sur une periode non ouvrable date debut :   ".$Arr[0]."  ".$Arr[1]."   date fin :  ".$Arr[2]."  ".$Arr[3];  
 				       }
 				       else 
 				       {
@@ -137,18 +142,52 @@ class PropositionController extends Zend_Controller_Action
 		                   	  {    
 		                   		  // si le congé n'existe pas 
 		                   		  if($res_c == null)
-		                   		  {   
-		                   		      // oui 
-									  $proposition->save();
-										    
-								      $this->view->success = "Cr&eacute;ation d'une proposition pour :   ".$pers->getNomPrenom()." 	&nbsp;&nbsp;&nbsp; du :   ".$Arr[0]."  ".$Arr[1]."	  &nbsp;&nbsp;&nbsp; au :   ".$Arr[2]."   ".$Arr[3];             
-	                                        
-		                   		      // vider le formulaire pour crée une autre proposition
-									   $form->getElement('Ressource')->setValue('');
-									   $form->getElement('Debut')->setValue('');
-									   $form->getElement('Fin')->setValue('');
-									   $form->getElement('DebutMidi')->setValue('');
-									   $form->getElement('FinMidi')->setValue('');	
+		                   		  {
+		                   		  	
+		                   		      $res =  $outils->authorized($pers,$proposition);
+		                   		      
+		                   		     
+		                   		  	  if($res[0] == true)
+		                   		  	  {
+			                   		      // oui 
+										  $proposition->save();
+											    
+									      $this->view->success = "Cr&eacute;ation d'une proposition pour :   ".$pers->getNomPrenom()." 	&nbsp;&nbsp;&nbsp; du :   ".$Arr[0]."  ".$Arr[1]."	  &nbsp;&nbsp;&nbsp; au :   ".$Arr[2]."   ".$Arr[3];             
+		                                        
+			                   		      // vider le formulaire pour crée une autre proposition
+										   $form->getElement('Ressource')->setValue('');
+										   $form->getElement('Debut')->setValue('');
+										   $form->getElement('Fin')->setValue('');
+										   $form->getElement('DebutMidi')->setValue('');
+										   $form->getElement('FinMidi')->setValue('');	
+		                   		  	  } 
+									  else 
+									  {     
+									  	     //return array($bool,$personne->getDate_debut(),$personne_datefin,$obj_dd,$obj_df);
+									  									  	     
+									  	     if($res[3] < $res[1])    // date_debut_proposition  < date_debut_projet
+									         {
+									         	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et ne peux pas pos&eacute; une proposition avant cette date !";
+									         }
+									         elseif($res[2] > $res[4])  // date_fin_projet > date_fin_proposition 
+									         {
+										             if($res[2] < date("Y-m-d"))  // date_fin_projet  <  date_aujourdhui 
+										             {
+										             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."   a quitt&eacute; le projet le :  ".$pers->getDate_fin()."   impossible de lui cr&eacute;er une proposition !";
+										             }	
+										             else                        // date_fin_projet  >=  date_aujourdhui 
+										             {
+										             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  va quit&eacute; le projet le :  ".$pers->getDate_fin()."  et ne peux pas pos&eacute; une proposition du : ".$res[3]." au :".$res[4]." !";
+										             }	
+									         }
+									         else
+									        {   
+									        	if($res[2] == "-" || $res[2] == "01/01/1970" || $res[2] == "1970-01-01"  || $res[2] == "0000-00-00" || $res[2] == "00-00-0000")
+									        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  aucune proposition avant cette date n'est acc&eacute;pt&eacute;e !";
+									        	else
+									        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et fini le : ".$res[2]." aucune proposition hors cette p&eacute;riode n'est acc&eacute;pt&eacute;e !";
+									        } 
+									  }
 		                   		  }
 		                   	      // si le congé existe 
 						  	      else

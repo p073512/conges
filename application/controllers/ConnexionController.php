@@ -95,9 +95,7 @@ class ConnexionController extends Zend_Controller_Action
 
                             // affichage du message d'acceuil et redirection apres 1 sec
 							 $baseUrl = new Zend_View_Helper_BaseUrl();
-							$this->getResponse()->setHeader('Refresh', '2; ' . $baseUrl->baseUrl(). '/index');
-                           
-
+							 $this->getResponse()->setHeader('Refresh', '2; ' . $baseUrl->baseUrl(). '/index');
 						}
 
 				}
@@ -117,7 +115,6 @@ class ConnexionController extends Zend_Controller_Action
 			}
 			else  // formulaire invalide 
 			{
-
 			           if($data['Profil'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
 						{
 						   $this->view->error = "Veuillez selectionner un profil !";
@@ -127,7 +124,6 @@ class ConnexionController extends Zend_Controller_Action
 						{	
 							$this->view->error = "Veuillez renseignez votre Mot de passe !";	//création et initialisation d'un objet Default_Model_Users
 						}
-	
 			}
 		}
 	

@@ -42,8 +42,6 @@ class CongeController extends Zend_Controller_Action
 
 	public function creerAction()
 	{   
-		
-		
 		// detecter la version du navigateur :) Ã  utiliser 
 		
 		// $userAgent = new Zend_Http_UserAgent();
@@ -92,8 +90,9 @@ class CongeController extends Zend_Controller_Action
 			$personne = new Default_Model_Personne();
 			$id_personne = $data['Ressource'];       // id personne 
 
-	        $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
+	         $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
 			
+	         $outils = new Default_Controller_Helpers_outils(); 
 			
 			// Vérifie si les données répondent aux conditions de validateurs 
 			if($form->isValid($data)) // formulaire valide 
@@ -119,8 +118,7 @@ class CongeController extends Zend_Controller_Action
 	                  try
 	                  {     
 						  	 $conge = new Default_Model_Conge();  
-						  	 $outils = new Default_Controller_Helpers_outils();
-						  	 
+						  	  	 
 						  	//************** gerer les datetimes en fonction des demis journées *****************************// 
 			     			    $date = $outils->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
 			     	        //***********************************************************************************************// 		 
@@ -163,21 +161,57 @@ class CongeController extends Zend_Controller_Action
 		             
 											    
 										if($res == null)   // pas de chevachement de congés
-										{  
-												// affichage du message de succÃ¨s 
-											    $this->view->success = "Cr&eacute;ation du cong&eacute; pour :   ".$pers->getNomPrenom()." 	 &nbsp;&nbsp;&nbsp; du :   ".$Arr[0]."  ".$Arr[1]."	  &nbsp;&nbsp;&nbsp; au :   ".$Arr[2]."   ".$Arr[3];                      
-			
-											    // sauvegarder dans la BD 
-											    $conge->save(); 
+										{      
+											    $r =  $outils->authorized($pers,$conge);
 											
-											    // vider le formulaire pour crée un autre congé
-											     $form->getElement('Ressource')->setValue('');
-												 $form->getElement('TypeConge')->setValue('');
-												 $form->getElement('Debut')->setValue('');
-												 $form->getElement('Fin')->setValue('');
-												 $form->getElement('DebutMidi')->setValue('');
-												 $form->getElement('FinMidi')->setValue('');
-												 $form->getElement('Ferme')->setValue(''); 
+												var_dump($r);
+												echo "</br>".date("Y-m-d");  
+												
+					                   		  	  if($r[0] == true)
+					                   		  	  {
+						                   		         // oui 
+													     $conge->save();
+														    
+												         // affichage du message de succÃ¨s 
+											             $this->view->success = "Cr&eacute;ation du cong&eacute; pour :   ".$pers->getNomPrenom()." 	 &nbsp;&nbsp;&nbsp; du :   ".$Arr[0]."  ".$Arr[1]."	  &nbsp;&nbsp;&nbsp; au :   ".$Arr[2]."   ".$Arr[3];                                 
+					                                        
+						                   		         // vider le formulaire pour crée un autre congé
+													     $form->getElement('Ressource')->setValue('');
+														 $form->getElement('TypeConge')->setValue('');
+														 $form->getElement('Debut')->setValue('');
+														 $form->getElement('Fin')->setValue('');
+														 $form->getElement('DebutMidi')->setValue('');
+														 $form->getElement('FinMidi')->setValue('');
+														 $form->getElement('Ferme')->setValue(''); 
+					                   		  	  } 
+												  else 
+												  {     //return array($bool,$personne->getDate_debut(),$personne_datefin,$obj_dd,$obj_df);
+									  									  	     
+												  	     if($r[3] < $r[1])    // date_debut_proposition  < date_debut_projet
+												         {
+												         	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et ne peux pas pos&eacute; un cong&eacute; avant cette date !";
+												         }
+												         elseif($r[2] > $r[4])  // date_fin_projet > date_fin_proposition 
+												         {
+													             if($r[2] < date("Y-m-d"))  // date_fin_projet  <  date_aujourdhui 
+													             {
+													             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."   a quitt&eacute; le projet le :  ".$pers->getDate_fin()."   impossible de lui cr&eacute;er un cong&eacute; !";
+													             }	
+													             else                        // date_fin_projet  >=  date_aujourdhui 
+													             {
+													             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  va quit&eacute; le projet le :  ".$pers->getDate_fin()."  et ne peux pas pos&eacute; un cong&eacute; du : ".$r[3]." au :".$r[4]." !";
+													             }	
+												         }
+												         else
+												        {   
+												        	if($r[2] == "-" || $r[2] == "01/01/1970" || $r[2] == "1970-01-01"  || $r[2] == "0000-00-00" || $r[2] == "00-00-0000")
+												        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  aucun cong&eacute; avant cette date n'est acc&eacute;pt&eacute;e !";
+												        	else
+												        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et fini le : ".$r[2]." aucun cong&eacute; hors cette p&eacute;riode n'est acc&eacute;pt&eacute;e !";
+												        } 
+						
+												  }
+	
 										}
 										else   // chevauchement existe
 										{   

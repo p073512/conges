@@ -120,27 +120,32 @@ class Default_Model_CongeMapper
     //$flag = 1 inclue les bornes / $flag = 0 n'iclue pas les bornes 
 	public function conges_existant($id_personne,$date_debut,$date_fin,$flag) 
 	    {  
+	    	
+	    	
+	    	$debut_mois = date('Y-m-d',strtotime($date_debut)); 
+    	    $fin_mois = date('Y-m-d',strtotime($date_fin)).'23:59:59';
+	    	
 		    $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 		    $select = new Zend_Db_Select($db);
 		    $select ->from((array('c' =>'conge')),array('c.id_personne' ,'c.date_debut','c.date_fin','c.mi_debut_journee','c.mi_fin_journee','c.nombre_jours','c.id_type_conge')); 
 		    $select->where('c.id_personne ='.$id_personne);
+		   
 		    
 	        if($flag == 0) // retourne toute les dates qui touche la periode 
 	        {
-		        $select->where('('.$db->quoteInto('c.date_debut>=?', $date_debut).'&&'.$db->quoteInto('c.date_fin <=?', $date_fin).') OR 
-		                        ('.$db->quoteInto('c.date_debut<=?', $date_debut).'&&'.$db->quoteInto('c.date_fin >=?', $date_fin).')OR 
-		                        ('.$db->quoteInto('c.date_debut<= ?', $date_fin).'&&'.$db->quoteInto('c.date_debut >?', $date_debut).')OR 
-		                        ('.$db->quoteInto('c.date_fin >= ?', $date_debut).'&&'.$db->quoteInto('c.date_fin <?', $date_fin).')');
-		
+		     
+	        	$select->where('c.date_debut >= ?', $debut_mois) 
+    	               ->where('c.date_fin <= ?', $fin_mois);
 			    $row = $select->query()->fetchAll();
+	        	
 	        }
 	        elseif($flag == 1) // retourne toute les dates qui touche la periode sauf date_debut == df  ou date_fin == dd 
 	        {
-		        $select->where('('.$db->quoteInto('c.date_debut>=?', $date_debut).'&&'.$db->quoteInto('c.date_fin <=?', $date_fin).') OR 
-		                        ('.$db->quoteInto('c.date_debut<?', $date_debut).'&&'.$db->quoteInto('c.date_fin >?', $date_fin).')OR 
-		                        ('.$db->quoteInto('c.date_debut< ?', $date_fin).'&&'.$db->quoteInto('c.date_debut >?', $date_debut).')OR 
-		                        ('.$db->quoteInto('c.date_fin > ?', $date_debut).'&&'.$db->quoteInto('c.date_fin <?', $date_fin).')');
-	
+		      
+		        $select->where('c.date_debut > ?', $debut_mois) 
+    	               ->where('c.date_fin < ?', $fin_mois);
+			    $row = $select->query()->fetchAll();
+		        
 			    $row = $select->query()->fetchAll();
 	        }
 	

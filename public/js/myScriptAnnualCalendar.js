@@ -1212,11 +1212,13 @@
         	            .remove();
         	            
         	            
+        	        
+        	           
+        	            
         	            if(data == null)
         	            	{
         				    	
-        				    		// $('#myModal')
-        				             // .modal('hide');
+        				    		
         				    		 d3.selectAll('svg')
         				             .style("opacity", 1)
         				             .transition()
@@ -1238,10 +1240,7 @@
 	        	              	 DrawAnnualCalendar(periode.Year,calendarOptions,data);
         	            	
         	            	}
-        	            // setTimeout(function(data){calendarData = null;alert('Finito'+ calendarData);},60000);
-        	     //       $('#myModal')
-        	       //         .modal('hide');
-
+        	     
 
         	        },
 

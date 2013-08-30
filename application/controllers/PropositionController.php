@@ -346,16 +346,14 @@ class PropositionController extends Zend_Controller_Action
 										   $form->getElement('FinMidi')->setValue('');	
 		                   		  	  } 
 									  else 
-									  {     
-									  	     //return array($bool,$personne->getDate_debut(),$personne_datefin,$obj_dd,$obj_df);
-									  									  	     
+									  {   				  	     
 									  	     if($res[3] < $res[1])    // date_debut_proposition  < date_debut_projet
 									         {
 									         	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et ne peux pas pos&eacute; une proposition avant cette date !";
 									         }
-									         elseif($res[2] > $res[4])  // date_fin_projet > date_fin_proposition 
+									         elseif($res[4] > $res[2])  // date_fin_proposition  >  date_fin_projet
 									         {
-										             if($res[2] < date("Y-m-d"))  // date_fin_projet  <  date_aujourdhui 
+										             if($res[2] > date("Y-m-d"))  // date_fin_projet  >  date_aujourdhui 
 										             {
 										             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."   a quitt&eacute; le projet le :  ".$pers->getDate_fin()."   impossible de lui cr&eacute;er une proposition !";
 										             }	
@@ -366,7 +364,7 @@ class PropositionController extends Zend_Controller_Action
 									         }
 									         else
 									        {   
-									        	if($res[2] == "-" || $res[2] == "01/01/1970" || $res[2] == "1970-01-01"  || $res[2] == "0000-00-00" || $res[2] == "00-00-0000")
+									        	if(($res[2] == "-" || $res[2] == "01/01/1970" || $res[2] == "1970-01-01"  || $res[2] == "0000-00-00" || $res[2] == "00-00-0000"))
 									        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  aucune proposition avant cette date n'est acc&eacute;pt&eacute;e !";
 									        	else
 									        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et fini le : ".$res[2]." aucune proposition hors cette p&eacute;riode n'est acc&eacute;pt&eacute;e !";
@@ -571,6 +569,11 @@ class PropositionController extends Zend_Controller_Action
 			//r�cup�ration des donn�es envoy�es par le formulaire
 			$data =  $this->getRequest()->getParams();
 			
+		    $requete = $this->getRequest();
+			if ($requete instanceof Zend_Controller_Request_Http)
+			{ 
+				$baseurl = $requete->getBaseUrl();
+			}
 			
             
 			//v�rifie que les donn�es r�pondent aux conditions des validateurs
@@ -645,11 +648,13 @@ class PropositionController extends Zend_Controller_Action
 			                   // si le cong� n'existe pas 
 			                   if($res_c == null)
 			                   {   // oui 
+
 									 $proposition->save();
 			                   		 $this->view->success = " La proposition a &eacute;t&eacute; modifi&eacute; avec succ&eacute;s !";
 								     header("Refresh:1.5;URL='../../afficher'");              // URL dynamique 
                                }
 			                   // si le cong� existe 
+
 								elseif($res_c <> null)
 							   {   
 								 // non 

@@ -9,9 +9,7 @@ class Default_Model_Solde
 	protected  $_total_cp;
 	protected  $_annee_reference;
 	
-	protected $_referenceMap =array('SoldeConge'=>array('columns' => 'id_personne',
-	                                                'refTableClass' => 'Default_Model_DbTable_Personne',
-	                                                'refColumns'=>'id'));
+	
 	
 	
 	//le mapper va nous fournir les méthodes pour interagir avec notre table (objet de type Default_Model_PersonneMapper)
@@ -109,9 +107,9 @@ class Default_Model_Solde
 	}
 	
 	
-	public function setTotal_cp($date_entree)
+	public function setTotal_cp()
 	{
-		$this->_total_cp = (float)$this->totalcp($date_entree);
+		$this->_total_cp = (float)$this->totalcp();
 		return $this;
 	}
 
@@ -158,9 +156,9 @@ class Default_Model_Solde
 	}
 
 	//récupère une entrée particulière
-	public function find($annee_reference)
+	public function find($annee_reference,$idPersonne)
 	{
-		$this->getMapper()->find($annee_reference, $this);
+		$this->getMapper()->find($annee_reference,$idPersonne,$this);
 		return $this;
 	}
 	public function find2($annee_reference)
@@ -178,17 +176,18 @@ class Default_Model_Solde
 	{
 		return $this->getMapper()->fetchAll2($str);
 	}
-
+	
 	//permet la suppression
 	public function delete($id_personne)
 	{
 		$this->getMapper()->delete($id_personne);
 	}
 	// cherche le nombre de ressources existant de la table conge REMARQUE remplace la date de debut
-	public function totalcp($date_entree)
+	public function totalcp()
 	{
 		$date=date('d/m/Y');
 		list($jour_actuel, $mois_actuel, $annee_actuelle) = explode("/", $date);
+		$date_entree = $this->personne->getDate_entree();
 		list( $annee_entree, $mois_entree,$jour_entree) = explode("-", $date_entree);
 		$cemule_annees =$annee_actuelle - $annee_entree ;
 		$supplument_anciennete =0;

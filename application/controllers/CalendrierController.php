@@ -8,8 +8,9 @@
          
       }
       
-      public function indexAction()
-      {
+//une action doit respecter la nomenclature [actionName]Action
+	public function indexAction()
+{
           $conges          = array(); // tableau conteneur des congés qui seront renvoyés à la vue
           $keysIndiceConge = array(); // tableau des indice congé (dans le cas ou plusieurs congé posé dans un seul mois)
           $indiceConge ; //mois-annee , les congés posés sur un mois sont associés a cette clé
@@ -20,6 +21,29 @@
               $data = $this->getRequest()->getPost();
               
               if (isset($data['annee']) && isset($data['mois'])) {
+              	
+              	
+               // composition de la date début a partir du mois et année saisie dans le form
+                      $dateDebut = '01-' . $data['mois'] . '-' . $data['annee'];
+                      
+                      if ($data['mois'] == '1') // : février ( Janvier = 0) 
+                          {
+                          if (((($data['annee'] % 4) == 0) && ((($data['annee'] % 100) != 0) || (($data['annee'] % 400) == 0)))) // année bissextile
+                              {
+                              $dateFin = '29-' . $data['mois'] . '-' . $data['annee'] . ' 23:59:59';
+                              
+                          } else // année non bissextile
+                              {
+                              $dateFin = '28-' . $data['mois'] . '-' . $data['annee'];
+                          }
+                      } else if ($data['mois'] == '4' || $data['mois'] == '6' || $data['mois'] == '9' || $data['mois'] == '11') // avril / juin / Septembre / Novembre
+                          {
+                          $dateFin = '30-' . $data['mois'] . '-' . $data['annee'] . ' 23:59:59';
+                      } else // Janvier/ Mars /Mai / Juillet /Aout / Octobre /Décembre
+                          {
+                          $dateFin = '31-' . $data['mois'] . '-' . $data['annee'] . ' 23:59:59';
+                      }
+              	
                   
                   if (isset($data['id_personne']) && $data['id_personne'] !== 'x') {
                       
@@ -36,47 +60,29 @@
                       $congeArray = array();
                       
                       $outils  = new Default_Controller_Helpers_outils();
-                      
+
                       $jferiesCSM = $outils->setJoursFerie($data['annee'], true, false);
 		              $jferiesCSM = (array) $jferiesCSM;
 		             
 		              $jferiesFR = $outils->setJoursFerie($data['annee']);
-		              $jferiesFR = (array) $jferiesFR;
-                    
+		              $jferiesFR = (array) $jferiesFR;                  
 
                      
-                      // composition de la date début a partir du mois et année saisie dans le form
-                      $dateDebut = '01-' . $data['mois'] . '-' . $data['annee'];
-                      
-                      if ($data['mois'] == '1') // : février ( Janvier = 0) 
-                          {
-                          if (((($data['annee'] % 4) == 0) && ((($data['annee'] % 100) != 0) || (($data['annee'] % 400) == 0)))) // année bissextile
-                              {
-                              $dateFin = '29-' . $data['mois'] . '-' . $data['annee'] . ' 23:59:59';
-                              
-                          } else // année non bissextile
-                              {
-                              $dateFin = '28-' . $data['mois'] . '-' . $data['annee'];
-                          }
-                      } else if ($data['mois'] == '3' || $data['mois'] == '5' || $data['mois'] == '8' || $data['mois'] == 10) // avril / juin / Septembre / Novembre
-                          {
-                          $dateFin = '30-' . $data['mois'] . '-' . $data['annee'] . ' 23:59:59';
-                      } else // Janvier/ Mars /Mai / Juillet /Aout / Octobre /Décembre
-                          {
-                          $dateFin = '31-' . $data['mois'] . '-' . $data['annee'] . ' 23:59:59';
-                      }
+                     
+                     
                       
                       // récupération des congés 
                       $congeArray = $congeObj->conges_existant($personne->getId(), $dateDebut, $dateFin, '0');
+                      
                      
-	                  $resultCount = count($congeArray);
+	                    $resultCount = count($congeArray);
 	                    
-	                   if($resultCount == 0) // si aucun congé
-	                   {
-	                   	 $this->_helper->json(null);
-	                   	 return;
-	                   }
-	                   
+		                   if($resultCount == 0)  // si aucun congé n'est retourné.
+		                   {
+		                   	 $this->_helper->json(null);
+		                   	 return;
+		                   }
+                      
                       foreach ($congeArray as $k => $v) {
                            
                           $idTypeConge = $congeArray[$k]['id_type_conge'];
@@ -138,21 +144,27 @@
                     $congeObj   = new Default_Model_Conge();
                     $congeArray = array();
                     
-                    $congeArray = $congeObj->fetchAll($str = array());
-                  
-                    $i = 0;
+                
+                    $where = array('date_debut >= ?' => date('Y-m-d',strtotime($dateDebut)),
+                                    'date_fin <= ?' => date('Y-m-d',strtotime($dateFin)).'23:59:59' );
+
+                    $congeArray = $congeObj->fetchAll($str = array(),$where);
                    
-                   $resultCount = count($congeArray);
                     
-                   if($resultCount == 0) // si aucun congé
-                   {
-                   	 $this->_helper->json(null);
-                   	 return;
-                   }
-                    	  
+                    $resultCount = count($congeArray);
+                    
+	                   if($resultCount == 0)// si aucun congé
+	                   {
+	                   	 $this->_helper->json(null);
+	                   	 return;
+	                   }
+                    
+                    
+                    $i = 0;
+                    
+                    
                     foreach($congeArray as $v)
                     {
-                 
                         $conge = array(); //réinitialisation de $conge (table temp)
                      
                      		$idPersonne = $v->getId_personne();
@@ -240,7 +252,9 @@
                      $jferiesCSM = $outils->setJoursFerie($data['annee'], true, false);
 		             $jferiesCSM = (array) $jferiesCSM;
 		             
+
 		             $jferiesFR = $outils->setJoursFerie($data['annee']);
+
 		             $jferiesFR = (array) $jferiesFR;
                      
 		             $ressourcesArray = array('ressources'=> $ressources,
@@ -267,10 +281,10 @@
           }
           
       }
-      
+         
      public function annuelAction()
      {
-     	 $conges          = array(); // tableau conteneur des congés qui seront renvoyés à la vue
+     	  $conges          = array(); // tableau conteneur des congés qui seront renvoyés à la vue
           $keysIndiceConge = array(); // tableau des indice congé (dans le cas ou plusieurs congé posé dans un seul mois)
           $indiceConge ; //mois-annee , les congés posés sur un mois sont associés a cette clé
           $ressourcesArray = array();

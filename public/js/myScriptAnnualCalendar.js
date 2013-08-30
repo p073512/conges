@@ -42,7 +42,7 @@
 				        "45": "#9270C2",
 				        "R": "#A595C2", //#B6B3F2
 				        "F": "#3B868A", // #FFBDD8
-				        "AP": "#1A20BA",
+				        "AP": "#046D8B",
 				        "M": "#5D656C",
 				        "DF": "#FAF4B1",
 				        "AS": "#EB540A",
@@ -736,7 +736,7 @@
             	              
             	                k = 0;
             
-                    
+            	          joursTravailles = 0; 
                     	  jQuery.each(dataj[i+1], function (j, val) {
                     	  data = dataj[i+1];
                     	
@@ -800,6 +800,7 @@
                               
                               if(tConge == null)
                     		  {
+                              joursTravailles += 1;
                     		  dataJson[k] = {
                                       "date": thisDate,
                                       "typeJour": 'N',
@@ -844,7 +845,8 @@
                                       };
                                       k = k + 2;
                                       return true;
-                                  } else if (tConge[thisDate].dm && !tConge[thisDate].fm) { 
+                                  } else if (tConge[thisDate].dm && !tConge[thisDate].fm) {
+                                	  joursTravailles += 0.5;
                                       dataJson[k] = {
                                           "date": thisDate,
                                           "typeJour": 'FM',
@@ -869,7 +871,9 @@
                                           "title": title,
                                           "jour": j
                                       };
+                                      joursTravailles += 0.5;
                                       dataJson[k + 1] = {
+                                    		  
                                           "date": thisDate,
                                           "typeJour": 'DM',
                                           "typeConge": 'NaN',
@@ -888,7 +892,7 @@
                           } else {
 
                               dataJson[k] = {
-                                  "nombreJours": data[j],
+                                  "nombreJours": joursTravailles,
                                   "indice": j
                               };
                               k++;
@@ -1267,7 +1271,9 @@
           
           date = new Date();
           annee = date.getFullYear();
-       
+          console.log(annee);
+          jQuery('select#annee option[value=' + annee + ']')
+          .attr('selected', true);
           
           if(jQuery('#personne').val() == 'x')
         	  {

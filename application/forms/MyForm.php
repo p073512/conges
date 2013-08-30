@@ -111,7 +111,7 @@ class Default_Form_MyForm extends Zend_Form
      */
 	
 
-	public function setDbOptions($elementName, &$object, $id_function ='getId', $libelle_function = 'getLibelle',$where = null, $str = array())
+	public function setDbOptions($elementName, &$object, $id_function ='getId', $libelle_function = 'getLibelle',$where = null,$groupBy = null, $str = array())
 				{
 					// vérifie si le champ en question est un "select"
 					if($this->elements[$elementName] instanceof Zend_Form_Element_Select)
@@ -131,8 +131,32 @@ class Default_Form_MyForm extends Zend_Form
 								/* remplie le tableau objArray avec les id et libelle 
 								 * obtenues via les fonction variable $id_function et $libelle_function
 								*/
-								$objArray [$p->$id_function()] = $p->$libelle_function();
+								
+								if(isset($groupBy))
+								{
+									
+									if(is_object($p->$groupBy())) // si critere de groupement est un objet récupéré le libellé de l'objet
+									{
+								    
+								     	$objArray[$p->$groupBy()->getLibelle()][$p->$id_function()] = $p->$libelle_function();
+								    
+									
+									}
+									else
+									{
+									  	$objArray[$p->$groupBy()][$p->$id_function()] = $p->$libelle_function();
+									}
+									
+									
+								}
+							else 
+									{
+										$objArray [$p->$id_function()] = $p->$libelle_function();
+									}
+								
+								
 							}
+						
 							/*
 							 * Première option affiche le libellé choissisez pour forcer le user
 							 * à sélectionner une ligne , id value à x pour s'assurer qu'il ne sera

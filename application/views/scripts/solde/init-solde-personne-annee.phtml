@@ -6,86 +6,28 @@
 		$this->JQuery()->addStyleSheet($this->baseUrl() . '/js/jquery/themes/smoothness/jquery-ui-1.8.23.custom.css');
 		// MBA : indique le fichier de script javascript à utliser avec jQuery UI
 		$this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
-		$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/i18n/jquery.ui.datepicker-fr.js');
-			   
-	    echo $this->jQuery(); 
+		$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/jquery.ui.datepicker.js');
+				   
+	  echo $this->jQuery(); 
 	  ?> 
-<script type="text/javascript">
-
-$(document).ready(function(){
-
-
-	$typeCongeCSM = ['CP','EX','F','M','AS','PC','P','AP'];
-
-	label=$('#Ressource :selected').parent().attr('label');
-	   
-	if(label == 'CSM')
-    {
-        $('#TypeConge option').each(function(){
-       
-                if($.inArray($(this).text(),$typeCongeCSM) == -1)
-               {
-                   $(this).hide();
-               }
-
-            });
-        $('#TypeConge').prepend('<option value="x">Choisissez</option>');
-         
-	
-	}
-	else
-	{
-		$('#TypeConge option').show();
-	}
-	
-	
-$('#Ressource').change(function(){
-
-	label=$('#Ressource :selected').parent().attr('label');
-	$('#TypeConge option[value=x]').attr('selected',true); // on force la selection � chaque changement de la liste.
-   
-	if(label == 'CSM')
-    {
-        $('#TypeConge option').each(function(){
-       
-                if($.inArray($(this).text(),$typeCongeCSM) == -1)
-               {
-                   $(this).hide();
-               }
-
-            });
-        $('#TypeConge').prepend('<option value="x">Choisissez</option>');
-         
-		
-	}
-	else
-	{
-		$('#TypeConge option').show();
-	}
-
-});
-
-	
-	
-	
-});
-
-
-</script>	   
  
-    <div class="row-fluid offset1">
+	<div class="row-fluid offset1">
 		<div id="header-container">
             
 			<div class="dropdown">
                   <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
-                  	cong&eacute; <b class="caret"></b>
+                     Soldes
+                     <b class="caret"></b>
                   </a>
-					<ul class="dropdown-menu">
-						<li><a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'creer'), 'default', true) ?>">Cr&eacute;er</a></li>
-						<li><a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'afficher'), 'default', true) ?>">Afficher</a></li>
-					</ul>
+                  
+                   <ul class="dropdown-menu">
+                        <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'index-solde'), 'default', true) ?>">Afficher soldes</a></li>
+                        <li class="nav-header">Initialiser</li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'init-solde-personne-annee'), 'default', true) ?>">Une Personne Une Année</a></li>
+                  </ul>
               
 			</div><!--MBA : fermeture dropdown -->
+          
 		</div><!-- MBA : fermeture div="header-container" -->
 	</div><!-- MBA : fermeture div="row-fluid -->
          <br/>
@@ -111,54 +53,33 @@ $('#Ressource').change(function(){
 	 * traitemets : logique, ajout BD, Exception ...
 	 */
 
-	if(isset($this->error))
-	{ 
-	?>
-	
-      <!-- afficage alerte avec message d'erreur -->
-			<div class="alert alert-error">
-				<button type="button" class="close " data-dismiss="alert"></button>
-				<strong>Erreur :</strong>  <?php //Message d'erreur
-                                         echo "   ".$this->error; ?>
-			</div>
-
-	<?php } ?>
-
-	<?php
-	
-	/*
-	 * Gestion des messages warnings 
-	 */
-
-	if(isset($this->warning)){ 
+	if(isset($this->error)){ 
 	?>
 	
       <!-- afficage alerte avec message d'erreur -->
 			<div class="alert">
 				<button type="button" class="close " data-dismiss="alert"></button>
-				<strong>Alerte :</strong>  <?php //Message warning
-                                         echo "   ".$this->warning; ?>
+				<strong>Alerte!</strong>  <?php //Message d'erreur
+                                         echo "error :".$this->error; ?>
 			</div>
-	
-	<?php } 
-	 
-	
-	
- 	/*
-	 * Gestion des messages succès 
+
+	<?php }
+    /*
+	 * Si erreurs de traitements* renvoyé depuis le controlleur 
+	 * traitemets : logique, ajout BD, Exception ...
 	 */
 	
-	else if(isset($this->success))
-	{
+	else if(isset($this->success)){
 	?>
 	
 	<!-- afficage message succés  -->
-            <div class="alert alert-success">
+            <div class="alert alert-info">
 				<button type="button" class="close " data-dismiss="alert"></button>
-				<strong>Succes :</strong> <?php //Message succes
-	                                      echo "   ".$this->success ;?>
+				<strong>Succes!</strong> <?php //Message succes
+	             echo "Solde bien initialisé <a href='".$this->url(array('controller' => 'ptrsolde', 'action' => 'index-solde'), 'default', true)."'>Afficher les soldes </a>"; ?>
 			</div>
 	<?php }?>
+	
 		<!-- ICI L'AFFICHAGE DU FORMULAIRE -->
 			
 		<fieldset>
@@ -168,11 +89,6 @@ $('#Ressource').change(function(){
 					<form action="<?php $this->form->getAction() ?>" name="<?php $this->form->getName() ?>" method="post">
 					
                       <?php
-                      	
-                      
-                      
-                      
-                      
                       /*
                        * On récupére les élements du formulaire , et on compte le nombre de ceux ci
                        */

@@ -102,7 +102,20 @@ echo $this->headScript();
      </thead>
         <?php
             $helper = new Default_Controller_Helpers_outils();
-          
+         
+            if(count($this->propositionArray) == '0')
+            {
+            	?>
+            	</table>
+            	<div class="hero-unit" >
+            	<h1>Pas de propositions</h1>
+            	<p>il n'y a aucune proposition dans la base de données ou toutes le propositions sont déjà traitées.</p>
+            	</div>
+            	<?php 
+            	
+            }
+            else
+            {
             //$this->usersArray est une variable qui peut �tre garnie par le controller
             //elle doit recevoir un tableau contenant des objets de type Default_Model_Proposition
             //le tableau est parcouru par foreach pour afficher les propi�t�s des objets contenus dans le tableau
@@ -141,11 +154,18 @@ echo $this->headScript();
           ?>
             <!-- Valider proposition -->
             <td>
+           
                 <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'valider', 'id' => $proposition->id,'solde'=>2), 'default', true); ?>"><i  class="icon-checkmark"></i></a>
             </td>
             <!-- Refuser proposition -->
             <td>
-                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'refuser', 'id' => $proposition->id), 'default', true); ?>"><i  class="icon-cancel-2"></i></a>
+	           <?php if($proposition->etat == 'KO'){ // si proposition refusée icone refuser est désactivée?>
+	           <i  class="icon-cancel-2"></i> 
+	           <?php }else {?>
+	            <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'refuser', 'id' => $proposition->id), 'default', true); ?>"><i  class="icon-cancel-2"></i></a>
+	          
+	           <?php }?> 
+            
             </td>       
          <?php 
             }
@@ -155,7 +175,7 @@ echo $this->headScript();
 
         </tr> 
         </tbody>
-        <?php endforeach; ?>
+        <?php endforeach; }?>
        
     </table>
  <?php

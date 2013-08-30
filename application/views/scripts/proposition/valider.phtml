@@ -1,5 +1,4 @@
 
-
    <?php 
                $profil = substr_replace($this->LoggedProfil(),"",0,31);
                $profil = str_replace("Deconnexion","", $profil);
@@ -28,9 +27,13 @@
             
 			<div class="dropdown">
                   <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
-                  Initialisation des soldes 
+                  Proposition <b class="caret"></b>
                   </a>
-					
+					<ul class="dropdown-menu">
+						<li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'creer'), 'default', true) ?>">Cr&eacute;er</a></li>
+						<li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'afficher'), 'default', true) ?>">Afficher</a></li>
+					</ul>
+              
 			</div><!--MBA : fermeture dropdown -->
           
 		</div><!-- MBA : fermeture div="header-container" -->
@@ -39,7 +42,7 @@
 
 <div class="container">
 		<div class="well row-fluid">
-		
+		<h4>Validation d'une proposition :</h4><br/>
 	<?php 	if(isset($this->error))
 	 { 
 	?>
@@ -73,7 +76,7 @@
 	 
     
     /*
-	 * Si erreurs de traitements* renvoyé depuis le controlleur 
+	 * Si erreurs de traitements* renvoyÃ© depuis le controlleur 
 	 * traitemets : logique, ajout BD, Exception ...
 	 */
 	
@@ -81,50 +84,23 @@
 	{
 		?>
 	
-		<!-- afficage message succés  -->
+		<!-- afficage message succÃ©s  -->
      	       <div class="alert alert-info">
 					<button type="button" class="close " data-dismiss="alert"></button>
 						<strong>Succes!</strong> <?php  echo $this->success; //Message succes ?> 
 			   </div>
 	<?php 
 	}?>
+	<br/>
+	<script type="text/javascript">
+	$(document).ready(function(){
+    $('button#retour').click(function(){
+	 history.go(-1);
+	 });
+		});
 	
-	<div id="filtres_solde">
-			
-				
-				<strong>Initialiser solde congé :</strong><br/>
-			
-			     
-			<div class="offset4 span3 well">
-				<form action="<?php $this->form->getAction() ?>" name="<?php $this->form->getName() ?>" method="post">
-					
-			
-			       <?php
-
-			       foreach($this->form as $k=>$e)
-			       {
-			       	if($e->gettype() == 'Zend_Form_Element_Submit')
-			       	{
-			       		$submit = $e;
-			       	}
-			       	else
-			       	{
-			       			echo $e;
-			       	}
-			        
-			       
-			       }
-			       ?>
-			       <center><?php echo $submit; ?></center>
-			       
-			   </form>
-	</div>
-	
-   </div>
-   
+	</script>
+<button type="button" id="retour" >Retour</a>
 </div>
-
-
-		
-		
+   
 </div>

@@ -1,91 +1,38 @@
 	 <?php
 	 #region MBA
 	 /*
-	  * MBA : Import de la bibliotheque JqueryUI et datePicker elles seront utilisÃ©es dans le formulaire
+	  * MBA : Import de la bibliotheque JqueryUI et datePicker elles seront utilisées dans le formulaire
 	  */
 		$this->JQuery()->addStyleSheet($this->baseUrl() . '/js/jquery/themes/smoothness/jquery-ui-1.8.23.custom.css');
-		// MBA : indique le fichier de script javascript Ã  utliser avec jQuery UI
+		// MBA : indique le fichier de script javascript à utliser avec jQuery UI
 		$this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
 		$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/i18n/jquery.ui.datepicker-fr.js');
-			   
-	    echo $this->jQuery(); 
+		$this->Jquery()->addJavascriptFile($this->baseUrl() .'/scriptjs/d3.js');	
+		$this->Jquery()->addJavascriptFile($this->baseUrl() .'/scriptjs/jquery.tipsy.js');
+	
+		$this->headScript()->appendFile( $this->baseUrl() .'/js/myScriptCalendarview.js');
+	  
+		echo $this->jQuery(); 
 	  ?> 
-<script type="text/javascript">
-
-$(document).ready(function(){
-
-
-	$typeCongeCSM = ['CP','EX','F','M','AS','PC','P','AP'];
-
-	label=$('#Ressource :selected').parent().attr('label');
-	   
-	if(label == 'CSM')
-    {
-        $('#TypeConge option').each(function(){
-       
-                if($.inArray($(this).text(),$typeCongeCSM) == -1)
-               {
-                   $(this).hide();
-               }
-
-            });
-        $('#TypeConge').prepend('<option value="x">Choisissez</option>');
-         
-	
-	}
-	else
-	{
-		$('#TypeConge option').show();
-	}
-	
-	
-$('#Ressource').change(function(){
-
-	label=$('#Ressource :selected').parent().attr('label');
-	$('#TypeConge option[value=x]').attr('selected',true); // on force la selection à chaque changement de la liste.
-   
-	if(label == 'CSM')
-    {
-        $('#TypeConge option').each(function(){
-       
-                if($.inArray($(this).text(),$typeCongeCSM) == -1)
-               {
-                   $(this).hide();
-               }
-
-            });
-        $('#TypeConge').prepend('<option value="x">Choisissez</option>');
-         
-		
-	}
-	else
-	{
-		$('#TypeConge option').show();
-	}
-
-});
-
-	
-	
-	
-});
-
-
-</script>	   
  
-    <div class="row-fluid offset1">
+ 
+		<div class="row-fluid offset1">
 		<div id="header-container">
             
 			<div class="dropdown">
                   <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
-                  	cong&eacute; <b class="caret"></b>
+                     Soldes
+                     <b class="caret"></b>
                   </a>
-					<ul class="dropdown-menu">
-						<li><a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'creer'), 'default', true) ?>">Cr&eacute;er</a></li>
-						<li><a href="<?php echo $this->url(array('controller' => 'conge', 'action' => 'afficher'), 'default', true) ?>">Afficher</a></li>
-					</ul>
+                  
+                   <ul class="dropdown-menu">
+                        <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'index-solde'), 'default', true) ?>">Afficher soldes</a></li>
+                        <li class="nav-header">Initialiser</li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'init-solde-personne-annee'), 'default', true) ?>">Une Personne Une Année</a></li>
+                  </ul>
               
 			</div><!--MBA : fermeture dropdown -->
+          
 		</div><!-- MBA : fermeture div="header-container" -->
 	</div><!-- MBA : fermeture div="row-fluid -->
          <br/>
@@ -94,11 +41,13 @@ $('#Ressource').change(function(){
 	<?php
 	/*
 	 * MBA : Appel au layout 'layouts/scripts/mylayout';
-	 * setAction : Le formulaire opÃ¨re sur la page courante
+	 * setAction : Le formulaire opère sur la page courante
 	 * 
 	 */
 	$this->layout()->setLayout('mylayout');
+	if(isset($this->form))
 	$this->form->setAction($this->url());
+  
 	?>
 
 
@@ -107,7 +56,7 @@ $('#Ressource').change(function(){
 					
 	<?php
 	/*
-	 * Si erreurs de traitements* renvoyÃ© depuis le controlleur 
+	 * Si erreurs de traitements* renvoyé depuis le controlleur 
 	 * traitemets : logique, ajout BD, Exception ...
 	 */
 
@@ -119,7 +68,7 @@ $('#Ressource').change(function(){
 			<div class="alert alert-error">
 				<button type="button" class="close " data-dismiss="alert"></button>
 				<strong>Erreur :</strong>  <?php //Message d'erreur
-                                         echo "Â Â Â ".$this->error; ?>
+                                         echo "   ".$this->error; ?>
 			</div>
 
 	<?php } ?>
@@ -137,7 +86,7 @@ $('#Ressource').change(function(){
 			<div class="alert">
 				<button type="button" class="close " data-dismiss="alert"></button>
 				<strong>Alerte :</strong>  <?php //Message warning
-                                         echo "Â Â Â ".$this->warning; ?>
+                                         echo "   ".$this->warning; ?>
 			</div>
 	
 	<?php } 
@@ -145,27 +94,28 @@ $('#Ressource').change(function(){
 	
 	
  	/*
-	 * Gestion des messages succÃ¨s 
+	 * Gestion des messages succès 
 	 */
 	
 	else if(isset($this->success))
 	{
 	?>
 	
-	<!-- afficage message succÃ©s  -->
+	<!-- afficage message succés  -->
             <div class="alert alert-success">
 				<button type="button" class="close " data-dismiss="alert"></button>
 				<strong>Succes :</strong> <?php //Message succes
-	                                      echo "Â Â Â ".$this->success ;?>
+	                                      echo "   ".$this->success ;?>
 			</div>
 	<?php }?>
+	
 		<!-- ICI L'AFFICHAGE DU FORMULAIRE -->
 			
 		<fieldset>
 			<legend ><?php if(isset($this->title))echo $this->title;?></legend>
 				
-				<!-- On rÃ©cupÃ©re les informations nÃ©cessaire du formulaire via le $this->form -->
-					<form action="<?php $this->form->getAction() ?>" name="<?php $this->form->getName() ?>" method="post">
+				<!-- On récupére les informations nécessaire du formulaire via le $this->form -->
+					<form action="<?php if(isset($this->form))$this->form->getAction() ?>" name="<?php if(isset($this->form))$this->form->getName() ?>" method="post">
 					
                       <?php
                       	
@@ -174,29 +124,33 @@ $('#Ressource').change(function(){
                       
                       
                       /*
-                       * On rÃ©cupÃ©re les Ã©lements du formulaire , et on compte le nombre de ceux ci
+                       * On récupére les élements du formulaire , et on compte le nombre de ceux ci
                        */
+                      if(isset($this->form))
+                      {
+                      	
+                      
 	                      $Elements =$this->form->getElements();
 	                      $N_Elements = count($Elements);
 
 	                      if($N_Elements > 5)
 	                      {
 	                      	/*
-	                         * Si Le nombre d'Ã©lÃ©ment est supÃ©rieur Ã  5 l'affichage sera en deux colonnes 
+	                         * Si Le nombre d'élément est supérieur à 5 l'affichage sera en deux colonnes 
 	                         * pour optimiser la visualisation. 
 	                         */
                       ?>
                       
-                      	<!-- ouverture premiÃ¨re colonne (conteneur div )-->
+                      	<!-- ouverture première colonne (conteneur div )-->
                       	<div class="span4 offset2">
                       	
                       	
                       <?php 
                       	/*
                       	 * $i s'incremente tout au long du foreach
-                      	 * $break contient le nombre d'Ã©lÃ©ment par 2 pour les afficher 
-                      	 * en deux colonnes (ne prend jamais valeur rÃ©el si nombre est impaire
-                      	 * la premiÃ¨re colonne contiendra plus de champ (+1) que la deuxieme
+                      	 * $break contient le nombre d'élément par 2 pour les afficher 
+                      	 * en deux colonnes (ne prend jamais valeur réel si nombre est impaire
+                      	 * la première colonne contiendra plus de champ (+1) que la deuxieme
                       	 * 
                       	 * ...
                       	 * 
@@ -207,7 +161,7 @@ $('#Ressource').change(function(){
 	                      
 	                      	foreach( $Elements as $k=>$element)
 	                      	{
-	                      		/*si (Break n'est pas encore atteint ($i commenÃ§ant de 0))
+	                      		/*si (Break n'est pas encore atteint ($i commençant de 0))
 	                      		 *  =>ecrire dans la premiere colonne 
 	                      		 */ 
 	                      		
@@ -218,7 +172,7 @@ $('#Ressource').change(function(){
 	                      		}
 	                      		elseif ($i >= $break)
 	                      		{
-	                      		/*si (Break est atteint ($i s'incrementant par 1 sur chaque Ã©criture d'Ã©lÃ©ment))
+	                      		/*si (Break est atteint ($i s'incrementant par 1 sur chaque écriture d'élément))
 	                      		 *  =>fermer la premiere colonne
 	                      		 *  =>ouvrir deuxieme colonne
 	                      		 *  =>ecrire dans la deuxieme colonne 
@@ -245,7 +199,7 @@ $('#Ressource').change(function(){
                       	/* 	
                       	if($N_Elements > 15)
                       	{
-                      		 	echo'affichage customisÃ© Ã  tester(ajout d'une 3 eme colonne)
+                      		 	echo'affichage customisé à tester(ajout d'une 3 eme colonne)
                       		 	 pour l'instant affichage max sur 2 colonne;
                       	}
                      */
@@ -253,30 +207,32 @@ $('#Ressource').change(function(){
                       }
                       else { //$N_element <5
                       	?>
-                      	<!--offset4 on se dÃ©place de 4 case* pour centrer la colonne(div)
-                      	 case : .span voir systÃ¨me de grid (css)
+                      	<!--offset4 on se déplace de 4 case* pour centrer la colonne(div)
+                      	 case : .span voir système de grid (css)
                       	 -->
                       	
                       	<div class="span offset4">
                       	
                       
-                      	<?php  //Ecriture dans la premiÃ¨re colonne
+                      	<?php  //Ecriture dans la première colonne
 
                       	      foreach ( $Elements as $k=>$Element)
                                   echo $this->form->getElement($k); 
                            
                       } // fin else 
-                      	
+                      }
                         ?>
                       </div>
                         </form>
 		</fieldset>
                 
 		</div><!-- MBA Fermeture div class="well row-fluid" -->
+		 <div id="wrapper" class="offset2 span10" >
+			    <!-- ici sera affichÃ© le calendrier -->
+	      </div>
 	</div><!-- MBA Fermeture div class="container" -->
         
 <!-- MBA FIN AFFICHAGE DU FORMULAIRE -->
-
 
   
  <?php #endregion MBA

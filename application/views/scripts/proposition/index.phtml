@@ -145,7 +145,12 @@ echo $this->headScript();
             </td>
             <!-- Refuser proposition -->
             <td>
-                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'refuser', 'id' => $proposition->id), 'default', true); ?>"><i  class="icon-cancel-2"></i></a>
+                  <?php if($proposition->etat == 'KO'){ // si proposition refusée icone refuser est désactivée?>
+	           <i  class="icon-cancel-2"></i> 
+	           <?php }else {?>
+	            <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'refuser', 'id' => $proposition->id), 'default', true); ?>"><i  class="icon-cancel-2"></i></a>
+	          
+	           <?php }?> 
             </td>       
          <?php 
             }

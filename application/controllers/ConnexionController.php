@@ -107,7 +107,7 @@ class ConnexionController extends Zend_Controller_Action
 						}
 					    else 
 					    {
-						$this->view->error = "Mot de passe incorrecte !";
+						$this->view->error = "Mot de passe incorrect !";
 						$form->getElement('Password')->setValue('');
 						$form->getElement('Password')->setErrorMessages(array("Mot de passe invalide !"));
 					    }

@@ -850,6 +850,120 @@
 
 	}
 	
+	                                                                   
+                                                                     
+                                             
+   /** 
+	 *  @desc  Fonction responsable du découpage des congés en sous congés (par mois) et (par demi journée)
+     *               
+     *  @name  sous_periodes
+     *
+	 *  @param string $date_debut
+	 *  @param string $date_fin
+	 * 
+	 *  @return array() de strings 
+	 *  
+	 *  @example  sous_periodes('2013-08-01 12:00:00','2013-10-21 11:59:59')    
+	 *            return $periode ;
+	 *             
+	 *            // details du tableau : 
+	 *                      
+	 *            $periode[0]['date_debut'] = '2013-08-01 12:00:00';
+	 *            $periode[0]['date_fin']   = '2013-08-01 23:59:59';
+	 *                   
+     *            $periode[1]['date_debut'] = '2013-08-02 00:00:00';
+	 *            $periode[1]['date_fin']   = '2013-08-31 23:59:59';
+	 *                   
+	 *            $periode[2]['date_debut'] = '2013-09-01 00:00:00';
+	 *            $periode[2]['date_fin']   = '2013-09-30 23:59:59';
+	 *                   
+	 *            $periode[3]['date_debut'] = '2013-10-01 00:00:00';
+	 *            $periode[3]['date_fin']   = '2013-10-20 23:59:59';
+	 *                   
+	 *            $periode[4]['date_debut'] = '2013-10-21 00:00:00';
+	 *            $periode[4]['date_fin']   = '2013-10-21 11:59:59';                
+	 */
+
+	
+	
+	function sous_periodes($date_debut,$date_fin) 
+	{
+
+				
+			$date_debut = new DateTime($date_debut);
+			$date_fin = new DateTime($date_fin);
+				
+			$date_it = new DateTime(date_format($date_debut,'Y-m-d H:i:s')); // curseur qui parcoure nos dates du début à la fin
+			$periode_debut = new DateTime(date_format($date_debut, 'Y-m-d H:i:s'));
+			$periode_fin = new DateTime(date_format($date_fin, 'Y-m-d H:i:s'));
+			$periodes = array();
+			
+				// Traiter les 1/2 journées en début et fin de période
+				// Période 0 : [12h-0h]
+				if (!strcmp(date_format($date_debut, 'H'),'12')) 
+				{
+					
+					$periodes[] = array('date_debut' => date_format($date_debut, 'Y-m-d 12:00:00'), 'date_fin' => date_format($date_debut, 'Y-m-d 23:59:59'));
+					
+					// Incrémentation du curseur
+					$date_it->add(new DateInterval("P1D"));
+					$date_it->setTime(0,0,0); // RAZ de l'heure
+					
+						if (date_format($date_it, 'Y-m-d') > date_format($date_fin, 'Y-m-d')) 
+						{
+							return $periodes;
+						}
+				}
+			
+				// Période N : [0h-12h]
+				if (!strcmp(date_format($date_fin, 'H'),'11')) 
+				{
+				
+					$periodeFin = array('date_debut' => date_format($date_fin, 'Y-m-d 00:00:00'), 'date_fin' => date_format($date_fin, 'Y-m-d 11:59:59'));
+					
+					// On décrémente d'une journée la période de fin
+					$periode_fin->sub(new DateInterval("P1D"));
+					$periode_fin->setTime(0,0,0); // RAZ de l'heure
+					
+						if (date_format($date_it, 'Y-m-d') > date_format($periode_fin, 'Y-m-d')) 
+						{
+							$periodes[] = $periodeFin;
+							return $periodes;
+						}
+				}
+			
+				// Tant que le mois du curseur n'a pas rejoint le dernier mois à traiter, on enregistre des périodes
+				while (date_format($date_it, 'Y-m') < date_format($periode_fin, 'Y-m')) 
+				{
+				
+					// Nouvelle date début pour la prochaine période
+					$periode_debut = new DateTime(date_format($date_it, 'Y-m-d 0:0:0'));
+					
+					// Avancer le curseur jusqu'à la fin du mois
+					$nb_jours = date_format($date_it, 't') - date_format($date_it, 'j');
+					$date_it->add(new DateInterval("P".$nb_jours."D"));
+				
+					// Enregistrer la nouvelle période
+				
+					$periodes[] = array('date_debut' => date_format($periode_debut, 'Y-m-d 00:00:00'), 'date_fin' => date_format($date_it, 'Y-m-d 23:59:59'));
+					
+					// Avancer le curseur jusqu'au début du mois suivant (+1 jour)
+					$date_it->add(new DateInterval("P1D"));
+					
+				}
+			
+				// Enregistrer la dernière période
+			
+				$periodes[] = array('date_debut' => date_format($date_it, 'Y-m-d 00:00:00'), 'date_fin' => date_format($periode_fin, 'Y-m-d 23:59:59'));
+				
+				if (isset($periodeFin)) 
+				{
+					$periodes[] = $periodeFin;
+				}
+				return $periodes;
+}
+	
+	
 
 	
  }// End of class 

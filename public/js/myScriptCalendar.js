@@ -38,7 +38,7 @@ var calendarOptions = {
         "45": "#9270C2",
         "R": "#A595C2", //#B6B3F2
         "F": "#3B868A", // #FFBDD8
-        "AP": "#1A20BA",
+        "AP": "#046D8B",
         "M": "#5D656C",
         "DF": "#FAF4B1",
         "AS": "#EB540A",
@@ -587,6 +587,7 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
 
                 dataJson = [];
                 j = 0;
+                joursTravailles = 0; 
                 jQuery.each(data, function (i, val) {
                 	
                 	
@@ -602,7 +603,8 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
 
                         thisDate = periode.Year + "-" + month + "-" + day;
                         //console.log(data[i] + '=>' + i);
-
+                       
+                        
                         if (data[i] == 'Samedi') {
                             dataJson[j] = {
                                 "date": thisDate,
@@ -674,7 +676,8 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
                                 };
                                 j = j + 2;
                                 return true;
-                            } else if (tConge[thisDate].dm && !tConge[thisDate].fm) { 
+                            } else if (tConge[thisDate].dm && !tConge[thisDate].fm) {
+                            	joursTravailles += 0.5;
                                 dataJson[j] = {
                                     "date": thisDate,
                                     "typeJour": 'FM',
@@ -692,6 +695,7 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
                                 j = j + 2;
                                 return true;
                             } else if (tConge[thisDate].fm && !tConge[thisDate].dm) {
+                            	joursTravailles += 0.5;
                                 dataJson[j] = {
                                     "date": thisDate,
                                     "typeJour": 'FM',
@@ -711,6 +715,7 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
                             }
 
                         } else {
+                        	joursTravailles += 1;
                             dataJson[j] = {
                                 "date": thisDate,
                                 "typeJour": 'N',
@@ -726,7 +731,7 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
                     } else {
 
                         dataJson[j] = {
-                            "nombreJours": data[i],
+                            "nombreJours": joursTravailles,//data[i],
                             "indice": i
                         };
                         j++;
@@ -734,8 +739,8 @@ function DrawMonthCalendar(periode, opt, dataset, filtre) {
 
                 });
 
-                console.log('dataJson');
-                console.log(dataJson);
+              //  console.log('dataJson');
+             //   console.log(dataJson);
 
                 width = opt.dimensions.svg.w; //Largeur calendrier
                 height = opt.dimensions.svg.h; //Hauteur calendrier
@@ -1047,11 +1052,11 @@ function getCalendarContent(idPersonne, mois, annee,filtred) {
     jQuery.ajax({
         type: 'POST',
         async: false,
-        url: './index',
+        url: 'calendrier/index',
         dataType: 'json', // échange en format JSON
         data: {
             annee: annee,
-            mois: mois,
+            mois: parseInt(mois) +1,
             id_personne: idPersonne
               },
         success: function (data, status) {
@@ -1234,6 +1239,7 @@ function setNavMonthMenu(action, month, year) {
 
     jQuery('select#mois option[value=' + iMoisCourant + ']')
         .attr('selected', true);
+   
     jQuery('select#annee option[value=' + anneeCourante + ']')
         .attr('selected', true);
 

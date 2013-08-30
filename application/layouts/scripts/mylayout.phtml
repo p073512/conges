@@ -159,6 +159,16 @@ echo $this->doctype() ?>
                              
                            </ul>
                          </li>
+                         <li class="divider-vertical"></li>
+                         <li class="dropdown">
+                           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Solde<b class="caret"></b></a>
+                           <ul class="dropdown-menu">
+                            <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'index'), 'default', true) ?>">Afficher Soldes</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'init-solde-personne-annee'), 'default', true) ?>">Initialiser solde</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'fiche-rh'), 'default', true) ?>">Fiche RH</a></li>
+                             <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'sommeConges'), 'default', true) ?>">Sommes Congés</a></li>
+                           </ul>
+                         </li>
                        </ul>
                      </div><!-- /.nav-collapse -->
                    </div>

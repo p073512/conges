@@ -56,21 +56,26 @@ class Default_Model_SoldeMapper
 	}
 
 	//récupére une entrée dans la table
-	public function find($annee_reference, Default_Model_Solde $solde)
+	public function find($annee_reference,$idPersonne, Default_Model_Solde $solde)
 	{
-		$result = $this->getDbTable()->find($annee_reference);
+
+	
+	
+		$result = $this->getDbTable()->find($annee_reference,strval($idPersonne));
+		
 		if (0 == count($result)) 
 		{
 			return;
 		}
 		
+		
+		
 		$row = $result->current();
 		$RowPersonne = $row->findParentRow('Default_Model_DbTable_Personne');
         $Personne = new Default_Model_Personne($RowPersonne->toArray());
         
-	
-		$date_entree = $personne->getDate_entree();
-		$modalite = $personne->getModalite()->getId();
+        $date_entree = $Personne->getDate_entree();
+		$modalite = $Personne->getModalite()->getId();
 		//initialisation de la variable $row avec l'entrée récupérée
 		$row = $result->current();
 
@@ -85,6 +90,7 @@ class Default_Model_SoldeMapper
 			$solde->setTotal_q1($modalite);
 			
 			$solde->setAnnee_reference();
+		return $result;
 			
 	}
 
@@ -94,7 +100,7 @@ class Default_Model_SoldeMapper
 		//récupération dans la variable $resultSet de toutes les entrées de notre table
 		$resultSet = $this->getDbTable()->fetchAll($str);
 		$personne = new Default_Model_Personne();
-		$personne = $personne->fetchall($str=array());
+		$personne = $personne->fetchAll($str=array());
 		
 		//chaque entrée est représentée par un objet Default_Model_Personne
 		//qui est ajouté dans un tableau
@@ -103,7 +109,7 @@ class Default_Model_SoldeMapper
 		{
 			$date_entree = $p->getDate_entree();
 			$id_personne = $p->getId();
-			$modalite = $p->getId_modalite();
+			$modalite = $p->getModalite()->getId();
 			$entry = new Default_Model_Solde();
 			$entry->setPersonne($id_personne);
 			$entry->setTotal_cp($date_entree);
@@ -116,7 +122,12 @@ class Default_Model_SoldeMapper
 
 		return $entries;
 	}
-
+    
+	
+	
+	
+	
+	
 	//permet de supprimer un utilisateur,
 	//reçoit la condition de suppression (le plus souvent basé sur l'id)
 	public function delete($id_personne)

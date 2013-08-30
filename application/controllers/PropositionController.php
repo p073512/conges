@@ -2,11 +2,13 @@
 <?php
 class PropositionController extends Zend_Controller_Action
 {   
-     
+	
+	protected $lastPage;
      public function preDispatch() 
     {
     	    $doctypeHelper = new Zend_View_Helper_Doctype();
             $doctypeHelper->doctype('HTML5');
+            
 	}
  
 	//:::::::::::::// ACTION INDEX //::::::::::::://
@@ -18,7 +20,9 @@ class PropositionController extends Zend_Controller_Action
 
 		//cr�ation de notre objet Paginator avec comme param�tre la m�thode
 		//r�cup�rant toutes les entr�es dans notre base de donn�es
-		$paginator = Zend_Paginator::factory($proposition->fetchAll($str=array()));
+		$etats = array('NC','KO');
+		$where = array('etat in (?)'=> $etats); // condition pour récupérer que les propositions non traitées , pour avoir toutes les proposition enlevez le $where de la fonction fetchALL
+		$paginator = Zend_Paginator::factory($proposition->fetchAll($str = array(),$where));
 		//indique le nombre d�l�ments � afficher par page
 		$paginator->setItemCountPerPage(20);
 		//r�cup�re le num�ro de la page � afficher
@@ -214,7 +218,7 @@ class PropositionController extends Zend_Controller_Action
         // remplir le select avec les ressources CSM lors du chargement de la page 
        
 	    $where =  array("id_entite = ?" => 2);
-	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
+	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where,'getPole');
 			
 		
 	    
@@ -234,6 +238,7 @@ class PropositionController extends Zend_Controller_Action
 			//v�rifie que les donn�es r�pondent aux conditions des validateurs
 			if($form->isValid($data))  // form valide 
 			{
+				
 				if($data['Ressource'] === 'x')  // si on a pas selectionn� une ressource  id = 'x'
 				{
 				   $this->view->error = "Veuillez selectionner une ressource !";
@@ -272,7 +277,7 @@ class PropositionController extends Zend_Controller_Action
 				       {    
 				       	    // pour l'affichage de  " du : 2013-05-06 � Midi"     au lieu de  " du : 2013-02-06 12:00:00 " 
 							$Arr =  $outils->makeMidi($date[0],$date[1]);  	
-				        	$this->view->warning = $pers->getNomPrenom()." a pos&eacute; une proposition sur une periode non ouvrable date debut :   ".$Arr[0]."  ".$Arr[1]."   date fin :  ".$Arr[2]."  ".$Arr[3];  
+				        	$this->view->warning = $pers->getNomPrenom()." vous avez posé une proposition sur une periode non ouvrable date debut :   ".$Arr[0]."  ".$Arr[1]."   date fin :  ".$Arr[2]."  ".$Arr[3];  
 				       }
 				       else 
 				       {
@@ -280,6 +285,19 @@ class PropositionController extends Zend_Controller_Action
 							$proposition->setId_personne($data['Ressource']);	
 						    $proposition->setDate_debut($tab[0]);   // date_debut normaliser 
 							$proposition->setDate_fin($tab[1]);     // date_fin normaliser 
+							
+							    // extraire la date_debut
+								$dm = substr($tab[0],11,18);   // extraire le time de la date_debut
+							
+								if($dm == '12:00:00') $data['DebutMidi'] = '1';
+								else $data['DebutMidi'] = '0';
+								
+								   // extraire la date_fin
+								$fm = substr($tab[1],11,18);     // extraire le time de la date_fin
+								
+								if($fm == '11:59:59') $data['FinMidi'] = '1';
+								else $data['FinMidi'] = '0';
+		                    
 							$proposition->setMi_debut_journee($data['DebutMidi']);
 							$proposition->setMi_fin_journee($data['FinMidi']);
 
@@ -289,26 +307,27 @@ class PropositionController extends Zend_Controller_Action
 
 							$proposition->setEtat('NC');
 	                                
+							
+							//****************/// Gestion des chevauchements de congés ///****************//			
+							 $c = new Default_Model_DbTable_Conge();
+							 $res_c = $c->conges_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getMi_debut_journee(),$proposition->getMi_fin_journee(),null);
+		                    //****************************************************************************//	    
+							
 							//****************/// Gestion des chevauchements de propositions ///****************//			
 						  	 $p = new Default_Model_DbTable_Proposition();
 							 $res_p = $p->propositions_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getMi_debut_journee(),$proposition->getMi_fin_journee(), null);
 		                    //****************************************************************************//	
 									
-							//****************/// Gestion des chevauchements de cong�s ///****************//			
-							 $c = new Default_Model_DbTable_Conge();
-							 $res_c = $c->conges_en_double($proposition->getId_personne(),$proposition->getDate_debut(),$proposition->getDate_fin(),$proposition->getMi_debut_journee(),$proposition->getMi_fin_journee(), null);
-		                    //****************************************************************************//	    
-								        
+							
+						    
 					         // pour l'affichage de  " du : 2013-05-06 � Midi"     au lieu de  " du : 2013-02-06 12:00:00 " 
 							 $Arr =  $outils->makeMidi($proposition->getDate_debut(),$proposition->getDate_fin());  	
 	    
 						     // proposition n'existe pas dans la base de donn�e 
-		                      if($res_p == null)
+		                      if($res_p == null && $res_c == null) // si pas de congé ni proposition touchant la période.
 		                   	  {    
-		                   		  // si le cong� n'existe pas 
-		                   		  if($res_c == null)
-		                   		  {
-		                   		  	
+		                   		  // si proposition et congé n'existent pas 
+		                   		  
 		                   		      $res =  $outils->authorized($pers,$proposition);
 		                   		      
 		                   		     
@@ -355,21 +374,20 @@ class PropositionController extends Zend_Controller_Action
 									  }
 		                   		  }
 		                   	      // si le cong� existe 
-						  	      else
+						  	      else if(count($res_c) > 0)
 						          {   
 					    	       	 // non 
-		               			     $this->view->warning = "La proposition de :".$pers->getNomPrenom()." est d&eacute;j&agrave; pass&eacute;e en cong&eacute; !";
-							      }	 
-		                   	   }
+		               			     $this->view->warning = "Un congé existe déjà à cette période!";
+							      }
+							      else if(count($res_p) > 0 )
+							      {
+							      	 $Arr =  $outils->makeMidi($res_p[0]['date_debut'],$res_p[0]['date_fin']);
+									 $this->view->warning = $pers->getNomPrenom()." &nbsp;&nbsp;a d&eacute;j&agrave; pos&eacute; une proposition sur la p&eacute;riode &nbsp;&nbsp;&nbsp; du :  ".$Arr[0]."  ".$Arr[1]."	&nbsp;&nbsp;&nbsp; au :  ".$Arr[2]."  ".$Arr[3]." &nbsp;!";    
+							      }
+		                   	   
 							   else   // chevauchement existe 
 							   {     
-								    if(count($res_p) == 1)  // doublon = 1 
-									{  	
-							                $Arr =  $outils->makeMidi($res_p[0]['date_debut'],$res_p[0]['date_fin']);
-											$this->view->warning = $pers->getNomPrenom()." &nbsp;&nbsp;a d&eacute;j&agrave; pos&eacute; une proposition sur la p&eacute;riode &nbsp;&nbsp;&nbsp; du :  ".$Arr[0]."  ".$Arr[1]."	&nbsp;&nbsp;&nbsp; au :  ".$Arr[2]."  ".$Arr[3]." &nbsp;!";    
-									} 
-									else  // doublons > 1 
-									{   
+								  
 											
 											// Responsable sur l'affichage de la periode total des propositions ( 'date_debut' de la "1ere proposition"     et 'date_fin' de la "derniere proposition" )
 											// remplir un tableau par toute les dates (debut et fin) de toute les propositions de cette personne 
@@ -389,7 +407,7 @@ class PropositionController extends Zend_Controller_Action
 										
 								}
 								    	    
-								    }
+								    
 				         } // else if tab null
 					}
 					catch (Exception $e) 
@@ -418,11 +436,12 @@ class PropositionController extends Zend_Controller_Action
         // remplir le select avec les ressources CSM lors du chargement de la page 
        
 	    $where =  array("id_entite = ?" => 2);
-	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
+	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where,'getPole');
+			
 			
 				
-				
 				$form->populate($data);
+					
 				if($data['Ressource'] === 'x')     // si on a pas selectionn� une ressource  id = 'x'
 				{
 				   $this->view->error = "Veuillez selectionner une ressource !";
@@ -465,7 +484,7 @@ class PropositionController extends Zend_Controller_Action
         // remplir le select avec les ressources CSM lors du chargement de la page 
        
 	    $where =  array("id_entite = ?" => 2);
-	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
+	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where,'getPole');
 			
 			
 			
@@ -518,7 +537,7 @@ class PropositionController extends Zend_Controller_Action
 
 	     // remplie le select avec le  nom et prenom de la personne ayant id personne  
 	     $where = array('id = ?' => $id_personne);
-		 $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
+		 $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where,'getPole');
 
 		 
 		 // placeholders
@@ -628,7 +647,7 @@ class PropositionController extends Zend_Controller_Action
 			                   {   // oui 
 									 $proposition->save();
 			                   		 $this->view->success = " La proposition a &eacute;t&eacute; modifi&eacute; avec succ&eacute;s !";
-								     header("Refresh:1.5;URL=".$baseurl."/proposition/afficher");              // URL dynamique 
+								     header("Refresh:1.5;URL='../../afficher'");              // URL dynamique 
                                }
 			                   // si le cong� existe 
 								elseif($res_c <> null)
@@ -670,6 +689,7 @@ class PropositionController extends Zend_Controller_Action
 	//:::::::::::::// ACTION DELETE //::::::::::::://
 	public function supprimerAction()
 	{
+		 $result = null;
 		 if($this->getRequest()->isXmlHttpRequest())
 		 {     
 		 	//r�cup�re les param�tres de la requ�te Ajax 
@@ -685,9 +705,11 @@ class PropositionController extends Zend_Controller_Action
 			{     //appel de la fcontion de suppression avec en argument,
 				  //la clause where qui sera appliqu�e
 				  $result = $proposition->delete("id=$id");   
+				 
 			}
 			catch (Zend_Db_Exception $e)
 			{
+				
 					// en cas d'erreur envoi de reponse avec code erreur [500]
 					$content = array("status"=>"500","result"=> $result);
 	       			$this->view->error= "Erreur";
@@ -712,12 +734,23 @@ class PropositionController extends Zend_Controller_Action
 	//:::::::::::::// ACTION Valider //::::::::::::://
 	public function validerAction()
 	{
+		
+		
+		$this->view->warning = null;
+		
+		$propo = new Default_Model_Proposition;
+		$paginator = Zend_Paginator::factory($propo->fetchAll($str = array()));
+		$paginator->setItemCountPerPage(10);
+		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
+		$this->view->propositionArray = $paginator; 	
+		
+		
 		//r�cup�re les param�tres de la requ�te	
 		$params = $this->getRequest()->getParams();
 
 		$proposition = new Default_Model_Proposition();
 		$result = $proposition->find($params['id']);
-
+      
         if(isset($params['id']))
 		{   
 				// sauvegarder les donn�es recus de la requete 
@@ -727,7 +760,26 @@ class PropositionController extends Zend_Controller_Action
 				$date_fin = $proposition->getDate_fin();
 				$debut_midi = $proposition->getMi_debut_journee();
 				$fin_midi = $proposition->getMi_fin_journee();
-				    	
+				
+				
+				
+							
+				/// Gestion des chevauchements de cong�s	
+				$c = new Default_Model_DbTable_Conge();
+				$res_c = $c->conges_en_double($id_personne,$date_debut,$date_fin,$debut_midi,$fin_midi, null);
+                
+				
+				if($res_c != null)
+				{
+					 $this->view->warning =  'Des Congés existent déjà sur cette période !';
+					 $this->_helper->viewRenderer('valider'); 
+					
+					
+				}
+				
+				else 
+				{
+					    	
 				// mettre l'etat de la proposition � OK
 				$etat = $proposition->setEtat("OK")->save();  
 			            
@@ -766,11 +818,16 @@ class PropositionController extends Zend_Controller_Action
 				
 			    if (!in_array($result->getId('id'), $tableau_id_conge))
 			    {
-					$conge->save();
+				 $conge->save();
 			    }
-
+                $this->view->success = 'La proposition à été bien validé';
 				//redirection
-				$this->_helper->redirector('afficher');
+				$this->_helper->viewRenderer('valider');
+				}
+				
+				
+				
+				
 		 }  
  }
 
@@ -804,8 +861,12 @@ class PropositionController extends Zend_Controller_Action
 	//:::::::::::::// ACTION AFFICHER//::::::::::::://
 	public function afficherAction ()
 	{
+		
+		$this->lastPage = $this->_getParam('page');
 		$proposition = new Default_Model_Proposition;
-		$paginator = Zend_Paginator::factory($proposition->fetchAll($str = array()));
+		$etats = array('NC','KO');
+		$where = array('etat in (?)'=> $etats); // condition pour récupérer que les propositions non traitées , pour avoir toutes les proposition enlevez le $where de la fonction fetchALL
+		$paginator = Zend_Paginator::factory($proposition->fetchAll($str = array(),$where));
 		$paginator->setItemCountPerPage(10);
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 		$this->view->propositionArray = $paginator; 		

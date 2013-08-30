@@ -1,25 +1,86 @@
 <?php
-//"Default" correspond au namespace que nous avons défini dans le bootstrap
-class Default_Form_Solde extends Zend_Form
+//"Default" correspond au namespace que nous avons dÃ©fini dans le bootstrap
+class Default_Form_Solde extends Default_Form_MyForm
 {
-	//l'initialisation et la configuration des éléments de notre formulaire
+	//l'initialisation et la configuration des Ã©lÃ©ments de notre formulaire
 	//se trouveront dans le constructeur de la classe,
-	//de cette façon tous les éléments de notre formulaire seront créés lors
+	//de cette faÃ§on tous les Ã©lÃ©ments de notre formulaire seront crÃ©Ã©s lors
 	//de l'instaniation d'un objet de type Default_Form_Users
+	protected $_iAnnee;
+	protected $_iSubmit;
+	
+     public function getiAnnee()
+        {
+    	return $this->_iAnnee;
+        }
+        
+     public function getiSubmit()
+	    {
+	    	return $this->_iSubmit;
+	    }
+	    
+	    public function init()
+	 {
+
+	 	
+	 	parent::init();
+        
+        // si on veut changer le nom ou la mÃ©thode du form appliquez ces mÃ©thodes.
+		$this->setName('initialiserSolde');
+	    $this->setMethod('post');
+		 /*
+         * Champ input type text nom 
+         * Validation : requis,
+         * Filtre : StringTrim (supprime les espaces en dÃ©but et fin ),
+         *          StringTags (supprime les balises html et php)
+         */
+         
+			$date = new DateTime();
+	        $year = $date->format('Y');
+
+   		 $this->_iAnnee = $this->createElement('text', 'Annee',array(
+   		 'label' => 'Annee',
+   		 'placeholder' => 'Entrez une annÃ©e..',
+   		 'required' => true,
+  		 'filters'=> array('StripTags','StringTrim'),
+   		 'validators' => array( 
+                                 array('Between',
+                                   true,
+                                     array('min' => $year-1, 'max' => $year+1),
+                                       array('Messages' => 'AnnÃ©e entre '.($year-1).' et '.($year+1).' !')),
+   		                         array('NotEmpty',
+   		                            true,
+   		                               array('Messages'=>'Veuillez saisir une annÃ©e !')),
+   		                         array('stringLength',
+   		                             true,
+   		                               4,
+   		                                 array('Messages'=>"L'annÃ©e doit Ãªtre sur 4 digits"))
+   		                         )
+   		 ));
+   		 
+   		  $this->iSubmit =   new Zend_Form_Element_submit( 'creer',
+		   array('label' => 'Initialiser'));
+   		 
+	    $this->addElements(array($this->getiAnnee(),
+	                             $this->getiSubmit(),)); 
+	    
+	 }
+	 
+	
+	 
+	
+	/**
 	public function  __construct($options = null) {
 		parent::__construct($options);
 
-		//donne un nom à notre formulaire
+		//donne un nom Ã  notre formulaire
 		$this->setName('solde');
 		$this->removeDecorator('DtDdWrapper');
 		$this->removeDecorator('HtmlTag');
 		$this->removeDecorator('Label');
-		//création d'un élément input de type hidden
+		//crÃ©ation d'un Ã©lÃ©ment input de type hidden
 		$id = new Zend_Form_Element_Hidden('id');
 
-		$date=date('D/d/m/Y');
-		list($dcourt,$day, $month, $year) = explode("/", $date);
-		$year =	(int)$year;
 		
 		$annee_reference_sl = new Zend_Form_Element_Text('annee_reference_sl');
 		$annee_reference_sl->setRequired(true);
@@ -38,11 +99,12 @@ class Default_Form_Solde extends Zend_Form
 		$submit_sl->removeDecorator('HtmlTag');
 		$submit_sl->removeDecorator('Label');
 
-		//ajout des éléments au formulaire
+		//ajout des Ã©lÃ©ments au formulaire
 		$this->addElements(array(
 		$id,
 		$annee_reference_sl,
 		$submit_sl));
 	
 	}
+	**/
 }

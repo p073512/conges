@@ -347,7 +347,8 @@ function dPath(x, y, w, h, r1, r2, r3, r4) {
 function DrawMonthCalendar(periode, opt, dataset, filtre) {
 
 
-   
+   console.log(periode.From);
+   console.log(periode.To);
 
 
     // balise svg incluse dans le div conteneur dont l'id est 'wrapper'

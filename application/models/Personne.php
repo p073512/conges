@@ -304,6 +304,11 @@ class Default_Model_Personne
 		return $this->getMapper()->IsExist($nom,$prenom);
 	}
 	
+	public function getRessourcesByCs($cs)
+	{
+		return $this->getMapper()->getRessourcesByCs($cs);	
+	}
+	
 	
 	//r�cup�re toutes les entr�es de la table
 	public function fetchAll($str,$where = null)

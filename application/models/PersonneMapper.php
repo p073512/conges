@@ -148,6 +148,34 @@ class Default_Model_PersonneMapper
 
 		return $entries;
 	}
+	
+	/**
+	 * function : fonction qui retourne les ressouces selon le centre de service
+	 * auquel elles appartiennent.
+	 *
+	 */
+	public function getRessourcesByCs($cs)
+	{
+		if($cs == true)
+		$cs = '1';
+		else if($cs == false)
+		$cs = '0';
+		
+		$db = Zend_Db_Table_Abstract::getDefaultAdapter();
+		$select = new Zend_Db_Select($db);
+		
+		
+		$select = $db->select()
+             ->from(array('p' => 'personne'))
+             ->join(array('e' =>'entite'),
+                   'p.id_entite = e.id')
+             ->where('e.cs = ?', $cs);
+		
+		$result = $select->query()->fetchAll();
+		return $result;
+		
+		
+	}
 
 	//permet de supprimer un utilisateur,
 	//reçoit la condition de suppression (le plus souvent basé sur l'id)

@@ -20,11 +20,28 @@ class My_Form_Decorators_Fselect extends Zend_Form_Decorator_Abstract
 		$elementOptions = $element->getMultiOptions() ;
 		
 		$options="";
+		
  		foreach($elementOptions as $id_opt=>$option)
 		{
+			if(is_array($option)) // tableau multidimension (Cas optgroup renseigne)
+			{
+				$options.= '<optgroup value="'.$id_opt.' "label="'.$id_opt.'">';
+				foreach ($option as $val=>$labelopt)
+				{
+					$selected = ($value == $val) ?"selected":"";
+					$options .= "<option value='$val' ".$selected.">$labelopt</option>";
+				}
+				$options .= '</optgroup>';
+
+	
+			}
+			else
+			{
 			$selected = ($value == $id_opt) ?"selected":"";
 		    $options .= "<option value='$id_opt' ".$selected.">$option</option>";
 		   
+			}
+		
 		}
 		
 		$separateur = "<br/>";

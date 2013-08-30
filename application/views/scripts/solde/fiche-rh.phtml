@@ -1,0 +1,94 @@
+<div class="row-fluid offset1">
+		<div id="header-container">
+            
+			<div class="dropdown">
+                  <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
+                     Soldes
+                     <b class="caret"></b>
+                  </a>
+                  
+                   <ul class="dropdown-menu">
+                        <li><a href="<?php echo $this->url(array('controller' => 'ptrsolde', 'action' => 'index-solde'), 'default', true) ?>">Afficher soldes</a></li>
+                        <li class="nav-header">Initialiser</li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'ptrsolde', 'action' => 'init-solde-personne-annee'), 'default', true) ?>">Une Personne Une Ann�e</a></li>
+                  </ul>
+              
+			</div><!--MBA : fermeture dropdown -->
+          
+		</div><!-- MBA : fermeture div="header-container" -->
+	</div><!-- MBA : fermeture div="row-fluid -->
+         <br/>
+
+<div class="container">
+		<div class="well row-fluid">
+		<h2>Fiche RH : </h2><h4><?php if(isset($this->soldeArray['ressource'])) echo $this->soldeArray['ressource']; ?></h4><br/>
+	<?php 	if(isset($this->error)){ 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Alerte!</strong>  <?php //Message d'erreur
+                                         echo "Erreur :".$this->error; ?>
+			</div>
+
+	<?php }
+    /*
+	 * Si erreurs de traitements* renvoyé depuis le controlleur 
+	 * traitemets : logique, ajout BD, Exception ...
+	 */
+	
+	else if(isset($this->success)){
+	?>
+	
+	<!-- afficage message succés  -->
+            <div class="alert alert-info">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Succes!</strong> <?php //Message succes
+	                                      echo $this->success; ?>
+			</div>
+	<?php }?>
+	<div class="span3 well"><?php	echo $this->form; ?></div>
+    <table class="well span8 table table-hover" style="{float:left}">
+       <thead> 
+       <tr>
+           
+            <th>Nombre de jours</th>
+            <th>Droits</th>
+            <th>Consommes</th>
+            <th>Solde</th>
+            <th>Solde previsionnel</th>
+            <th>Reliquat</th>
+
+        </tr>
+        </thead>
+       <tbody> 
+       <tr>
+            <td>Conges payes</td>
+            <td><?php if(isset($this->soldeArray["droits"]["CP"]))echo $this->soldeArray["droits"]["CP"]; else echo'-'; ?></td>
+            <td><?php if(isset($this->soldeArray["consomme"]["CP"]))echo $this->soldeArray["consomme"]["CP"];else echo '-'; ?></td>
+            <td><?php if(isset($this->soldeArray["solde_courant"]["CP"])) echo $this->soldeArray["solde_courant"]["CP"]; else echo '-'; ?></td>
+            <td><?php if(isset($this->soldeArray["solde_prev"]["CP"])) echo $this->soldeArray["solde_prev"]["CP"]; else echo '-'; ?></td>
+            <td><?php if(isset($this->soldeArray["reliquat"]["CP"]))echo $this->soldeArray["reliquat"]["CP"]; else echo '-'; ?></td>
+        </tr>
+       <tr>
+            <td>RTT Q1</td>
+            <td><?php if(isset($this->soldeArray["droits"]["Q1"])) echo $this->soldeArray["droits"]["Q1"]; else echo '-'; ?></td>
+            <td><?php if(isset($this->soldeArray["consomme"]["Q1"]))echo $this->soldeArray["consomme"]["Q1"]; else echo '-'; ?></td>
+            <td><?php if(isset($this->soldeArray["solde_courant"]["Q1"]))echo $this->soldeArray["solde_courant"]["Q1"]; else echo '-'; ?></td>
+            <td><?php if(isset($this->soldeArray["solde_prev"]["Q1"]))echo $this->soldeArray["solde_prev"]["Q1"]; else echo '-'; ?></td>
+            <td><?php if(isset($this->soldeArray["reliquat"]["Q1"])) echo $this->soldeArray["reliquat"]["Q1"]; else echo '-'; ?></td>
+        </tr>
+       <tr>
+            <td>RTT Q2</td>
+            <td><?php if(isset($this->soldeArray["droits"]["Q2"])) echo $this->soldeArray["droits"]["Q2"]; else echo '-';?></td>
+            <td><?php if(isset($this->soldeArray["consomme"]["Q2"])) echo $this->soldeArray["consomme"]["Q2"]; else echo '-';?></td>
+            <td><?php if(isset($this->soldeArray["solde_courant"]["Q2"])) echo $this->soldeArray["solde_courant"]["Q2"]; else echo '-';?></td>
+            <td><?php if(isset($this->soldeArray["solde_prev"]["Q2"])) echo $this->soldeArray["solde_prev"]["Q2"]; else echo '-';?></td>
+            <td>-</td>
+        </tr>
+    </table>
+    
+	</div>
+
+</div>

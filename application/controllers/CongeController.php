@@ -1,228 +1,647 @@
 <?php
 class CongeController extends Zend_Controller_Action
 {
-	//action par défaut
+    public function preDispatch() 
+    {
+	    $doctypeHelper = new Zend_View_Helper_Doctype();
+        $doctypeHelper->doctype('HTML5');	
+       
+    }
+	
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::// ACTION INDEX //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+	  
 	public function indexAction()
 	{
-		//création d'un d'une instance Default_Model_Users
+		//crï¿½ation d'un d'une instance Default_Model_Users
 		$conge = new Default_Model_Conge();
 
-		//$this->view permet d'accéder à la vue qui sera utilisée par l'action
+		//$this->view permet d'accï¿½der Ã  la vue qui sera utilisï¿½e par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
-		//la valeur correspond à un tableau d'objets de type Default_Model_Users récupérés par la méthode fetchAll()
+		//la valeur correspond Ã  un tableau d'objets de type Default_Model_Users rï¿½cupï¿½rï¿½s par la mï¿½thode fetchAll()
 		//$this->view->usersArray = $users->fetchAll();
 
-		//création de notre objet Paginator avec comme paramètre la méthode
-		//récupérant toutes les entrées dans notre base de données
+		//crï¿½ation de notre objet Paginator avec comme paramï¿½tre la mï¿½thode
+		//rï¿½cupï¿½rant toutes les entrï¿½es dans notre base de donnï¿½es
 		$paginator = Zend_Paginator::factory($conge->fetchAll($str =array()));
-		//indique le nombre déléments à afficher par page
+		//indique le nombre dï¿½lï¿½ments Ã  afficher par page
 		$paginator->setItemCountPerPage(20);
-		//récupère le numéro de la page à afficher
+		//rï¿½cupï¿½re le numï¿½ro de la page Ã  afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 
-		//$this->view permet d'accéder à la vue qui sera utilisée par l'action
+		//$this->view permet d'accï¿½der Ã  la vue qui sera utilisï¿½e par l'action
 		//on initialise la valeur usersArray de la vue
 		//(cf. application/views/scripts/users/index.phtml)
 		
-		
 		$this->view->congeArray = $paginator;
-		
 	}
-
-	public function createAction()
-	{
-		
-		
-		//création du fomulaire
-		$form = new Default_Form_Conge();
-		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'conge', 'action' => 'create'), 'default', true));
-		$form->submit->setLabel('Valider');
-		$this->view->form = $form;
-		$this->view->title = "Deposer un conge";
-		$this->view->headLink()->appendStylesheet($this->view->baseUrl().'/css/page2.css');
-		$data = array();
-			
-		if($this->_request->isPost())
-		{
-				//récupération des données envoyées par le formulaire
-				$data = $this->_request->getPost();
-	
-				//vérifie que les données répondent aux conditions des validateurs
-			if($form->isValid($data))
-			{
-					//création et initialisation d'un objet Default_Model_Users
-					//qui sera enregistré dans la base de données
-					$conge = new Default_Model_Conge();
-					$conge->setId_personne($form->getValue('id_personne'));
-					$conge->setId_type_conge($form->getValue('id_type_conge'));
-					$conge->setDate_debut($form->getValue('date_debut'),'yy-mm-dd');
-					$conge->setDate_fin($form->getValue('date_fin'),'yy-mm-dd');
-					$conge->setMi_debut_journee($form->getValue('mi_debut_journee'));
-					$conge->setMi_fin_journee($form->getValue('mi_fin_journee'));
-					$conge->setNombre_jours();
-					$conge->setAnnee_reference($form->getValue('annee_reference'));
-					$conge->setFerme($form->getValue('ferme'));
-					/*
-					 * Gestion du chevauchement
-					 * on appelle le helper pour verifierl'existance des proposition avant 
-					 * l'enregistrement dans la base
-					 */
-					
-					if($this->_helper->validation->verifierConges($form->getValue('id_personne'),$form->getValue('date_debut'),$form->getValue('date_fin'),$form->getValue('mi_debut_journee'),$form->getValue('mi_fin_journee'),$form->getValue('id_type_conge'),0))
-					{
-						$conge->save();
-						//redirection
-						$this->_helper->redirector('index');
-					}
-					else 
-					{
-						$form->populate($data);
-						if($form->getValue('annee_reference')==0)
-						echo "<strong><em><span style='background-color:rgb(255,0,0)'> annee de reference doit etre non nulle</span></em></strong>";
-						else echo "<strong><em><span style='background-color:rgb(255,0,0)'>  conge deja demande</span></em></strong>";
-					}
-			}
-			else 
-			{
-				$form->populate($data);
-				if($form->getValue('annee_reference')==0)
-				echo "<strong><em><span style='background-color:rgb(255,0,0)'> annee de reference doit etre non nulle</span></em></strong>";
-				else echo "<strong><em><span style='background-color:rgb(255,0,0)'>  conge deja demande</span></em></strong>";
-			}
-		}
-		else
-		{
-			$form->populate($data);
-		}
-		
-	}
-
-	public function editAction()
-	{
-		//création du fomulaire
-		$form = new Default_Form_Conge();
-		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'conge', 'action' => 'edit'), 'default', true));
-		$form->submit->setLabel('Modifier');
-		$this->view->title = "Modification du conge";
-		//assigne le formulaire à la vue
-		$this->view->form = $form;
-
-		//si la page est POSTée = formulaire envoyé
-		if($this->getRequest()->isPost())
-		{
-			//récupération des données envoyées par le formulaire
-			$data = $this->getRequest()->getPost();
-
-			//vérifie que les données répondent aux conditions des validateurs
-			if($form->isValid($data))
-			{
-				
-				//création et initialisation d'un objet Default_Model_Conge
-				//qui sera enregistré dans la base de données
-				$conge = new Default_Model_Conge();
-				$conge->setId($form->getValue('id'));
-				$conge->setId_personne($form->getValue('id_personne'));
-				
-				//$date_debut = new Zend_Date;
-				//$date_debut->set($form->getValue('date_debut'),'yy-mm-dd');
-				$conge->setDate_debut($form->getValue('date_debut'),'yy-mm-dd');
-				$conge->setDate_fin($form->getValue('date_fin'),'yy-mm-dd');
-				$conge->setMi_debut_journee($form->getValue('mi_debut_journee'));
-				$conge->setMi_fin_journee($form->getValue('mi_fin_journee'));
-				$conge->setNombre_jours();
-				$conge->setId_type_conge($form->getValue('id_type_conge'));
-				$conge->setAnnee_reference($form->getValue('annee_reference'));
-				$conge->setFerme($form->getValue('ferme'));
-				if($this->_helper->validation->verifierConges($form->getValue('id_personne'),$form->getValue('date_debut'),$form->getValue('date_fin'),$form->getValue('mi_debut_journee'),$form->getValue('mi_fin_journee')))
-				{
-					$proposition->save();
-					//redirection
-					$this->_helper->redirector('index');
-					
-				}
-				else 
-				{
-					$form->populate($data);
-					$this->view->title = "<strong><em><span style='background-color:rgb(255,0,0)'> proposition ou conge deja demande</span></em></strong>";
-				}
-			}
-			else
-			{
-				//si erreur rencontrée, le formulaire est rempli avec les données
-				//envoyées précédemment
-				$form->populate($data);
-			}
-		}
-		else
-		{
-			//récupération de l'id passé en paramètre
-			$id = $this->_getParam('id', 0);
-
-			if($id > 0)
-			{
-				//récupération de l'entrée
-				$conge = new Default_Model_Conge();
-				$conge = $conge->find($id);
-
-				//assignation des valeurs de l'entrée dans un tableau
-				//tableau utilisé pour la méthode populate() qui va remplir le champs du formulaire
-				//avec les valeurs du tableau
-				$data[] = array();
-				$data['id'] = $conge->getId();
-				$data['id_personne'] = $conge->getId_personne();
-				$data['date_debut'] = $conge->getDate_debut();
-				$data['mi_debut_journee'] = $conge->getMi_debut_journee();
-				$data['date_fin'] = $conge->getDate_fin();
-				$data['mi_fin_journee'] = $conge->getMi_fin_journee();
-				$data['nombre_jours'] = $conge->getNombre_jours();
-				$data['id_type_conge'] = $conge->getId_type_conge();
-				$data['annee_reference'] = $conge->getAnnee_reference();
-				$data['ferme'] = $conge->getFerme();
-				$personne = new Default_Model_Personne();
-				$result_set_personnes = $personne->find($id);
-				$this->view->title = "Modification de la proposition de Mr/Mme : ".$result_set_personnes->getNom()." ".$result_set_personnes->getPrenom();
-				$form->populate($data);
-			
-				
-				
-			}
-		}
-	}
-
-	public function deleteAction()
-	{
-		//récupére les paramètres de la requête
-		$params = $this->getRequest()->getParams();
 
 	
+	
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::// ACTION CREER //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
 
-		//vérifie que le paramètre id existe
-		if(isset($params['id']))
+	public function creerAction()
+	{   
+		// detecter la version du navigateur :) Ã  utiliser 
+		
+		// $userAgent = new Zend_Http_UserAgent();
+		// $r = $userAgent->getDevice()->getBrowserVersion();
+		// var_dump($r);
+	
+
+		// crï¿½ation du fomulaire
+		 $form = new Default_Form_Conge();
+		 
+		//indique l'action qui va traiter le formulaire
+		//$form->setAction($this->view->url(array('controller' => 'conge', 'action' => 'creer'), 'default', true));
+
+        // assigne le formulaire Ã  la vue
+		$this->view->form = $form;
+		$this->view->title = "<h4>DÃ©poser un congÃ© :</h4><br/>";
+
+
+		// remplir la list Annï¿½e de reference par Annee , Annee + 1 , Annee - 1
+	    $date_tmp = getdate(); // recuperer date system
+	    $annee = (string) $date_tmp['year']; // extraire l'annï¿½e 
+	    
+	    // remplir la list par annee-1 , annee , annee+1
+	    $list_annee = array((string)$annee-1=>(string)$annee-1,$annee=>$annee,(string)$annee+1=>(string)$annee+1);
+		$anneeref = $form->getElement('AnneeRef');
+		$anneeref->setValue($annee);
+		$anneeref->setMultiOptions($list_annee);
+		
+
+		// remplir le select par les ressources front 
+        $where = array('id_entite <> ?' => '2');
+	    $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',null,'getEntite');
+		
+	    
+	    // remplir le type de conge  
+	     $form->setDbOptions('TypeConge',new Default_Model_TypeConge(),'getId','getCode');
+
+		 $this->_helper->viewRenderer('creer');  // creer conge
+
+	    // requete POST 
+		if($this->_request->isPost())   
 		{
-			$id = $params['id'];
+			
+			// rï¿½cupï¿½ration des donnï¿½es envoyï¿½s par le formulaire
+			$data = $this->_request->getPost();
+			$personne = new Default_Model_Personne();
+			$id_personne = $data['Ressource'];       // id personne 
 
-			//création du modèle pour la suppression
+	         $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
+			
+	         $outils = new Default_Controller_Helpers_outils(); 
+			
+			// Vï¿½rifie si les donnï¿½es rï¿½pondent aux conditions de validateurs 
+			if($form->isValid($data)) // formulaire valide 
+			{
+				
+	            if($data['Ressource'] === 'x')     // si on a pas selectionnï¿½ une ressource  id = 'x'
+				{$this->view->error = "Veuillez selectionner une ressource !";}
+				
+				
+				elseif($data['TypeConge'] === 'x')     // si on a pas selectionnï¿½ un type de conge
+				{ 
+					$this->view->error = "Veuillez selectionner un Type de conge !";
+				}
+				
+				elseif ($data['Debut'] > $data['Fin'])   // si la date_debut > date_fin          
+				{$this->view->error = "La date de d&eacutebut doit &ecirc;tre inf&eacuterieure ou &eacute;gale &agrave la date de fin";}
+				
+				// si on a cochï¿½ dans une journï¿½e les deux cases debut_midi et fin_midi 
+				elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1)) 
+				{   
+				    $this->view->error = "Sur un meme jour vous ne pouvez selectionner que ' Debut midi ' ou ' Fin midi ' !";
+				    $form->getElement('DebutMidi')->setValue('0');
+				    $form->getElement('FinMidi')->setValue('0');
+				}
+			    else   // sinon 
+				{  
+
+					
+	                  try
+	                  {     
+						  	 $conge = new Default_Model_Conge();  
+						  	  	 
+						  	//************** gerer les datetimes en fonction des demis journï¿½es *****************************// 
+			     			    $date = $outils->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
+			     	        //***********************************************************************************************// 		 
+
+							//************** Normaliser date debut et date fin ***************//
+				        	    $tab = $outils->normaliser_date($date[0],$date[1],false);     // (maroc = false)  ==> france = true 
+	                  	    //****************************************************************//
+
+	                            if($tab == null)
+				        	    {
+				        	       $this->view->warning = $pers->getNomPrenom()." a posï¿½ un congï¿½ sur une periode non ouvrable du : ".$date[0]." au :".$date[1];  
+				        	    }    
+				        	    else 
+				        	    {
+				        	    
+					  		            // remplir l'objet $conge 
+										$conge->setId_personne($data['Ressource']);
+										$conge->setId_type_conge($data['TypeConge']);
+										$conge->setDate_debut($tab[0]);   // date_debut normaliser 
+										$conge->setDate_fin($tab[1]);     // date_fin normaliser 
+										$conge->setMi_debut_journee($data['DebutMidi']);
+										$conge->setMi_fin_journee($data['FinMidi']);
+		
+									    //////////////////////////////////calcul nombre de jours/////////////////////////// 
+										$conge->calcul_periode_conge(new DateTime($tab[0]),new DateTime($tab[1]));
+										///////////////////////////////////////////////////////////////////////////////////
+										
+										$conge->setAnnee_reference($data['AnneeRef']);
+									    $conge->setFerme($data['Ferme']);
+									    
+									    
+									 
+								    //***********************************/// Gestion des chevauchements de congï¿½s ///*********************************//			
+										$c = new Default_Model_DbTable_Conge();
+
+										$res = $c->conges_en_double($conge->getId_personne(),$conge->getDate_debut(),$conge->getDate_fin(), null);
+									
+									    // pour l'affichage de  du : 2013-05-06 Ã  Midi     au lieu de  du : 2013-02-06 12:00:00 
+										$Arr =  $outils->makeMidi($conge->getDate_debut(),$conge->getDate_fin());
+		             
+											    
+										if($res == null)   // pas de chevachement de congï¿½s
+										{      
+											    $r =  $outils->authorized($pers,$conge);
+										
+
+					                   		  	  if($r[0] == true)
+					                   		  	  {
+						                   		       //********************* decoupage du congÃ© en sous congÃ© **************************
+								        	    	     $tab_conges = $outils->sous_periodes($conge->getDate_debut(),$conge->getDate_fin());
+						                               //*********************************************************************************
+								        	    	   for ($i = 0; $i < count($tab_conges); $i++) 
+								        	    	   {
+								        	    	   	    $conge = new Default_Model_Conge(); 
+								        	    	   	    
+								        	    	   	    // remplir l'objet $conge 
+															$conge->setId_personne($data['Ressource']);
+															$conge->setId_type_conge($data['TypeConge']);
+															
+															
+															//************** Normaliser date debut et date fin ***************//
+				        	   								 $tt = $outils->normaliser_date($tab_conges[$i]['date_debut'],$tab_conges[$i]['date_fin'],false);     // (maroc = false)  ==> france
+	                  	   									//****************************************************************//
+															
+															$conge->setDate_debut($tt[0]);   // date_debut normaliser 
+															$conge->setDate_fin($tt[1]);     // date_fin normaliser 
+															
+															
+															if(substr($tab_conges[$i]['date_debut'],12,8) == "12:00:00")
+															  $dm = 1;
+															else 
+															  $dm = 0;
+															
+															if(substr($tab_conges[$i]['date_fin'],12,8) == "11:59:59")
+															 $fm = 1;
+															else 
+															  $fm = 0;
+
+															$conge->setMi_debut_journee($dm);
+															$conge->setMi_fin_journee($fm);
+							
+															
+	                  	   									 
+														    //////////////////////////////////calcul nombre de jours/////////////////////////// 
+															$conge->calcul_periode_conge(new DateTime($tab_conges[$i]['date_debut']),new DateTime($tab_conges[$i]['date_fin']));
+															///////////////////////////////////////////////////////////////////////////////////
+															
+															$conge->setAnnee_reference($data['AnneeRef']);
+														    $conge->setFerme($data['Ferme']);
+									    
+								        	    	   	    
+								        	    	   	     // oui 
+													         $conge->save();
+								        	    	   }
+														    
+												         // affichage du message de succÃ¨s 
+											             $this->view->success = "Cr&eacute;ation du cong&eacute; pour :   ".$pers->getNomPrenom()." 	 &nbsp;&nbsp;&nbsp; du :   ".$Arr[0]."  ".$Arr[1]."	  &nbsp;&nbsp;&nbsp; au :   ".$Arr[2]."   ".$Arr[3];                                 
+					                                        
+						                   		         // vider le formulaire pour crï¿½e un autre congï¿½
+													     $form->getElement('Ressource')->setValue('');
+														 $form->getElement('TypeConge')->setValue('');
+														 $form->getElement('Debut')->setValue('');
+														 $form->getElement('Fin')->setValue('');
+														 $form->getElement('DebutMidi')->setValue('');
+														 $form->getElement('FinMidi')->setValue('');
+														 $form->getElement('Ferme')->setValue(''); 
+					                   		  	  } 
+												  else 
+												  {     //return array($bool,$personne->getDate_debut(),$personne_datefin,$obj_dd,$obj_df);
+									  									  	     
+												  	     if($r[3] < $r[1])    // date_debut_conge  < date_debut_projet
+												         {
+												         	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et ne peux pas pos&eacute; un cong&eacute; avant cette date !";
+												         }
+												          elseif($res[4] > $res[2])  // date_fin_conge  >  date_fin_projet
+									         			  {
+										             			 if($res[2] > date("Y-m-d"))  // date_fin_projet  >  date_aujourdhui 
+										                         {
+													             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."   a quitt&eacute; le projet le :  ".$pers->getDate_fin()."   impossible de lui cr&eacute;er un cong&eacute; !";
+													             }	
+													             else                        // date_fin_projet  <=  date_aujourdhui 
+													             {
+													             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  va quit&eacute; le projet le :  ".$pers->getDate_fin()."  et ne peux pas pos&eacute; un cong&eacute; du : ".$r[3]." au :".$r[4]." !";
+													             }	
+												         }
+												         else
+												        {   
+												        	if($r[2] == "-" || $r[2] == "01/01/1970" || $r[2] == "1970-01-01"  || $r[2] == "0000-00-00" || $r[2] == "00-00-0000")
+												        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  aucun cong&eacute; avant cette date n'est acc&eacute;pt&eacute;e !";
+												        	else
+												        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et fini le : ".$r[2]." aucun cong&eacute; hors cette p&eacute;riode n'est acc&eacute;pt&eacute;e !";
+												        } 
+						
+												  }
+	
+										}
+										else   // chevauchement existe
+										{   
+										    
+											if(count($res) == 1)  // doublon = 1 
+											{
+								                $Arr =  $outils->makeMidi($res[0]['date_debut'],$res[0]['date_fin']);
+												$this->view->warning = $pers->getNomPrenom()."&nbsp;&nbsp;a d&eacute;j&agrave; pos&eacute; un cong&eacute; sur la p&eacute;riode &nbsp;&nbsp;&nbsp; du :  ".$Arr[0]."  ".$Arr[1]."	&nbsp;&nbsp;&nbsp; au :  ".$Arr[2]."  ".$Arr[3]." &nbsp;!";    
+											
+											} 
+											else           // doublons > 1 
+											{   
+												// Responsable sur l'affichage de la periode total des congï¿½s ( 'date_debut' du "1er congï¿½"     et 'date_fin' du "dernier congï¿½" )
+												// remplir un tableau par toute les dates (debut et fin) de tout les congï¿½s de cette personne 
+												// triï¿½ le tableau rempli et afficher la premiere et la derniere valeur 
+												$j = 0;
+												for($i=0; $i < count($res); $i++ )
+												{
+											   		$t[$j] = $res[$i]['date_debut'];
+											    	$t[$j+1] = $res[$i]['date_fin'];
+											    	$j = $j+2;
+												}
+									   		    sort($t);   // triÃ© ASC par default 
+		                                        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+										
+												$Arr =  $outils->makeMidi($t[0],$t[count($t)-1]);
+											    $this->view->warning = $pers->getNomPrenom()."&nbsp;&nbsp; &agrave; d&eacute;ja pos&eacute; &nbsp;&nbsp;".count($res)." &nbsp; cong&eacutes sur la p&eacute;riode &nbsp;&nbsp;&nbsp; du : ".$Arr[0]."  ".$Arr[1]." &nbsp;&nbsp;&nbsp; au :  ".$Arr[2]."  ".$Arr[3]." &nbsp;!";
+											}
+		
+										}
+								  //********************************************************************************************************************//		 
+	                  
+				       	    } // fin else tab null
+				      }
+		       	      catch (Exception $e) 
+					  {      
+					  	 // echo  $e->getMessage();
+  						 $this->view->error = "La cr&eacuteation du cong&eacute pour : ".$pers->getNomPrenom()." &agrave; ï¿½chou&eacute !";	
+					  }
+		         } 
+	      }
+	      else  // forme invalide 
+	      {
+	      	    
+	      	
+	      	
+	            if($data['Ressource'] === 'x')     // si on a pas selectionnï¿½ une ressource  id = 'x'
+				{$this->view->error = "Veuillez selectionner une ressource !";}
+				
+				
+			    elseif($data['TypeConge'] === 'x')     // si on a pas selectionnï¿½ un type de conge
+				{$this->view->error = "Veuillez selectionner un type de conge !";}
+				
+	         	elseif($data['Debut'] == null )
+			    { $this->view->error = "Veuillez saisir une date de debut !"; }
+			    
+			    elseif($data['Fin'] == null )
+			    {$this->view->error = "Veuillez saisir une date de fin !";}
+
+			    elseif ($data['Debut'] > $data['Fin'])
+				{$this->view->error = "La date de d&eacutebut doit &ecirc;tre inf&eacuterieure ou &eacutegale &agrave la date de fin";}	
+
+	            $form->populate($data);
+	      }   
+	   }  
+	}
+
+	
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::// ACTION MODIFIER //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+
+	public function modifierAction()
+	{
+		 $this->_helper->viewRenderer('creer'); // creer conge
+		 $form = new Default_Form_Conge();  	//crï¿½ation du fomulaire
+		 $form->Valider->setLabel('Modifier');  //indique l'action qui va traiter le formulaire
+		
+		 //***// assigne le formulaire Ã  la vue
+		 $this->view->form = $form;
+		 $this->view->title = "Modifier Conge"; 
+
+  		 $conge = new Default_Model_Conge();
+         $personne = new Default_Model_Personne();
+		
+         //***// rï¿½cupï¿½ration des donnï¿½es envoyï¿½es par le formulaire
+	     $data_id =  $this->getRequest()->getParams();
+          
+         //***// recupere l'id personne qui a posï¿½ le conge
+         $cong = $conge->find($data_id['id']);
+	     $id_personne =  $cong->getId_personne();  // id personne 
+	     
+	     $pers = $personne->find($id_personne);   // retourne l'objet personne ayant l'id "$id_personne"
+
+	     $id_type_conge = $cong->getId_type_conge(); // id_type_conge
+         
+ 		 
+ 		 //***// remplir la liste Annï¿½e de reference par Annee , Annee + 1 , Annee - 1
+ 		 $date_debut = $cong->getDate_debut();  // recuperer date debut 
+	     $annee = substr($date_debut, 0,4);     // extraire l'annï¿½e 
+ 		 $list_annee = array($annee=>$annee,(string)$annee-1=>(string)$annee-1,(string)$annee+1=>(string)$annee+1);
+ 		 $anneeref = $form->getElement('AnneeRef');
+ 		 $anneeref->setMultiOptions($list_annee);
+ 
+ 		 
+ 		 //***// stocker les anciennes valeurs du formulaire 
+		 $PreData['Debut']=  $conge->getDate_debut();  	
+		 $PreData['DebutMidi'] = $conge->getMi_debut_journee();
+		 $PreData['Fin'] =  $conge->getDate_fin();         
+		 $PreData['FinMidi'] = $conge->getMi_fin_journee();    
+		 $PreData['AnneeRef'] = $conge->getAnnee_reference();
+		 $PreData['TypeConge'] = $conge->getId_type_conge();
+		 $PreData['Ferme'] = $conge->getFerme(); 
+
+		 
+		 //***// stocker les nouvelles valeurs du formulaire 
+	     $data = array();
+	     $data['_date_debut'] = $form->getElement('Debut')->getValue();
+	     $data['_mi_debut_journee'] = $form->getElement('DebutMidi')->getValue();
+	     $data['_date_fin'] = $form->getElement('Fin')->getValue();
+	     $data['_mi_fin_journee'] = $form->getElement('FinMidi')->getValue();
+	     $data['_annee_reference'] = $form->getElement('AnneeRef')->getValue();
+	     $data['_id_type_conge'] = $form->getElement('TypeConge')->getValue();
+	     $data['_ferme'] = $form->getElement('Ferme')->getValue();
+		 
+	     //***// remplie le select avec les types de conge qui existent
+	  /*   if($personne->getEntite()->getCs() == '0') // france == 0 
+	     {	*/
+	    
+	     	$form->setDbOptions('TypeConge',new Default_Model_TypeConge(),'getId','getCode');
+	   /*  }
+	     else 
+	     {  
+	     	echo "MAROC" ;
+	     	// remplie le select avec le libelle "CP" pour une ressource maroc 
+	       	 $id = 1;
+	         $cp = array('x'=>'Choisissez:','CP'=>'CP');
+ 		     $typeconge = $form->getElement('TypeConge');
+ 		     $typeconge->setMultiOptions($cp);
+	       	 //$where = array('id = ?' => $id );
+	         //$form->setDbOptions('TypeConge',new Default_Model_TypeConge(),'getId','getCode',$where);
+	     }
+	     */
+
+		 //***// remplie le select avec le  nom et prenom de la personne ayant id personne  
+	     $where = array('id = ?' => $id_personne);
+		 $form->setDbOptions('Ressource',new Default_Model_Personne(),'getId','getNomPrenom',$where);
+		 		 
+		 //***// remplir le formulaire par les donnï¿½es recupï¿½rer 
+		 $form->getElement('Ressource')->setValue($id_personne);
+		 $form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // afficher la datedebut du datetime
+		 $form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // afficher la datefin du datetime
+
+		 if(substr($PreData['Debut'],11,19) == "12:00:00")
+		 { $PreData['DebutMidi'] = 1;  }
+		 else 
+		 { $PreData['DebutMidi'] = 0;}
+		 if(substr($PreData['Fin'],11,19) == "11:59:59")
+		 { $PreData['FinMidi'] = 1;}
+		 else 
+		 {$PreData['FinMidi'] = 0;}
+		 
+		 $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);  
+		 $form->getElement('FinMidi')->setValue($PreData['FinMidi']);
+		 $form->getElement('AnneeRef')->setValue($PreData['AnneeRef']);
+		 $form->getElement('TypeConge')->setValue($id_type_conge); 
+		 $form->getElement('Ferme')->setValue($PreData['Ferme']);
+
+	  	  //si la page est POSTï¿½e = formulaire envoyï¿½
+		  if($this->getRequest()->isPost())
+		  { 
+		 		//rï¿½cupï¿½ration des donnï¿½es envoyï¿½es par le formulaire
+		  	    $data = $this->_request->getPost();
+
+		  	    
+			  	$requete = $this->getRequest();
+				if ($requete instanceof Zend_Controller_Request_Http)
+				{ 
+					$baseurl = $requete->getBaseUrl();
+				}
+
+			//vï¿½rifie que les donnï¿½es rï¿½pondent aux conditions des validateurs
+			if($form->isValid($data))
+			{      
+				    $i = 1;
+					// vï¿½rifie si les donnï¿½es ont subit une modification
+					foreach($PreData as $k=>$v)
+				    {
+				       if((string)$PreData[$k] != (string)$data[$k])
+				       { $i*=0; }  	
+				    }
+					 
+				    if($data['Ressource'] === 'x')     // si on a pas selectionnï¿½ une ressource  id = 'x'
+					{
+						$this->view->error = "Veuillez selectionner une ressource !";
+					}
+					elseif($data['TypeConge'] === 'x')     // si on a pas selectionnï¿½ un type conge  id = 'x'
+					{
+						$this->view->error = "Veuillez selectionner un type cong&eacute; !";
+					}
+				    elseif(($data['Debut'] == $data['Fin']) && ($data['DebutMidi'] == 1 && $data['FinMidi'] == 1))
+					{
+					       $this->view->error = "Sur un meme jour vous ne pouvez selectionner que ' Debut midi ' ou ' Fin midi '  !";
+					       $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);   // afficher que la date du datetime 
+					       $form->getElement('FinMidi')->setValue($PreData['FinMidi']);       // afficher que la date du datetime
+					}
+					elseif($i == 1)  // pas de modification effectuï¿½
+				    {
+				        $this->view->warning = "Aucun champ n'a &eacute;t&eacute; modifi&eacute; !";
+				    }
+					elseif ($data['Debut'] > $data['Fin'])  // date debut > date fin 
+					{ 
+						$this->view->error = "La date de d&eacute;but doit ï¿½tre inf&eacute;rieure ou &eacute;gale &agrave; la date de fin";
+					}
+				    else       
+			        {           
+					            $this->view->title = "Modification du cong&eacute;";
+
+					            $outils = new Default_Controller_Helpers_outils();
+					            
+						try 
+					 	{        
+					            //************** gerer les datetimes en fonction des demis journï¿½es *****************************// 
+			     			        $date = $outils->makeDatetime($data['Debut'],$data['Fin'],$data['DebutMidi'],$data['FinMidi']); 
+			     	            //***********************************************************************************************// 		 
+			     	            
+			     			    //************** Normaliser date debut et date fin ***************//    
+			     			        // si ressource marocaine 
+									if($pers->getEntite()->getCs() == '1')   
+									{
+									   $maroc = true;  
+									}
+									// sinon francaise car par defaut $maroc recoit false
+									$tab = $outils->normaliser_date($date[0],$date[1],$maroc);  
+                                //****************************************************************//
+      
+			        	   	    	
+							        //***// remplir l'objet conge par les valeurs modifiï¿½es     
+						            $conge ->setId($data_id['id']);
+						            $conge->setId_proposition($cong->getId_proposition());
+						            $conge->setId_personne($id_personne);
+						            $conge->setDate_debut($tab[0]);
+								    $conge->setDate_fin($tab[1]);
+								    $conge->setMi_debut_journee($data['DebutMidi']);
+								    $conge->setMi_fin_journee($data['FinMidi']);
+								    $conge->setAnnee_reference($data['AnneeRef']);
+								    
+									//////////////////////////////////calcul nombre de jours/////////////////////////// 
+									$conge->calcul_periode_conge(new DateTime($tab[0]),new DateTime($tab[1]));
+									///////////////////////////////////////////////////////////////////////////////////
+
+								    $conge->setId_type_conge($data['TypeConge']);
+								    $conge->setFerme($data['Ferme']);    
+								    
+								 //****************/// Gestion des chevauchements de congï¿½s ///****************//	
+										
+									$c = new Default_Model_DbTable_Conge();
+
+									$res = $c->conges_en_double($conge->getId_personne(),$conge->getDate_debut(),$conge->getDate_fin(),$conge->getId());
+									
+									if($res == null)
+									{	 
+										 
+										  $r =  $outils->authorized($pers,$conge);
+	
+			                   		  	  if($r[0] == true)
+			                   		  	  {
+				                   		      // oui 
+											   $conge->save();
+										       $this->view->success = " Le cong&eacute; a &eacute;t&eacute; modifi&eacute; avec succ&eacute;s !";              
+							                   header("Refresh:1.5;URL=".$baseurl."/conge/afficher");   // URL dynamique 
+			                   		  	  } 
+										  else 
+										  {     					  	     
+										  	     if($r[3] < $r[1])    // date_debut_conge  < date_debut_projet
+										         {
+										         	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  aucune modification avant cette date n'est acc&eacute;pt&eacute;e ! ";
+										         }
+										          elseif($r[4] > $r[2])  // date_fin_conge  >  date_fin_projet
+										         {
+											             if($r[2] > date("Y-m-d"))  // date_fin_projet  >  date_aujourdhui 
+											             {
+											             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."   a quitt&eacute; le projet le :  ".$pers->getDate_fin()."   impossible de modifi&eacute; ce cong&eacute; !";
+											             }	
+											             else                        // date_fin_projet  >=  date_aujourdhui 
+											             {
+											             	$this->view->error = "La ressource :  ".$pers->getNomPrenom()."  va quit&eacute; le projet le :  ".$pers->getDate_fin()."  et ne peux modifi&eacute; le cong&eacute; du : ".$r[3]." au :".$r[4]." !";
+											             }	
+										         }
+										         else
+										        {   
+										        	if(($r[2] == "-" || $r[2] == "01/01/1970" || $r[2] == "1970-01-01"  || $r[2] == "0000-00-00" || $r[2] == "00-00-0000"))
+										        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  aucune modification avant cette date n'est acc&eacute;pt&eacute;e !";
+										        	else
+										        		$this->view->error = " La ressource :  ".$pers->getNomPrenom()."  a d&eacute;but&eacute; le :  ".$pers->getDate_debut()."  et fini le : ".$r[2]." aucune modification hors cette p&eacute;riode n'est acc&eacute;pt&eacute;e !";
+										        } 
+										  }
+    
+									}
+									else 
+									{    
+										 $this->view->warning = "Avec cette modification vous touchez un cong&eacute; existant !";
+                                         
+										 // remplir le formulaire par les donnï¿½es recupï¿½rer 
+										 $form->getElement('Ressource')->setValue($id_personne);
+										 $form->getElement('Debut')->setValue(substr($PreData['Debut'],0,10)); // extraire la datedebut du datetime
+										 $form->getElement('Fin')->setValue(substr($PreData['Fin'],0,10));     // extraire la datefin du datetime
+										 $form->getElement('DebutMidi')->setValue($PreData['DebutMidi']);  
+										 $form->getElement('FinMidi')->setValue($PreData['FinMidi']);
+										 $form->getElement('AnneeRef')->setValue($PreData['AnneeRef']);
+										 $form->getElement('TypeConge')->setValue($id_type_conge); 
+										 $form->getElement('Ferme')->setValue($PreData['Ferme']);
+
+									}  
+							      //****************************************************************************//
+						} 
+						catch (Exception $e) 
+						{
+								//$this->view->error = $e->getMessage();
+								$this->view->error = "Modification du cong&eacute; pour : ".$pers->getNomPrenom()." &agrave; &eacute;chou&eacute; !";	
+						}
+				
+			        }
+			}
+		}
+    }
+    
+    
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::// ACTION SUPPRIMER //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+
+
+	public function supprimerAction()
+	{
+		 if($this->getRequest()->isXmlHttpRequest())
+		 {     
+		 	 //rï¿½cupï¿½re les paramï¿½tres de la requÃªte Ajax 
+		 	$data = $this->getRequest()->getPost();
+			$id = $data['id'];   
+		        
+			//crï¿½ation du modï¿½le pour la suppression
 			$conge = new Default_Model_Conge();
-			//appel de la fcontion de suppression avec en argument,
-			//la clause where qui sera appliquée
-			$result = $conge->delete("id=$id");
 
-			//redirection
-			$this->_helper->redirector('index');
+			try 
+			{     //appel de la fcontion de suppression avec en argument,
+				  //la clause where qui sera appliquï¿½e
+				  $result = $conge->delete("id=$id");   
+			}
+			catch (Zend_Db_Exception $e)
+			{
+					// en cas d'erreur envoi de reponse avec code erreur [500]
+					$content = array("status"=>"500","result"=> $result);
+	       			$this->view->error= "Erreur";
+	       		    $this->_helper->json($content);
+	       				      
+	       			echo $content;
+			}
+				        	 //en cas de succï¿½s envoie de reponse avec code succï¿½s [200]
+					         $this->view->success = "Le congï¿½ a bien ï¿½tï¿½ supprimer !";
+				        	 $content = array("status"=>"200","result"=> "1");
+	       					
+	                         // envoi de reponse en format Json
+	       		       		 $this->_helper->json($content);
+
+				//redirection
+				$this->_helper->viewRenderer('afficher');
+
 		}
-		else
-		{
-			$this->view->form = 'Impossible delete: id missing !';
-		}
-	}
-	public function rederigerversindexAction ()
-	{
-	   $this->_helper->redirector('index');
 		
 	}
 
+
+	public function afficherAction()
+	{   
+		
+		$conge = new Default_Model_Conge();
+		$paginator = Zend_Paginator::factory($conge->fetchAll($str = array()));
+		$paginator->setItemCountPerPage(10);
+		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
+		$this->view->congeArray = $paginator;
+     		
+	}	
+	
+
+	
+	
 	
 }

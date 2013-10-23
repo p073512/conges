@@ -156,7 +156,7 @@ class UsersController extends Zend_Controller_Action
 		}
 		else
 		{
-			$this->view->form = 'Impossible delete: id missing !';
+			$this->view->form = 'Suppression impossible: id introuvable !';
 		}
 	}
 

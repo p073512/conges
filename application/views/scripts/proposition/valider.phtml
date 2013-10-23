@@ -1,0 +1,106 @@
+
+   <?php 
+               $profil = substr_replace($this->LoggedProfil(),"",0,31);
+               $profil = str_replace("Deconnexion","", $profil);
+               $profil = str_replace(" ","",$profil);
+               $profil  = strip_tags($profil);
+    ?>
+    
+	<!-- Modal Pour confirmation de suppression -->
+	 <div id="myModal" class="modal message hide fade" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" style="display: none;">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+			<h3 id="myModalLabel">Confirmer la suppression</h3>
+		</div>
+		<div class="modal-body">
+			<p></p>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true" id="annulSupp">Annuler</button>
+			<button class="btn  btn-info" id="suppButton">Confirmer</button>
+		</div>
+	</div>
+	
+	
+	<div class="row-fluid offset1">
+		<div id="header-container">
+            
+			<div class="dropdown">
+                  <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
+                  Proposition <b class="caret"></b>
+                  </a>
+					<ul class="dropdown-menu">
+						<li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'creer'), 'default', true) ?>">Cr&eacute;er</a></li>
+						<li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'afficher'), 'default', true) ?>">Afficher</a></li>
+					</ul>
+              
+			</div><!--MBA : fermeture dropdown -->
+          
+		</div><!-- MBA : fermeture div="header-container" -->
+	</div><!-- MBA : fermeture div="row-fluid -->
+         <br/>
+
+<div class="container">
+		<div class="well row-fluid">
+		<h4>Validation d'une proposition :</h4><br/>
+	<?php 	if(isset($this->error))
+	 { 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Alerte!</strong>  <?php //Message d'erreur
+                                         echo "Erreur :".$this->error; ?>
+			</div>
+
+	<?php 
+	 }
+    
+	 
+	/*
+	 * Gestion des messages warnings 
+	 */
+
+	if(isset($this->warning)){ 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Alerte :</strong>  <?php //Message warning
+                                         echo "   ".$this->warning; ?>
+			</div>
+	
+	<?php } 
+	 
+    
+    /*
+	 * Si erreurs de traitements* renvoyÃ© depuis le controlleur 
+	 * traitemets : logique, ajout BD, Exception ...
+	 */
+	
+	else if(isset($this->success))
+	{
+		?>
+	
+		<!-- afficage message succÃ©s  -->
+     	       <div class="alert alert-info">
+					<button type="button" class="close " data-dismiss="alert"></button>
+						<strong>Succes!</strong> <?php  echo $this->success; //Message succes ?> 
+			   </div>
+	<?php 
+	}?>
+	<br/>
+	<script type="text/javascript">
+	$(document).ready(function(){
+    $('button#retour').click(function(){
+	 history.go(-1);
+	 });
+		});
+	
+	</script>
+<button type="button" id="retour" >Retour</a>
+</div>
+   
+</div>

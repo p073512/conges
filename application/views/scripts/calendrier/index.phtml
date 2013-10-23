@@ -1,0 +1,292 @@
+
+	
+	 <?php
+	 #region MBA
+	 /*
+	  * MBA : Import de la bibliotheque JqueryUI et datePicker elles seront utilisÃ©es dans le formulaire
+	  */
+	    $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/tipsy.css');
+	   
+		$this->JQuery()->addStyleSheet($this->baseUrl() . '/js/jquery/themes/smoothness/jquery-ui-1.8.23.custom.css');
+		// MBA : indique le fichier de script javascript Ã  utliser avec jQuery UI
+		$this->JQuery()->setUiLocalPath($this->baseUrl() . '/js/jquery/ui/jquery-ui-1.8.23.custom.js');
+		$this->Jquery()->addJavascriptFile($this->baseUrl() . '/js/jquery/ui/i18n/jquery.ui.datepicker-fr.js');
+		$this->Jquery()->addJavascriptFile($this->baseUrl() .'/scriptjs/d3.js');
+		$this->Jquery()->addJavascriptFile($this->baseUrl() .'/scriptjs/bootmetro-charms.js');	
+		$this->Jquery()->addJavascriptFile($this->baseUrl() .'/scriptjs/jquery.tipsy.js');
+	
+		$this->headScript()->appendFile( $this->baseUrl() .'/js/myScriptCalendar.js');
+
+
+		echo $this->jQuery(); 
+	  ?> 
+
+	<div class="row-fluid offset1">
+		<div id="header-container">
+            
+			<div class="dropdown">
+                  <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
+                  Calendrier Mensuel :
+                  </a>
+
+			</div><!--MBA : fermeture dropdown -->
+          
+		</div><!-- MBA : fermeture div="header-container" -->
+	</div><!-- MBA : fermeture div="row-fluid -->
+         <br/>
+	
+	  
+	<?php
+	/*
+	 * MBA : Appel au layout 'layouts/scripts/mylayout';
+	 * setAction : Le formulaire opï¿½re sur la page courante
+	 * 
+	 */
+	$this->layout()->setLayout('mylayout');
+
+	?>
+
+
+	<div class="container">
+		<div class="well row-fluid">
+					
+	<?php
+	/*
+	 * Si erreurs de traitements* renvoyï¿½ depuis le controlleur 
+	 * traitemets : logique, ajout BD, Exception ...
+	 */
+
+	if(isset($this->error))
+	{ 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert alert-error">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Erreur :</strong>  <?php //Message d'erreur
+                                         echo "Erreur :".$this->error; ?>
+			</div>
+
+	<?php } ?>
+
+	<?php
+	
+	/*
+	 * Gestion des messages warnings 
+	 */
+
+	if(isset($this->warning)){ 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Alerte :</strong>  <?php //Message warning
+                                         echo "Alerte : ".$this->warning; ?>
+			</div>
+	
+	<?php } 
+	 
+	
+	
+ 	/*
+	 * Gestion des messages succÃ©s 
+	 */
+	
+	else if(isset($this->success))
+	{
+	?>
+	
+	<!-- afficage message succés  -->
+            <div class="alert alert-success">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Succes :</strong> <?php //Message succes
+	                                      echo "succés :".$this->success ;?>
+			</div>
+			<div class="row">
+			 
+	<?php } ?>
+
+     
+		 
+		  
+		  <div id="myModal" class="modal message hide fade" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" style="display: none;">
+			<div class="modal-header">
+				
+				<h3 id="myModalLabel">Chargement du calendrier .. </h3>
+				<div class="progress progress-indeterminate">
+			
+						<div class="bar">
+						</div>
+					</div>
+			<div class="modal-body">
+				<p></p>
+			</div>
+			<div class="modal-footer">
+			
+			</div>
+		 </div>
+		 </div>
+				
+			    <div id="wrapper" class="span10" >
+			    <!-- ici sera affiché le calendrier -->
+	            </div>
+	            <div class="span1">
+	           
+	            
+	            
+	            </div>
+      
+        
+         </div>
+                
+		</div><!-- MBA Fermeture div class="well row-fluid" -->
+		
+		
+	</div><!-- MBA Fermeture div class="container" -->
+ <footer class="win-commandlayout navbar-fixed-bottom win-ui-dark"> 
+ <div class="row"> 
+ <div class="span2"> 
+<button id="recharger" class="win-command">
+<span class="win-commandimage win-commandring">&#x0049;</span>
+<span class="win-label">Recharger</span>
+</button>
+<hr class="win-command">
+</div>
+
+<div class="span4 align-left">
+<button id="first" class="win-command">
+<span class="win-commandimage win-commandring">&#xe1b7;</span>
+<span class="win-label">First</span>
+</button>
+<button id="prev" class="win-command">
+
+
+</button>
+</div>
+<div class="span1">
+<button id="moisAnnee" class="win-command">
+
+
+</button>
+</div>
+<div class="span4 align-right">
+<button id="next" class="win-command">
+
+
+</button>
+<button id="last" class="win-command">
+<span class="win-commandimage win-commandring">&#xe1b6;</span>
+<span class="win-label">Last</span>
+</button>
+<hr class="win-command">
+
+</div>
+<div>
+<button id="settings" class="win-command">
+<span class="win-commandimage win-commandring">&#x0067;</span>
+<span class="win-label">Période</span>
+</button>
+<hr class="win-command">
+<button id="filtres" class="win-command">
+<span class="win-commandimage win-commandring ">&#xe1eb;</span>
+<span class="win-label">Filtres</span>
+</button>
+</div>
+</div>
+
+
+</footer>
+
+<div id="charms" class="win-ui-dark settings">
+	<div id="theme-charms-section" class="charms-section">
+		
+		<div class="charms-header">
+		<a class="close-charms win-command" href="#">
+		<span class="win-commandimage win-commandring">&#xe1ca;</span>
+		</a>
+		<h2>Paramètres</h2>
+		</div>
+		
+		<div class="row-fluid">
+			<div class="span12">
+			<?php  
+				                   $Elements =$this->form->getElements();
+				                   foreach ( $Elements as $k=>$Element)
+			                        echo $this->form->getElement($k);?>
+			             
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="charms" class="win-ui-dark filtre green">
+	<div id="theme-charms-section" class="charms-section">
+		
+		<div class="charms-header">
+		<a class="close-charms win-command" href="#">
+		<span class="win-commandimage win-commandring">&#xe1ca;</span>
+		</a>
+		<h2>Filtres</h2>
+		</div>
+		
+		<div class="row-fluid">
+			<div class="span12 btn-group bootstrap-select">
+			<br>
+			<label>Paramètres filtres :</label>
+	            <label class="radio">
+				<input id="and" type="radio" checked value="option1" name="optionsRadios" >
+				<span class="metro-radio">ET : tous les filtres</span>
+				</label>
+				<label class="radio">
+				<input id="or" type="radio"  value="option2" name="optionsRadios">
+				<span class="metro-radio">OU : l'un des filtres</span>
+				</label>
+				<br>
+			<label>Entite :</label>
+			
+	            <select id="entite" class="selectpicker" data-style="btn-success" title='Choisissez...' data-selected-text-format="count>3" multiple>
+		            <option value="1">ITSP</option>
+		            <option value="2">CSM</option>
+		            <option value="3">SS-T</option>
+	            </select>
+	            
+	         <br>   
+	      <label>Pole :</label>
+	     
+	            <select id="pole" class="selectpicker" data-style="btn-success" title='Choisissez...' data-selected-text-format="count>3" multiple>
+	            <option value="1">Pole 1</option>
+	            <option value="2">Pole 2</option>
+	            <option value="3">Pole 3</option>
+	            <option value="4">Pole 4</option>
+	            <option value="5">P2000</option>
+	            <option value="6">Projets</option>
+	            <option value="7">Pilote</option>
+	            
+	            </select>
+	        <br>
+	          <label id="Fonction" class="row-fluid" >Fonction:</label>
+	          
+	             <select id="fonction" class="selectpicker" data-style="btn-success"  title='Choisissez...' data-selected-text-format="count>3" multiple >
+	            <option value="1">Analyste</option>
+	            <option value="2">Developpeur</option>
+	            <option value="3">Expert</option>
+	            <option value="4">Manager</option>
+	            
+	            
+	            </select>
+	            <br>
+	            
+	            
+	            
+	            <br>
+	            
+	            <div class="row-fluid pagination-centered">
+	             <button type="button" id="Filtrer" class="">Filtrer</button>
+	             </div>
+	      
+			             
+			</div>
+		</div>
+	</div>
+</div>

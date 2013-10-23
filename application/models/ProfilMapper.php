@@ -13,7 +13,8 @@ class Default_Model_ProfilMapper
 		if (is_string($dbTable)) {
 			$dbTable = new $dbTable();
 		}
-		if (!$dbTable instanceof Zend_Db_Table_Abstract) {
+		if (!$dbTable instanceof Zend_Db_Table_Abstract) 
+		{
 			throw new Exception('Invalid table data gateway provided');
 		}
 		$this->_dbTable = $dbTable;
@@ -36,7 +37,7 @@ class Default_Model_ProfilMapper
 		//les noms des clés du tableau correspondent aux noms des champs de la table
 		$data = array(
                'login' => $profil->getLogin(),
-               'mot_passe' => $profil->getMotDePasse()
+               'mot_passe' => $profil->getMotDePasse(),
 		);
 
 		//on vérifie si un l'objet $profil contient un id

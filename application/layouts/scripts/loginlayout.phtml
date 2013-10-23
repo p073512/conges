@@ -1,0 +1,86 @@
+<?php 
+echo $this->doctype() ?>
+<!doctype html>
+
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+   <meta charset="utf-8" />
+   <!-- Toujours forcer le dernier IE (même en Intra) et le Chrome Frame -->
+   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+   <!-- Mobile viewport optimized: h5bp.com/viewport -->
+   <meta name="viewport" content="width=device-width">
+
+   <title>Application de gestion de Congés</title>
+   
+   
+   <!-- ligne à supprimer en cas d'utilisation de font locals -->
+   <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
+   <!-- Le fav and touch icons -->
+   <link rel="shortcut icon" href="<?php echo $this->baseUrl();?>./content/ico/favicon.ico">
+   <link rel="apple-touch-icon-precomposed" sizes="144x144" href="content/ico/apple-touch-icon-144-precomposed.png">
+   <link rel="apple-touch-icon-precomposed" sizes="114x114" href="content/ico/apple-touch-icon-114-precomposed.png">
+   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="content/ico/apple-touch-icon-72-precomposed.png">
+   <link rel="apple-touch-icon-precomposed" href="content/ico/apple-touch-icon-57-precomposed.png">
+  
+		  <?php
+		
+		 
+		  /*
+		   * Import des fichies de feuille de styles css propores au bootstrap MertroUI W8
+		   */
+		 
+		  $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/bootstrap.css');
+		  $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/bootstrap-responsive.css');
+		  $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/bootmetro.css');
+          $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/bootmetro-tiles.css');
+	      $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/bootmetro-charms.css');	
+	      $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/metro-ui-light.css');
+	      $this->headLink()->appendStylesheet($this->baseUrl() . '/content/css/icomoon.css'); 
+          echo $this->headLink();		       
+		        
+		        
+		  $this->headScript()->appendFile( $this->baseUrl() .'/scriptjs/jquery-1.8.2.min.js');
+		  $this->headScript()->appendFile($this->baseUrl().'/scriptjs/google-code-prettify/prettify.js');
+	      $this->headScript()->appendFile($this->baseUrl() .'/scriptjs/jquery.mousewheel.js');
+		  $this->headScript()->appendFile($this->baseUrl() .'/scriptjs/jquery.scrollTo.js');
+		  $this->headScript()->appendFile($this->baseUrl() .'/scriptjs/bootstrap.min.js');
+		  $this->headScript()->appendFile($this->baseUrl() .'/scriptjs/bootmetro.js');
+		  $this->headScript()->appendFile($this->baseUrl() .'/scriptjs/bootmetro-charms.js');
+		  $this->headScript()->appendFile($this->baseUrl().'/scriptjs/demo.js');
+		  $this->headScript()->appendFile($this->baseUrl() .'/scriptjs/holder.js');
+
+		  ?>
+		  <?php 
+			   
+		  echo $this->headTitle();
+		  
+			  	
+		  ?>
+		  <!-- All JavaScript at the bottom, except for Modernizr and Respond.
+          Modernizr enables HTML5 elements & feature detects; Respond is a polyfill for min/max-width CSS3 Media Queries
+          For optimal performance, use a custom Modernizr build: www.modernizr.com/download/ -->
+          <?php 
+          
+          echo $this->jQuery();
+          
+          $this->headScript()->appendFile($this->baseUrl( 'scriptjs/modernizr-2.6.1.min.js'));
+
+          echo $this->headScript();
+          
+      ?>
+		   <script type="text/javascript">
+			      $(".metro").metro();		      
+  		   </script>
+	</head>
+
+<body>
+		  <?php echo $this->layout()->content; ?>
+</body>
+
+
+           
+           
+

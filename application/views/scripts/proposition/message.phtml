@@ -20,11 +20,11 @@
 <script>
 if (confirm('solde de cette ressource est epuise. Si vous voulez le modifier appuyer sur annuler'))
 {
-	location.href= "<?php echo $this->url(array('solde'=> 1,'id'=>$this->id, 'controller' => 'proposition', 'action' => 'accepter'), 'default', true) ?>";
+	location.href= "<?php echo $this->url(array('solde'=> 1,'id'=>$this->id, 'controller' => 'proposition', 'action' => 'valider'), 'default', true) ?>";
 }
 else 
 {
-	location.href= "<?php echo $this->url(array('solde'=> 0,'id'=>$this->id,'controller' => 'proposition', 'action' => 'accepter'), 'default', true) ?>";
+	location.href= "<?php echo $this->url(array('solde'=> 0,'id'=>$this->id,'controller' => 'proposition', 'action' => 'valider'), 'default', true) ?>";
 }
 </script>
 

@@ -126,9 +126,9 @@ class Default_Model_Modalite
 	}
 
 	//récupère toutes les entrées de la table
-	public function fetchAll($str)
+	public function fetchAll($str,$where = null)
 	{
-		return $this->getMapper()->fetchAll($str);
+		return $this->getMapper()->fetchAll($where,$str);
 	}
 
 	//permet la suppression

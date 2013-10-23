@@ -1,53 +1,44 @@
 <?php
 class ConnexionController extends Zend_Controller_Action
 {
-	private $_auth;
+	  private $_auth;
 
-	public function init()
-	{
-		//récupération de l'instance d'authentification
-		$this->_auth = Zend_Auth::getInstance();
-		// Appel de l'aide comme méthode sur le gestionnaire d'aides:
-		$layout = $this->_helper->layout();
-		$layout->disableLayout();
+      public function preDispatch() 
+	  {
+	    	    $doctypeHelper = new Zend_View_Helper_Doctype();
+	            $doctypeHelper->doctype('HTML5');
+	    		$this->_helper->layout->setLayout('loginlayout');
+	    		$this->_auth = Zend_Auth::getInstance();
+
+	  }
+
+	  public function indexAction()
+	 {
+	    //création du fomulaire
+		$form = new Default_Form_TConnexion();
 		
-   
-	}
-
-	public function indexAction()
-	{
-		//création et affichage dans la vue du formulaire
-		$connexionForm = new Default_Form_Connexion();
-		$connexionForm->setAction($this->view->url(array('controller' => 'connexion', 'action' => 'connexion'), 'default', true));
-		$this->view->form = $connexionForm;
-	
-		
-	}
-
-	public function connexionAction()
-	{
-		//création du fomulaire
-		$form = new Default_Form_Connexion();
-		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'connexion', 'action' => 'connexion'), 'default', true));
-		
-
-		//assigne le formulaire à la vue
+        //assigne le formulaire à la vue
 		$this->view->form = $form;
 
-		//vérification si la page a bien été appelée à partir d'un formulaire
-		if($this->_request->isPost())
-		{
+		 // remplir le select par les profils ( admin , csm , equipe )
+	     $form->setDbOptions('Profil',new Default_Model_Profil(),'getLogin','getLogin');
+		
+	     //vérification si la page a bien été appelée à partir d'un formulaire
+	     if($this->_request->isPost())
+		{   
+			
 			//enregistrement des données envoyées à partir du formulaire dans un tableau
-			$data = $this->_request->getPost();
-
+			 $data = $this->_request->getPost();
+			
 			//validation du formulaire
 			if($form->isValid($data))
 			{
-				//Zend_Debug::dump($data, $label = "Formulaire de connexion valide", $echo = true);
-				$profil = $data['profil'];
-				$mot_passe =  $data['mot_passe'];
-
+				
+				$profil = $data['Profil']; // recuperer la valeur du profil
+				$mot_passe =  $data['Password']; // recuperer la valeur du mot de passe 
+                $remember_me = $data['Remember']; // recupere la valeur de checkbox remember me 
+                
+   
 				//création d'un adpatateur d'authentification utilisant une base de données
 				//le premier argument correspond à l'adptateur par défaut
 				//le second correspond à la table qui est utilisée pour l'authentification
@@ -60,7 +51,8 @@ class ConnexionController extends Zend_Controller_Action
 
 				//préparation de la requête d'authentification en indiquant l'identité et le crédit
 				$authAdapter->setIdentity($profil);
-				$authAdapter->setCredential($mot_passe);
+				$authAdapter->setCredential(md5($mot_passe)); // cryptage mot de pass algo MD5 
+
 
 				//exécution de la requête d'authentification et enregistrement du résultat
 				$result = $this->_auth->authenticate($authAdapter);
@@ -68,45 +60,79 @@ class ConnexionController extends Zend_Controller_Action
 				//si l'authentification a réussi
 				if($result->isValid())
 				{
-					Zend_Debug::dump($data, $label = "Résultat de la connexion valide", $echo = true);
+					//Zend_Debug::dump($data, $label = "Résultat de la connexion valide", $echo = true);
 					//stockage de l'identité sous forme d'objet
 					//le permier argument permet d'indiquer les valeurs que l'on veut enregistrer (null indique que l'on enreegistre l'entièreté de l'objet)
 					//le second argument permet d'indiquer les valeurs que l'on ne souhaite pas enregistrer
 					$this->_auth->getStorage()->write($res = $authAdapter->getResultRowObject(null, 'mot_passe'));
 
-					//permet de regénérer l'identifiant de session
-					Zend_Session::regenerateId();
+					// si on coche la case se souvenir de moi 
+					if ($remember_me === '1')
+			        {   
+			           	Zend_Session::rememberMe(24*3600);   // remember me pendant = 24h  
+	                }
 
-					//redirection
-					$this->_helper->_redirector('calendriermensuel', 'calendrier');
+			            if($data['Profil'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
+						{
+						   $this->view->error = "Veuillez selectionner un profil !";
+						}
+				        
+						elseif ($data['Password'] === '')  // mot de passe vide 
+						{	
+							$this->view->error = "Veuillez renseignez votre Mot de passe !";	//création et initialisation d'un objet Default_Model_Users
+						}
+						else  // sinon 
+						{   
+	
+						    if($profil === 'admin')
+								$this->view->success = " Bienvenue a vous Mr l'".$profil;
+							elseif($profil === 'csm')
+								$this->view->success = " Bienvenue a vous responsable de l'equipe ".$profil;
+							elseif($profil === 'equipe')
+								$this->view->success = " Bienvenue a vous membre de l'".$profil;
+							else 
+							$this->view->success = " Bienvenue a vous membre guest ";
+
+                            // affichage du message d'acceuil et redirection apres 1 sec
+							 $baseUrl = new Zend_View_Helper_BaseUrl();
+							 $this->getResponse()->setHeader('Refresh', '2; ' . $baseUrl->baseUrl(). '/index');
+						}
+
 				}
 				else
-				{
-					//si erreur rencontrée, le formulaire est rechargé
-					
-					echo "mot de passe incorrecte";
-					///$this->_helper->_redirector('index', 'connexion');
-				
+				{       // profil et mot de passe non vide 
+				        if($data['Profil'] === 'x' && $data['Password'] <> '')     // si on a pas selectionné une ressource  id = 'x'
+						{
+						   $this->view->error = "Veuillez selectionner d'abord un profil !";
+						}
+					    else 
+					    {
+						$this->view->error = "Mot de passe incorrect !";
+						$form->getElement('Password')->setValue('');
+						$form->getElement('Password')->setErrorMessages(array("Mot de passe invalide !"));
+					    }
 				}
 			}
-			else
+			else  // formulaire invalide 
 			{
-				//si erreur rencontrée, le formulaire est rechargé
-				
-				echo "mot de passe incorrecte";
-				//$this->_helper->_redirector('index', 'connexion');
-				
+			           if($data['Profil'] === 'x')     // si on a pas selectionné une ressource  id = 'x'
+						{
+						   $this->view->error = "Veuillez selectionner un profil !";
+						}
+						
+						elseif ($data['Password'] === '')
+						{	
+							$this->view->error = "Veuillez renseignez votre Mot de passe !";	//création et initialisation d'un objet Default_Model_Users
+						}
 			}
 		}
-		else
-		{
-			//redirection si la page n'a pas été appelée à partir d'un formulaire
-			//$this->_redirect($this->view->url(array('controller' => 'profil'), 'default', true));
-			
-			echo "mot de passe incorrecte";	
-			//$this->_helper->redirector('index', 'connexion');
-			
-		}
+	
+	} 
+	  
+	  
+	public function connexionAction()
+	{   
+	   
 	}
 
 	public function deconnexionAction()
@@ -114,6 +140,6 @@ class ConnexionController extends Zend_Controller_Action
 		//réinitialisation de l'instance d'authentification et destruction de la session
 		Zend_Auth::getInstance()->clearIdentity();
 		Zend_Session::destroy();
-		$this->_helper->redirector('index', 'connexion');
+		$this->_helper->redirector('connexion','index');
 	}
 }

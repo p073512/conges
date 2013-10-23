@@ -1,5 +1,5 @@
 <?php
-//"Default" est le namespace défini dans le bootstrap
+//"Default" est le namespace dï¿½fini dans le bootstrap
 class Default_Model_PoleMapper
 {
 
@@ -27,19 +27,19 @@ class Default_Model_PoleMapper
 		return $this->_dbTable;
 	}
 
-	//sauve une nouvelle entrée dans la table
+	//sauve une nouvelle entrï¿½e dans la table
 	public function save(Default_Model_Pole $pole)
 	{
-		//récupération dans un tableau des données de l'objet $pole
-		//les noms des clés du tableau correspondent aux noms des champs de la table
+		//rÃ©cupÃ©ration dans un tableau des donnï¿½es de l'objet $pole
+		//les noms des clÃ©s du tableau correspondent aux noms des champs de la table
 		$data = array(
                	'id' => $pole->getId(),
 				'libelle' => $pole->getLibelle()		
 		);
 
-		//on vérifie si un l'objet $pole contient un id
+		//on vï¿½rifie si un l'objet $pole contient un id
 		//si ce n'est pas le cas, il s'agit d'un nouvel enregistrement
-		//sinon, c'est une mise à jour d'une entrée à effectuer
+		//sinon, c'est une mise ï¿½ jour d'une entrï¿½e ï¿½ effectuer
 		if(null === ($id = $pole->getId()))
 		{
 			unset($data['id']);
@@ -51,7 +51,7 @@ class Default_Model_PoleMapper
 		}
 	}
 
-	//récupére une entrée dans la table
+	//rÃ©cupÃ©re une entrÃ©e dans la table
 	public function find($id, Default_Model_Pole $pole)
 	{
 		$result = $this->getDbTable()->find($id);
@@ -59,22 +59,22 @@ class Default_Model_PoleMapper
 			return;
 		}
 
-		//initialisation de la variable $row avec l'entrée récupérée
+		//initialisation de la variable $row avec l'entrÃ©e rÃ©cupÃ©rÃ©e
 		$row = $result->current();
 
-		//setting des valeurs dans notre objet $users passé en argument
+		//setting des valeurs dans notre objet $users passÃ© en argument
 		$pole->setId($row->id);
-		$pole->setLiblle($row->libelle);
+		$pole->setLibelle($row->libelle);
 	}
 
-	//récupére toutes les entrées de la table
+	//rÃ©cupÃ©re toutes les entrÃ©es de la table
 	public function fetchAll($str)
 	{
-		//récupération dans la variable $resultSet de toutes les entrées de notre table
+		//rÃ©cupÃ©ration dans la variable $resultSet de toutes les entrÃ©es de notre table
 		$resultSet = $this->getDbTable()->fetchAll($str);
 
-		//chaque entrée est représentée par un objet Default_Model_Pole
-		//qui est ajouté dans un tableau
+		//chaque entrÃ©e est reprÃ©sentÃ©e par un objet Default_Model_Pole
+		//qui est ajoutÃ© dans un tableau
 		$entries = array();
 		foreach($resultSet as $row)
 		{
@@ -89,7 +89,7 @@ class Default_Model_PoleMapper
 	}
 
 	//permet de supprimer un utilisateur,
-	//reçoit la condition de suppression (le plus souvent basé sur l'id)
+	//reï¿½oit la condition de suppression (le plus souvent basï¿½ sur l'id)
 	public function delete($id)
 	{
 		$result = $this->getDbTable()->delete($id);

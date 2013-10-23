@@ -1,34 +1,47 @@
-<div>
-    <table border="1">
-        <tr>
-            <th>id</th>
+<div class="container">
+	
+		<div class="well row-fluid">
+		<h4>Les jours f√©ri√©s du CSM :</h4><br/>
+	
+    <table class="table table-hover ">
+       <thead> 
+       <tr>
+           <th>id</th>
             <th>type de la fete</th>
             <th>date_debut</th>
             <th>Libelle</th>
             <th>Annee Reference</th>
+       
         </tr>
+        </thead>
         <?php
-            //$this->usersArray est une variable qui peut Ítre garnie par le controller
-            //elle doit recevoir un tableau contenant des objets de type Default_Model_Users
-            //le tableau est parcouru par foreach pour afficher les propiÈtÈs des objets contenus dans le tableau
+        
+            //$this->usersArray est une variable qui peut √©tre garnie par le controller
+            //elle doit recevoir un tableau contenant des objets de type Default_Model_Proposition
+            //le tableau est parcouru par foreach pour afficher les propi√©t√©s des objets contenus dans le tableau
             foreach ($this->ferieArray as $ferie) :
-          
+
         ?>
-        <tr>
+       <tbody> <tr id="<?php echo $ferie->id; ?>">
+           
             <td><?php echo $ferie->id; ?></td>
             <td><?php if($ferie->id_type ==2) echo "Religieuse"; else echo "Civile"; ?></td>
             <td><?php echo $ferie->date_debut; ?></td>
-            <td><?php echo $ferie->libelle; ?></td>
+               <td><?php echo $ferie->libelle; ?></td>
             <td><?php echo $ferie->annee_reference; ?></td>
+            
+          
         </tr>
-        <?php endforeach; ?>
+        <?php endforeach; ?></tbody>
     </table>
     <?php
-    //nous affichons, ‡ la suite du tableau (aprËs la balise </table>), notre template qui permettra de gÈrer la pagination
-    //la mÈthode pginationControl() prend, ici, 3 arguments:
+    //nous affichons, √© la suite du tableau (apr√©s la balise </table>), notre template qui permettra de g√©rer la pagination
+    //la m√©thode pginationControl() prend, ici, 3 arguments:
     //  - l'instane paginator
-    //  - le style de dÈfilement
+    //  - le style de d√©filement
     //  - le template de pagination
     echo $this->paginationControl($this->ferieArray, 'Sliding', 'common/my_paginator_control.phtml');
 	?>
+	
+	</div>
 </div>

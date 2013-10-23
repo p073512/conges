@@ -1,5 +1,5 @@
 <?php
-//"Default" est le namespace défini dans le bootstrap
+//"Default" est le namespace dÃ©fini dans le bootstrap
 class Default_Model_CongeMapper
 {
 
@@ -27,11 +27,11 @@ class Default_Model_CongeMapper
 		return $this->_dbTable;
 	}
 
-	//sauve une nouvelle entrée dans la table
+	//sauve une nouvelle entrÃ©e dans la table
 	public function save(Default_Model_Conge $conge)
 	{
-		//récupération dans un tableau des données de l'objet $conge
-		//les noms des clés du tableau correspondent aux noms des champs de la table
+		//rÃ©cupÃ©ration dans un tableau des donnÃ©es de l'objet $conge
+		//les noms des clÃ©s du tableau correspondent aux noms des champs de la table
 		$data = array(
                	'id' => $conge->getId(),
                	'id_personne' => $conge->getId_personne(),
@@ -46,9 +46,9 @@ class Default_Model_CongeMapper
 				'ferme' => $conge->getFerme()		
 		);
 
-		//on vérifie si un l'objet $conge contient un id
+		//on vÃ©rifie si un l'objet $conge contient un id
 		//si ce n'est pas le cas, il s'agit d'un nouvel enregistrement
-		//sinon, c'est une mise à jour d'une entrée à effectuer
+		//sinon, c'est une mise Ã  jour d'une entrÃ©e Ã  effectuer
 		if(null === ($id = $conge->getId()))
 		{
 			unset($data['id']);
@@ -60,7 +60,7 @@ class Default_Model_CongeMapper
 		}
 	}
 
-	//récupére une entrée dans la table
+	//rÃ©cupÃ©re une entrÃ©e dans la table
 	public function find($id, Default_Model_Conge $conge)
 	{
 		$result = $this->getDbTable()->find($id);
@@ -68,10 +68,10 @@ class Default_Model_CongeMapper
 			return;
 		}
 
-		//initialisation de la variable $row avec l'entrée récupérée
+		//initialisation de la variable $row avec l'entrÃ©e rÃ©cupÃ©rÃ©e
 		$row = $result->current();
 
-		//setting des valeurs dans notre objet $users passé en argument
+		//setting des valeurs dans notre objet $users passÃ© en argument
 		$conge->setId($row->id);
 		$conge->setId_personne($row->id_personne);
 		$conge->setId_proposition($row->id_proposition);
@@ -85,14 +85,16 @@ class Default_Model_CongeMapper
 		$conge->setFerme($row->ferme);
 	}
 
-	//récupére toutes les entrées de la table
-	public function fetchAll($str)
+	//rÃ©cupÃ©re toutes les entrÃ©es de la table
+	public function fetchAll($str,$where=null)
 	{
-		//récupération dans la variable $resultSet de toutes les entrées de notre table
-		$resultSet = $this->getDbTable()->fetchAll($str);
+	
+		//rÃ©cupÃ©ration dans la variable $resultSet de toutes les entrÃ©es de notre table
+		$resultSet = $this->getDbTable()->fetchAll($where);
 
-		//chaque entrée est représentée par un objet Default_Model_Conge
-		//qui est ajouté dans un tableau
+		
+		//chaque entrÃ©e est reprÃ©sentÃ©e par un objet Default_Model_Conge
+		//qui est ajoutÃ© dans un tableau
 		$entries = array();
 		foreach($resultSet as $row)
 		{
@@ -112,12 +114,51 @@ class Default_Model_CongeMapper
 
 			$entries[] = $entry;
 		}
-
+  
+     
+		
+		
 		return $entries;
 	}
+	
+ // recuperer les conges dans une periode de temps pour une ressource donnï¿½e 
+    //$flag = 1 inclue les bornes / $flag = 0 n'iclue pas les bornes 
+	public function conges_existant($id_personne,$date_debut,$date_fin,$flag) 
+	    {  
+	    	
+	    	$debut_mois = date('Y-m-d',strtotime($date_debut)); 
+    	    $fin_mois = date('Y-m-d',strtotime($date_fin)).'23:59:59';
+    	    
+	    	
+		    $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+		    $select = new Zend_Db_Select($db);
+		    $select ->from((array('c' =>'conge')),array('c.id_personne' ,'c.date_debut','c.date_fin','c.mi_debut_journee','c.mi_fin_journee','c.nombre_jours','c.id_type_conge')); 
+		    $select->where('c.id_personne ='.$id_personne);
+		   
+		    
+	        if($flag == 0) // retourne toute les dates qui touche la periode 
+	        {
+		     
+	        	$select->where('c.date_debut >= ?', $debut_mois) 
+    	               ->where('c.date_fin <= ?', $fin_mois);
+			    $row = $select->query()->fetchAll();
+	        	
+	        }
+	        elseif($flag == 1) // retourne toute les dates qui touche la periode sauf date_debut == df  ou date_fin == dd 
+	        {
+		      
+		        $select->where('c.date_debut > ?', $debut_mois) 
+    	               ->where('c.date_fin < ?', $fin_mois);
+			    $row = $select->query()->fetchAll();
+		        
+			    
+	        }
+	
+	    	return $row;
+	    }
 
 	//permet de supprimer un utilisateur,
-	//reçoit la condition de suppression (le plus souvent basé sur l'id)
+	//reÃ§oit la condition de suppression (le plus souvent basÃ© sur l'id)
 	public function delete($id)
 	{
 		$result = $this->getDbTable()->delete($id);
@@ -169,4 +210,64 @@ class Default_Model_CongeMapper
 	{
     	return $this->getDbTable()-> CongesNondoublontPole( $tableau_id,$debut_mois,$fin_mois) ;
     }
+    
+    public function somme_conges($idRessource,$anneeReference,$dateDebut,$dateFin,$ferme)
+		{
+		$idRessource = strval($idRessource);
+		$dateDebut = date('Y-m-d',strtotime($dateDebut)); 
+    	$dateFin = date('Y-m-d',strtotime($dateFin)).'23:59:59';	
+	    
+		$db = Zend_Db_Table_Abstract::getDefaultAdapter();
+		$select = new Zend_Db_Select($db);
+		
+		if($ferme == true)
+		$ferme = 1;
+		else if($ferme == false)
+		$ferme = 0;
+		
+		$resultat = array();      
+		$select = $db->select()
+             ->from(array('c' => 'conge'), 
+             		  array('somme' =>'sum(nombre_jours)'))
+                ->where('c.id_personne = ?',$idRessource)
+	             ->where('c.annee_reference = ?', $anneeReference)
+	              ->where('id_type_conge = ?',1)
+	          	   ->where('c.date_debut >= ?', $dateDebut) 
+	    	   		  ->where('c.date_fin <= ?', $dateFin)
+	          		   ->where('c.ferme = ? ',$ferme);
+		      		   
+		$cp = $select->query()->fetchAll();
+		
+		
+		$select = $db->select()
+             ->from(array('c' => 'conge'), 
+             		  array('somme' =>'sum(nombre_jours)'))
+                ->where('c.id_personne = ?',$idRessource)
+	             ->where('c.annee_reference = ?', $anneeReference)
+	              ->where('id_type_conge = ?',2)
+	          	   ->where('c.date_debut >= ?', $dateDebut) 
+	    	   		  ->where('c.date_fin <= ?', $dateFin)
+	          		   ->where('c.ferme = ? ',$ferme);
+		
+	          		   
+		$q1 = $select->query()->fetchAll();
+		
+		$select = $db->select()
+             ->from(array('c' => 'conge'), 
+             		  array('somme' =>'sum(nombre_jours)'))
+                ->where('c.id_personne = ?',$idRessource)
+	             ->where('c.annee_reference = ?', $anneeReference)
+	              ->where('id_type_conge = ?',3)
+	          	   ->where('c.date_debut >= ?', $dateDebut) 
+	    	   		  ->where('c.date_fin <= ?', $dateFin)
+	          		   ->where('c.ferme = ? ',$ferme);
+		
+	          		   
+		$q2 = $select->query()->fetchAll();
+		
+		return array($cp['0'],$q1['0'],$q2['0']);
+			
+			
+			
+		}
 }

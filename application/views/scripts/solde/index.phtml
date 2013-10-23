@@ -1,35 +1,90 @@
-<div>
-    <table border="1">
-        <tr>
-            <th>Nom Prenom</th>
-            <th>Total cp</th>
-            <th>Total q1</th>
-            <th>Total q2</th>
-            <th>Annee Reference</th>
+<div class="row-fluid offset1">
+		<div id="header-container">
+            
+			<div class="dropdown">
+                  <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
+                     Soldes
+                     <b class="caret"></b>
+                  </a>
+                  
+                   <ul class="dropdown-menu">
+                        <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'index-solde'), 'default', true) ?>">Afficher soldes</a></li>
+                        <li class="nav-header">Initialiser</li>
+                        <li><a href="<?php echo $this->url(array('controller' => 'solde', 'action' => 'init-solde-personne-annee'), 'default', true) ?>">Une Personne Une AnnÃ©e</a></li>
+                  </ul>
+              
+			</div><!--MBA : fermeture dropdown -->
+          
+		</div><!-- MBA : fermeture div="header-container" -->
+	</div><!-- MBA : fermeture div="row-fluid -->
+         <br/>
+
+<div class="container">
+		<div class="well row-fluid">
+		<h2>Liste des soldes :</h2><br/>
+	<?php 	if(isset($this->error)){ 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Alerte!</strong>  <?php //Message d'erreur
+                                         echo "Erreur :".$this->error; ?>
+			</div>
+
+	<?php }
+    /*
+	 * Si erreurs de traitements* renvoyÃ© depuis le controlleur 
+	 * traitemets : logique, ajout BD, Exception ...
+	 */
+	
+	else if(isset($this->success)){
+	?>
+	
+	<!-- afficage message succÃ©s  -->
+            <div class="alert alert-info">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Succes!</strong> <?php //Message succes
+	                                      echo $this->success; ?>
+			</div>
+	<?php }?>
+    <table class="table table-hover ">
+       <thead> 
+       <tr>
+           
+            <th>Ressource</th>
+            <th>Annee</th>
+            <th>CP</th>
+            <th>Q1</th>
+            <th>Q2</th>
+
         </tr>
+        </thead>
         <?php
-            //$this->usersArray est une variable qui peut être garnie par le controller
-            //elle doit recevoir un tableau contenant des objets de type Default_Model_Users
-            //le tableau est parcouru par foreach pour afficher les propiétés des objets contenus dans le tableau
+            //$this->usersArray est une variable qui peut ï¿½tre garnie par le controller
+            //elle doit recevoir un tableau contenant des objets de type Default_Model_Proposition
+            //le tableau est parcouru par foreach pour afficher les propiï¿½tï¿½s des objets contenus dans le tableau
             foreach ($this->soldeArray as $solde) :
-              $personne = new Default_Model_Personne();
-			$result_set_personnes = $personne->find($solde->id_personne);
+
         ?>
-        <tr>
-            <td><?php echo $result_set_personnes->getNom().'  '.$result_set_personnes->getPrenom(); ?></td>
-            <td><?php echo $solde->total_cp; ?></td>
-            <td><?php echo $solde->total_q1; ?></td>
-            <td><?php echo $solde->total_q2; ?></td>
-            <td><?php echo $solde->annee_reference; ?></td>
+       <tbody> <tr>
+            
+            <td><a href="<?php echo $this->url(array('controller' => 'ptrsolde', 'action' => 'fiche-rh', 'id' => $solde['id_ressource'], 'annee' => $solde['annee']), 'default', true) ?>"><?php echo $solde['ressource']; ?></a></td>
+            <td><?php echo $solde['annee']; ?></td>
+            <td><?php echo $solde['cp']; ?></td>
+            <td><?php echo $solde['q1']; ?></td>
+            <td><?php echo $solde['q2']; ?></td>
+
         </tr>
-        <?php endforeach; ?>
+        <?php endforeach; ?></tbody>
     </table>
     <?php
-    //nous affichons, à la suite du tableau (après la balise </table>), notre template qui permettra de gérer la pagination
-    //la méthode pginationControl() prend, ici, 3 arguments:
+    //nous affichons, ï¿½ la suite du tableau (aprï¿½s la balise </table>), notre template qui permettra de gï¿½rer la pagination
+    //la mÃ©thode pginationControl() prend, ici, 3 arguments:
     //  - l'instane paginator
-    //  - le style de défilement
+    //  - le style de dÃ©filement
     //  - le template de pagination
     echo $this->paginationControl($this->soldeArray, 'Sliding', 'common/my_paginator_control.phtml');
 	?>
+	</div>
 </div>

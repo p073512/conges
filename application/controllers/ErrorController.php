@@ -45,7 +45,7 @@ class ErrorController extends Zend_Controller_Action
 		*/
 		
 		// Tester les ACL's
-		$this->view->message = "Error !";
+		$this->view->message = "Erreur !";
 	}
 
 	public function getLog()
@@ -60,7 +60,7 @@ class ErrorController extends Zend_Controller_Action
 
 	public function denyAction()
 	{
-		$this->view->message = "You are not allowed to see this page !";
+		$this->view->message = "Vous n'êtes pas autorisé à consulter cette page !";
 	}
 
 }

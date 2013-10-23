@@ -7,9 +7,16 @@ class IndexController extends Zend_Controller_Action
 	
 	function preDispatch()
 	{
+	
+          $doctypeHelper = new Zend_View_Helper_Doctype();
+          $doctypeHelper->doctype('HTML5');
+        
+     
+		
 		$auth = Zend_Auth::getInstance();
 
-		if (!$auth->hasIdentity()) {
+		if (!$auth->hasIdentity()) 
+		{
 			$this->_redirect('connexion/index');
 		}
 	}
@@ -24,11 +31,7 @@ class IndexController extends Zend_Controller_Action
 	
 	//une action doit respecter la nomenclature [actionName]Action
 	public function indexAction()
-	{
-		//action appelée par défaut lors de l'affichage de l'index
-		//la vue application/views/scripts/index/index.phtml est
-		//automatiquement utilisée
-	}
-
+{
+  $this->_helper->redirector('afficher','proposition') ;      
 }
-
+}

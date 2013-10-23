@@ -1,6 +1,16 @@
 <?php
 class FerieController extends Zend_Controller_Action
 {
+
+     public function preDispatch() /* MTA : Mohamed khalil Takafi */
+    {
+    	    $doctypeHelper = new Zend_View_Helper_Doctype();
+            $doctypeHelper->doctype('HTML5');
+    		
+	}
+	
+	
+	
 	public function indexAction()
 	{
 		

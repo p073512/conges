@@ -1,57 +1,176 @@
+<?php 
+$this->headScript()->appendFile( $this->baseUrl() .'/js/myScriptProp.js');
+echo $this->headScript();
+?>
+   <?php 
+               $profil = substr_replace($this->LoggedProfil(),"",0,31);
+               $profil = str_replace("Deconnexion","", $profil);
+               $profil = str_replace(" ","",$profil);
+               $profil  = strip_tags($profil);
+    ?>
+    
+	<!-- Modal Pour confirmation de suppression -->
+	 <div id="myModal" class="modal message hide fade" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" style="display: none;">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+			<h3 id="myModalLabel">Confirmer la suppression</h3>
+		</div>
+		<div class="modal-body">
+			<p></p>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true" id="annulSupp">Annuler</button>
+			<button class="btn  btn-info" id="suppButton">Confirmer</button>
+		</div>
+	</div>
 	
-
-<div>
-    <table border="1" id="ma_table">
-        <tr>
+	
+	<div class="row-fluid offset1">
+		<div id="header-container">
             
-            <th>Nom Prenom</th>
-            <th>Date Debut</th>
-            <th>Date Fin</th>
-            <th>Debut Journee</th>
-            <th>Fin Journee</th>
-            <th>Nombre Jours</th>
-            <th>Etat</th>
-            <th>Edit</th>
-            <th>Delete</th>
+			<div class="dropdown">
+                  <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
+                  Proposition <b class="caret"></b>
+                  </a>
+					<ul class="dropdown-menu">
+						<li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'creer'), 'default', true) ?>">Cr&eacute;er</a></li>
+						<li><a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'afficher'), 'default', true) ?>">Afficher</a></li>
+					</ul>
+              
+			</div><!--MBA : fermeture dropdown -->
+          
+		</div><!-- MBA : fermeture div="header-container" -->
+	</div><!-- MBA : fermeture div="row-fluid -->
+         <br/>
 
+<div class="container">
+		<div class="well row-fluid">
+		<h4>Liste des Propositions :</h4><br/>
+	<?php 	if(isset($this->error))
+	 { 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Alerte!</strong>  <?php //Message d'erreur
+                                         echo "Erreur :".$this->error; ?>
+			</div>
+
+	<?php 
+	 }
+    
+    
+    /*
+	 * Si erreurs de traitements* renvoyÃƒÂ© depuis le controlleur 
+	 * traitemets : logique, ajout BD, Exception ...
+	 */
+	
+	else if(isset($this->success))
+	{
+		?>
+	
+		<!-- afficage message succÃƒÂ©s  -->
+     	       <div class="alert alert-info">
+					<button type="button" class="close " data-dismiss="alert"></button>
+						<strong>Succes!</strong> <?php  echo $this->success; //Message succes ?> 
+			   </div>
+	<?php 
+	}?>
+
+ <table class="table table-hover ">
+
+     <thead> 
+       <tr>
             
-
-        </tr>
+            <th>nom prenom</th>
+            <th>date debut</th>
+            <th>date fin</th>
+            <th>nombre jours</th>
+            <th>etat</th>
+            <th>modifier</th>
+            <th>supprimer</th>
+     <?php  if($profil == 'admin')
+            {  	     
+      ?>
+            <th>Valider</th>
+            <th>Refuser</th>
+     <?php 
+            }
+     ?>
+       </tr>
+     </thead>
         <?php
-            //$this->usersArray est une variable qui peut être garnie par le controller
+            $helper = new Default_Controller_Helpers_outils();
+          
+            //$this->usersArray est une variable qui peut ï¿½tre garnie par le controller
             //elle doit recevoir un tableau contenant des objets de type Default_Model_Proposition
-            //le tableau est parcouru par foreach pour afficher les propiétés des objets contenus dans le tableau
+            //le tableau est parcouru par foreach pour afficher les propiï¿½tï¿½s des objets contenus dans le tableau
             foreach ($this->propositionArray as $proposition) :
             $personne = new Default_Model_Personne();
 			$result_set_personnes = $personne->find($proposition->id_personne);
-        ?>
-        <tr>
-            
-            <td><?php echo $result_set_personnes->getNom().'  '.$result_set_personnes->getPrenom(); ?></td>
-            <td><?php echo $proposition->date_debut; ?></td>
-            <td><?php echo $proposition->date_fin; ?></td>
-            <td><?php echo $proposition->mi_debut_journee; ?></td>
-            <td><?php echo $proposition->mi_fin_journee; ?></td>
+			$date = $helper->makeMidi($proposition->date_debut,$proposition->date_fin);	
+
+			?>
+
+     <tbody>   
+            <tr id="<?php  /* gestion des couleur des ligne selon l'etat de la proposition */
+                            echo $proposition->id; ?>"<?php $etat =$proposition->etat;	
+        					switch($etat){
+							case 'OK':{echo 'class="success"';break;}
+						    case 'KO':{echo 'class="error"';break;}
+							case 'NC':{echo 'class="info"';break;}}?> >
+ 
+            <td><?php echo $result_set_personnes->getNomPrenom(); ?></td>
+            <td><?php echo $date[0].'&nbsp;&nbsp;&nbsp;'.$date[1]; ?></td>
+            <td><?php echo $date[2].'&nbsp;&nbsp;&nbsp;'.$date[3]; ?></td>
             <td><?php echo $proposition->nombre_jours; ?></td>
             <td><?php echo $proposition->etat; ?></td>
-            <td>
-                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'edit', 'id' => $proposition->id), 'default', true); ?>">Edit</a>
-            </td>
-           <td>
-                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'delete', 'id' => $proposition->id), 'default', true); ?>">Delete</a>
-            </td>
 
-        </tr>
+            <!-- Modifier proposition -->
+            <td>
+                 <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'modifier', 'id' => $proposition->id), 'default', true); ?>"><i  class="icon-pencil"></i></a>
+            </td>
+            <!-- Supprimer proposition -->
+            <td >
+                 <i class="icon-remove" id="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'supprimer'), 'default', true); ?>"></i>
+            </td>
+            
+         <?php  if($profil == 'admin')
+            {
+          ?>
+            <!-- Valider proposition -->
+            <td>
+                <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'valider', 'id' => $proposition->id,'solde'=>2), 'default', true); ?>"><i  class="icon-checkmark"></i></a>
+            </td>
+            <!-- Refuser proposition -->
+            <td>
+                  <?php if($proposition->etat == 'KO'){ // si proposition refusée icone refuser est désactivée?>
+	           <i  class="icon-cancel-2"></i> 
+	           <?php }else {?>
+	            <a href="<?php echo $this->url(array('controller' => 'proposition', 'action' => 'refuser', 'id' => $proposition->id), 'default', true); ?>"><i  class="icon-cancel-2"></i></a>
+	          
+	           <?php }?> 
+            </td>       
+         <?php 
+            }
+          ?>
+            
+            
+
+        </tr> 
+        </tbody>
         <?php endforeach; ?>
+       
     </table>
-    <?php
-    //nous affichons, à la suite du tableau (après la balise </table>), notre template qui permettra de gérer la pagination
-    //la méthode pginationControl() prend, ici, 3 arguments:
+ <?php
+    //nous affichons, ÃƒÂ  la suite du tableau (aprÃƒÂ¨s la balise </table>), notre template qui permettra de gÃƒÂ©rer la pagination
+    //la mÃƒÂ©thode pginationControl() prend, ici, 3 arguments:
     //  - l'instane paginator
-    //  - le style de défilement
+    //  - le style de dÃƒÂ©filement
     //  - le template de pagination
     echo $this->paginationControl($this->propositionArray, 'Sliding', 'common/my_paginator_control.phtml');
 	?>
-	
-
+</div>
+    <br>    <!--  MTA / Mohamed khalil Takafi  -->
 </div>

@@ -35,7 +35,7 @@ class Default_Model_SoldeMapper
 		//récupération dans un tableau des données de l'objet $Personne
 		//les noms des clés du tableau correspondent aux noms des champs de la table
 		$data = array(
-               	'id_personne' => $solde->getId_personne(),
+               	'id_personne' => $solde->getPersonne()->getId(),
 				'total_q1' => $solde->getTotal_q1(),
 				'total_q2' => $solde->getTotal_q2(),
 				'total_cp' => $solde->getTotal_cp(),
@@ -46,7 +46,7 @@ class Default_Model_SoldeMapper
 		//on vérifie si un l'objet $solde contient un id
 		//si ce n'est pas le cas, il s'agit d'un nouvel enregistrement
 		//sinon, c'est une mise à jour d'une entrée à effectuer
-		if(null !==($id_personne = $solde->getId_personne()))
+		if(null !==($id_personne = $solde->getPersonne()->getId()))
 		{
 			//unset($data['id_personne']);
 			$this->getDbTable()->insert($data);
@@ -56,22 +56,31 @@ class Default_Model_SoldeMapper
 	}
 
 	//récupére une entrée dans la table
-	public function find($id_personne,$annee_reference, Default_Model_Solde $solde)
+	public function find($annee_reference,$idPersonne, Default_Model_Solde $solde)
 	{
-		$result = $this->getDbTable()->find($id_personne,$annee_reference);
+
+	
+	
+		$result = $this->getDbTable()->find($annee_reference,strval($idPersonne));
+		
 		if (0 == count($result)) 
 		{
 			return;
 		}
-		$personne = new Default_Model_Personne();
-		$personne = $personne->find($id_personne,$annee_reference);
-		$date_entree = $personne->getDate_entree();
-		$modalite = $personne->getId_modalite();
+		
+		
+		
+		$row = $result->current();
+		$RowPersonne = $row->findParentRow('Default_Model_DbTable_Personne');
+        $Personne = new Default_Model_Personne($RowPersonne->toArray());
+        
+        $date_entree = $Personne->getDate_entree();
+		$modalite = $Personne->getModalite()->getId();
 		//initialisation de la variable $row avec l'entrée récupérée
 		$row = $result->current();
 
 		//setting des valeurs dans notre objet $Personne passé en argument
-			$solde->setId_personne($row->id_personne);
+			$solde->setPersonne($Personne);
 			$solde->setTotal_cp($date_entree);
 			if ($modalite ==7)
 			{
@@ -81,6 +90,7 @@ class Default_Model_SoldeMapper
 			$solde->setTotal_q1($modalite);
 			
 			$solde->setAnnee_reference();
+		return $result;
 			
 	}
 
@@ -90,7 +100,7 @@ class Default_Model_SoldeMapper
 		//récupération dans la variable $resultSet de toutes les entrées de notre table
 		$resultSet = $this->getDbTable()->fetchAll($str);
 		$personne = new Default_Model_Personne();
-		$personne = $personne->fetchall($str=array());
+		$personne = $personne->fetchAll($str=array());
 		
 		//chaque entrée est représentée par un objet Default_Model_Personne
 		//qui est ajouté dans un tableau
@@ -99,9 +109,9 @@ class Default_Model_SoldeMapper
 		{
 			$date_entree = $p->getDate_entree();
 			$id_personne = $p->getId();
-			$modalite = $p->getId_modalite();
+			$modalite = $p->getModalite()->getId();
 			$entry = new Default_Model_Solde();
-			$entry->setId_personne($id_personne);
+			$entry->setPersonne($id_personne);
 			$entry->setTotal_cp($date_entree);
 			$entry->setTotal_q1($modalite);
 			$entry->setTotal_q2(0);
@@ -112,7 +122,12 @@ class Default_Model_SoldeMapper
 
 		return $entries;
 	}
-
+    
+	
+	
+	
+	
+	
 	//permet de supprimer un utilisateur,
 	//reçoit la condition de suppression (le plus souvent basé sur l'id)
 	public function delete($id_personne)
@@ -122,19 +137,22 @@ class Default_Model_SoldeMapper
 	
 
 	
-	public function find2($id_personne,$annne_reference, Default_Model_Solde $solde)
+	public function find2($annne_reference, Default_Model_Solde $solde)
 	{
-		$result = $this->getDbTable()->find($id_personne,$annne_reference);
+		$result = $this->getDbTable()->find($annne_reference);
 		if (0 == count($result)) 
 		{
 			return;
 		}
 
 		//initialisation de la variable $row avec l'entrée récupérée
+		
 		$row = $result->current();
-
+		$RowPersonne = $row->findParentRow('Default_Model_DbTable_Personne');
+        $Personne = new Default_Model_Personne($RowPersonne->toArray());
+        
 		//setting des valeurs dans notre objet $Personne passé en argument
-			$solde->setId_personne($row->id_personne);
+			$solde->setPersonne($Personne);
 			$solde->setTotal_cp($row->total_cp);
 			$solde->setTotal_q1($row->total_q1);
 			$solde->setTotal_q2($row->total_q2);
@@ -153,7 +171,7 @@ class Default_Model_SoldeMapper
 		foreach($resultSet as $row)
 		{
 			$entry = new Default_Model_Solde();
-			$entry->setId_personne($row->id_personne);
+			$entry->setPersonne($row->id_personne);
 			$entry->setTotal_cp($row->total_cp);
 			$entry->setTotal_q1($row->total_q1);
 			$entry->setTotal_q2($row->total_q2);

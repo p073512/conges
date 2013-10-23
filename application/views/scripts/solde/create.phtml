@@ -1,12 +1,130 @@
 
-<div id ="filtre_solde">
-		<h4> <?php echo $this->escape($this->title); ?>  </h4>
-		<div id="filtres_solde">
-			<ol>
-				</br>
-				<li><strong>Annee de reference</strong></li>
+
+   <?php 
+               $profil = substr_replace($this->LoggedProfil(),"",0,31);
+               $profil = str_replace("Deconnexion","", $profil);
+               $profil = str_replace(" ","",$profil);
+               $profil  = strip_tags($profil);
+    ?>
+    
+	<!-- Modal Pour confirmation de suppression -->
+	 <div id="myModal" class="modal message hide fade" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" style="display: none;">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+			<h3 id="myModalLabel">Confirmer la suppression</h3>
+		</div>
+		<div class="modal-body">
+			<p></p>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true" id="annulSupp">Annuler</button>
+			<button class="btn  btn-info" id="suppButton">Confirmer</button>
+		</div>
+	</div>
+	
+	
+	<div class="row-fluid offset1">
+		<div id="header-container">
+            
+			<div class="dropdown">
+                  <a class="header-dropdown dropdown-toggle accent-color" data-toggle="dropdown" href="#" >
+                  Initialisation des soldes 
+                  </a>
+					
+			</div><!--MBA : fermeture dropdown -->
+          
+		</div><!-- MBA : fermeture div="header-container" -->
+	</div><!-- MBA : fermeture div="row-fluid -->
+         <br/>
+
+<div class="container">
+		<div class="well row-fluid">
+		
+	<?php 	if(isset($this->error))
+	 { 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Alerte!</strong>  <?php //Message d'erreur
+                                         echo "Erreur :".$this->error; ?>
+			</div>
+
+	<?php 
+	 }
+    
+	 
+	/*
+	 * Gestion des messages warnings 
+	 */
+
+	if(isset($this->warning)){ 
+	?>
+	
+      <!-- afficage alerte avec message d'erreur -->
+			<div class="alert">
+				<button type="button" class="close " data-dismiss="alert"></button>
+				<strong>Alerte :</strong>  <?php //Message warning
+                                         echo "   ".$this->warning; ?>
+			</div>
+	
+	<?php } 
+	 
+    
+    /*
+	 * Si erreurs de traitements* renvoyé depuis le controlleur 
+	 * traitemets : logique, ajout BD, Exception ...
+	 */
+	
+	else if(isset($this->success))
+	{
+		?>
+	
+		<!-- afficage message succés  -->
+     	       <div class="alert alert-info">
+					<button type="button" class="close " data-dismiss="alert"></button>
+						<strong>Succes!</strong> <?php  echo $this->success; //Message succes ?> 
+			   </div>
+	<?php 
+	}?>
+	
+	<div id="filtres_solde">
 			
+				
+				<strong>Initialiser solde congé :</strong><br/>
 			
-			</ol>			
-<?php echo $this->form; ?>
+			     
+			<div class="offset4 span3 well">
+				<form action="<?php $this->form->getAction() ?>" name="<?php $this->form->getName() ?>" method="post">
+					
+			
+			       <?php
+
+			       foreach($this->form as $k=>$e)
+			       {
+			       	if($e->gettype() == 'Zend_Form_Element_Submit')
+			       	{
+			       		$submit = $e;
+			       	}
+			       	else
+			       	{
+			       			echo $e;
+			       	}
+			        
+			       
+			       }
+			       ?>
+			       <center><?php echo $submit; ?></center>
+			       
+			   </form>
+	</div>
+	
+   </div>
+   
+</div>
+
+
+		
+		
 </div>

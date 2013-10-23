@@ -1,227 +1,1272 @@
 <?php
+#region MBA
 class PersonneController extends Zend_Controller_Action
 {
-	//action par d�faut
+	// indexAction() ici ...
+
+	public function preDispatch()
+	{
+		$doctypeHelper = new Zend_View_Helper_Doctype();
+		$doctypeHelper->doctype('HTML5');
+	}
+
 	public function indexAction()
 	{
-		//cr�ation d'un d'une instance Default_Model_Personne
+		//création d'un d'une instance Default_Model_Personne
 		$personne = new Default_Model_Personne();
 
-		//$this->view permet d'acc�der � la vue qui sera utilis�e par l'action
-		//on initialise la valeur usersArray de la vue
-		//(cf. application/views/scripts/users/index.phtml)
-		//la valeur correspond � un tableau d'objets de type Default_Model_Personne r�cup�r�s par la m�thode fetchAll()
-		//$this->view->usersArray = $personne->fetchAll();
-
-		//cr�ation de notre objet Paginator avec comme param�tre la m�thode
-		//r�cup�rant toutes les entr�es dans notre base de donn�es
+		//création de notre objet Paginator avec comme paramétre la méthode
+		//récupérant toutes les entrées dans notre base de données
 		$paginator = Zend_Paginator::factory($personne->fetchAll($str =array()));
-		//indique le nombre d�l�ments � afficher par page
+
+		//indique le nombre déléments é afficher par page
 		$paginator->setItemCountPerPage(20);
-		//r�cup�re le num�ro de la page � afficher
+
+		//récupére le numéro de la page é afficher
 		$paginator->setCurrentPageNumber($this->getRequest()->getParam('page'));
 
-		//$this->view permet d'acc�der � la vue qui sera utilis�e par l'action
-		//on initialise la valeur usersArray de la vue
-		//(cf. application/views/scripts/users/index.phtml)
 		$this->view->personneArray = $paginator;
+		// instanciation de la session
 	}
-
-	public function createAction()
+	
+	
+	
+	
+	
+	
+    // CreatepAction()  :  creer une personne de l'equipe CSM 
+	public function createpAction()
 	{
-		//cr�ation du fomulaire
-		$form = new Default_Form_Personne();
-		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'personne', 'action' => 'create'), 'default', true));
-		$form->submit_pr->setLabel('Ajouter');
+		$this->view->title ='<h4>Ajout ressources Marocaines</h4></br>';
+		$request = $this->getRequest();
+		$form    = new Default_Form_PersonneMa();
 
-		//assigne le formulaire � la vue
-		$this->view->form = $form;
-		$this->view->title = "Ajouter Une Ressource";
-		//si la page est POST�e = formulaire envoy�
-		if($this->_request->isPost())
+		//MBA : Peuplé les listes déroulantes é partir de la Base de donnée
+		$form->setDbOptions('fonction',new Default_Model_Fonction());
+		$form->setDbOptions('pole', new Default_Model_Pole());
+
+		if ($this->getRequest()->isPost())
 		{
-			//r�cup�ration des donn�es envoy�es par le formulaire
-			$data = $this->_request->getPost();
-
-			//v�rifie que les donn�es r�pondent aux conditions des validateurs
-			if($form->isValid($data))
-			{
-				//cr�ation et initialisation d'un objet Default_Model_Personne
-				//qui sera enregistr� dans la base de donn�es
-				$personne = new Default_Model_Personne();
-				$personne->setNom($form->getValue('nom_pr'));
-				$personne->setPrenom($form->getValue('prenom_pr'));
-				$personne->setDate_entree($form->getValue('date_entree_pr'));
-				$personne->setId_pole($form->getValue('id_pole_pr'));
-				$personne->setDate_debut('0000-00-00');
-				$personne->setDate_fin('0000-00-00');
-				$personne->setId_entite($form->getValue('id_entite_pr'));
-				$personne->setId_modalite($form->getValue('id_modalite_pr'));
-				$personne->setId_fonction($form->getValue('id_fonction_pr'));
-				$personne->setCentre_service($form->getValue('centre_service_pr'));
-				$personne->setPourcent($form->getValue('pourcent_pr'));
-				$personne->setStage($form->getValue('stage_pr'));
-				if($form->getValue('id_modalite_pr')!= 7 && $form->getValue('centre_service_pr') ==1) 
+			$data = $request->getPost();
+			
+			///////////////// récupération de l'url///////////////
+			$requete = $this->getRequest();
+			if ($requete instanceof Zend_Controller_Request_Http)
+			{$baseurl = $requete->getBaseUrl();}
+			
+			
+			if ($form->isValid($request->getPost()))       // formulaire valide 
+			{	 //echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;formulaire valide';
+			    $personne = new Default_Model_Personne();
+		
+				$IsExist = $personne->IsExist($data['Nom'], $data['Prenom']);
+				
+				if($IsExist>0)  // personne existe 
 				{
-					echo "la modalit� est no compatible avec le centre cservice";
-					
-					$form->populate($data);
+					$this->view->warning = "Désolé la ressource : ". $data['Nom']." ".$data['Prenom']." existe déjà !";
+							
+					// vider les champs du formulaire
+					$form->getElement('Nom')->setValue('');
+					$form->getElement('Prenom')->setValue('');
+					$form->getElement('fonction')->setValue('');
+					$form->getElement('pole')->setValue('');
+					$form->getElement('date_entree')->setValue('');
+					$form->getElement('date_debut')->setValue('');
+					$form->getElement('date_fin')->setValue('');
+					$form->getElement('pourcent')->setValue('100');
+					$form->getElement('Stage')->setValue('');
 				}
-				else
-				{
-					$personne->save();
-					/* initialisation du solde conge de la personne cree*/		
-					$resul = $personne ->find ($personne->maxid());
-					$solde= new Default_Model_Solde();
-					$solde ->setId_personne($resul->getId());
-					$solde ->setTotal_cp($form->getValue('date_entree_pr'));
-					if ($form->getValue('centre_service_pr') == 1)
+				else           // personne inexistante 
+				{  
+				    if($data['date_entree'] > $data['date_debut'])  // si on a pas saisi une date_fin
 					{
-						//$solde ->setTotal_q1(0);
-						$solde ->setTotal_q2(0);// a revoir
+						$this->view->error = "La date d'entree doit étre inf&eacute;rieure ou &eacute;gale à la date de debut";
+				     	$form->getElement('date_entree')->setView()->addError("");
+				        $form->getElement('date_debut')->setView()->addError("");
 					}
+				     elseif($data['date_fin'] <> '')
+				    { 
+					     if ($data['date_debut'] > $data['date_fin']) // si date debut > date fin 
+						 {$this->view->error = "La date de d&eacute;but doit étre inf&eacute;rieure ou &eacute;gale à la date de fin";
+					     $form->getElement('date_debut')->setView()->addError("");
+				         $form->getElement('date_fin')->setView()->addError("");}
+				         else 
+				         {
+				         	// remplir l'objet personne avec les informations necessaires 
+						    $personne->setNom($data['Nom']);
+						    $personne->setPrenom($data['Prenom']);
+							//centre de service,modalité et entité figés pour le csm
+							$personne->setEntite("2");
+							$personne->setModalite("7");
+							$personne->setFonction($data['fonction']);  
+		                    $personne->setPole($data['pole']);
+		                    $personne->setDate_entree($data['date_entree']);
+		                    $personne->setDate_debut($data['date_debut']);
+		                    $personne->setDate_fin($data['date_fin']);
+	                        $personne->setPourcent($data['pourcent']);
+		                    $personne->setStage($data['Stage']);
+						                    
+							try 
+							{
+								$personne->save();
+								$this->view->success = "la ressource : ". $data['Nom']." ".$data['Prenom']." a été crée avec succés  !";
+							}
+							catch (Zend_Db_Exception $e)
+							{
+								
+								if($e->getMessage())
+								$this->view->error = "Création de la ressource a échoué !";
+								else
+								{    // affichage du message de succès 
+								    if($personne->getStage() == '1')
+									{$this->view->success = "Création du stagiaire : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}
+								    else 
+									{$this->view->success = "Création de la ressource : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}  
+									
+								    // vider les champs du formulaire
+									$form->getElement('Nom')->setValue('');
+									$form->getElement('Prenom')->setValue('');
+									$form->getElement('fonction')->setValue('');
+									$form->getElement('pole')->setValue('');
+									$form->getElement('date_entree')->setValue('');
+									$form->getElement('date_debut')->setValue('');
+									$form->getElement('date_fin')->setValue('');
+									$form->getElement('pourcent')->setValue('100');
+									$form->getElement('Stage')->setValue('');
+								}
+								$form->populate($data);			
+							}
+							
+						
+							  
+
+			            } // fin else 
+				    }// fin elseif	
+				    else // sinon 
+				    {     	
+						    // remplir l'objet personne avec les informations necessaires 
+						    $personne->setNom($data['Nom']);
+						    $personne->setPrenom($data['Prenom']);
+							//centre de service,modalité et entité figés pour le csm
+							$personne->setEntite("2");
+							$personne->setModalite("7");
+							$personne->setFonction($data['fonction']);  
+		                    $personne->setPole($data['pole']);
+		                    $personne->setDate_entree($data['date_entree']);
+		                    $personne->setDate_debut($data['date_debut']);
+		                    $personne->setDate_fin($data['date_fin']);
+	                        $personne->setPourcent($data['pourcent']);
+		                    $personne->setStage($data['Stage']);
+					                    
+							try 
+							{
+								$personne->save();
+								$this->view->success = "la ressource : ". $data['Nom']." ".$data['Prenom']." a été crée avec succés  !";
+							}
+							catch (Zend_Db_Exception $e)
+							{
+								if($e->getMessage())
+								$this->view->error = "Création de la ressource a échoué !";
+								else
+								{    // affichage du message de succès 
+								    if($personne->getStage() == '1')
+									{$this->view->success = "Création du stagiaire : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}
+								    else 
+									{$this->view->success = "Création de la ressource : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}  
+								}
+								$form->populate($data);		
+					     	}
+
+							    // vider les champs du formulaire
+								$form->getElement('Nom')->setValue('');
+								$form->getElement('Prenom')->setValue('');
+								$form->getElement('fonction')->setValue('');
+								$form->getElement('pole')->setValue('');
+								$form->getElement('date_entree')->setValue('');
+								$form->getElement('date_debut')->setValue('');
+								$form->getElement('date_fin')->setValue('');
+								$form->getElement('pourcent')->setValue('100');
+								$form->getElement('Stage')->setValue('');
+
+					} // fin else 			
+				}// fin else 
+			} // fin if form valide 
+				
+			else     /****/// form invalide  
+			{   // echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;formulaire invalide !!';
+				$personne = new Default_Model_Personne();
+				$IsExist = $personne->IsExist($data['Nom'], $data['Prenom']);
+				if($IsExist>0)
+				{
+					$this->view->warning = "Désolé la ressource : ". $data['Nom']." ".$data['Prenom']." existe déjà !";
+					
+					// vider les champs du formulaire
+					$form->getElement('Nom')->setValue('');
+					$form->getElement('Prenom')->setValue('');
+					$form->getElement('fonction')->setValue('');
+					$form->getElement('pole')->setValue('');
+					$form->getElement('date_entree')->setValue('');
+					$form->getElement('date_debut')->setValue('');
+					$form->getElement('date_fin')->setValue('');
+					$form->getElement('pourcent')->setValue('100');
+					$form->getElement('Stage')->setValue('');
+                }
+				else 
+			 	{
+			 	
+				    if($data['Nom'] === '')  // si on a pas saisi un Nom
+					{$this->view->error = "Veuillez saisir un nom !";}
+					elseif($data['Prenom'] == '') // si on a pas saisi un Prenom
+					{$this->view->error = "Veuillez saisir un prenom !";}
+					elseif($data['fonction'] === 'x')  // si on a pas selectionné une fonction  id = 'x'
+					{$this->view->error = "Veuillez selectionner une fonction !";}
+					elseif($data['pole'] === 'x')  // si on a pas selectionné un pole  id = 'x'
+					{$this->view->error = "Veuillez selectionner un pole !";}
+					elseif($data['date_entree'] === '')  // si on a pas saisi une date_d'entree
+					{$this->view->error = "Veuillez saisir une date d'entree !";}
+					elseif($data['date_debut'] === '')  // si on a pas saisi une date_debut
+					{$this->view->error = "Veuillez saisir une date debut !";}
+				    elseif($data['date_entree'] > $data['date_debut'])  // si on a pas saisi une date_fin
+					{$this->view->error = "La date d'entree doit étre inf&eacute;rieure ou &eacute;gale à la date de debut";
+				     $form->getElement('date_entree')->setView()->addError("");
+				     $form->getElement('date_debut')->setView()->addError("");}
+				    elseif($form->getElement('pourcent')->hasErrors())                    
+			        {$this->view->error = "Le pourcentage doit etre compris entre 0 et 100";}
+
+				     elseif($data['date_fin'] <> '')
+				    { 
+					     if ($data['date_debut'] > $data['date_fin']) // si date debut > date fin 
+						 {$this->view->error = "La date de d&eacute;but doit étre inf&eacute;rieure ou &eacute;gale à la date de fin";
+					     $form->getElement('date_debut')->setView()->addError("");
+				         $form->getElement('date_fin')->setView()->addError("");}
+				         else 
+				         {
+				         
+					            // remplir l'objet personne avec les informations necessaires 
+							    $personne->setNom($data['Nom']);
+							    $personne->setPrenom($data['Prenom']);
+								//centre de service,modalité et entité figés pour le csm
+								$personne->setEntite("2");
+								$personne->setModalite("7");
+								$personne->setFonction($data['fonction']);  
+			                    $personne->setPole($data['pole']);
+			                    $personne->setDate_entree($data['date_entree']);
+			                    $personne->setDate_debut($data['date_debut']);
+			                    $personne->setDate_fin($data['date_fin']);
+		                        $personne->setPourcent($data['pourcent']);
+			                    $personne->setStage($data['Stage']);
+							                    
+								try 
+								{
+									$personne->save();
+									$this->view->success = "la ressource : ". $data['Nom']." ".$data['Prenom']." a été crée avec succés  !";
+								}
+								catch (Zend_Db_Exception $e)
+								{
+									
+									if($e->getMessage())
+									$this->view->error = "Création de la ressource a échoué !";
+									else
+									{    // affichage du message de succès 
+									    if($personne->getStage() == '1')
+										{$this->view->success = "Création du stagiaire : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}
+									    else 
+										{$this->view->success = "Création de la ressource : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}  
+										
+										// vider les champs du formulaire
+										$form->getElement('Nom')->setValue('');
+										$form->getElement('Prenom')->setValue('');
+										$form->getElement('fonction')->setValue('');
+										$form->getElement('pole')->setValue('');
+										$form->getElement('date_entree')->setValue('');
+										$form->getElement('date_debut')->setValue('');
+										$form->getElement('date_fin')->setValue('');
+										$form->getElement('pourcent')->setValue('100');
+										$form->getElement('Stage')->setValue('');	
+									}
+									$form->populate($data);		
+								}
+								
+								
+			         }
+				    }	  
+					else
+					{$this->view->error = "Formulaire invalide !";}	
+					$form->populate($data);	
+				}// fin else 
+			}// fin else 
+		}// fin if requete post
+
+		$this->view->form = $form;
+		
+	}// fin action createp
+
+	
+	
+	
+	
+	
+	
+	// CreatepfAction()  :  creer une personne de l'equipe FRONT 
+	// MTA : modifié le 18/07/2013 
+	public function createpfAction()
+	{
+		$this->view->title ='<h4>Ajout ressources Françaises</h4></br>';
+		$request = $this->getRequest();
+		$form    = new Default_Form_PersonneFr();
+
+		//MBA : Peuplé les listes déroulantes é partir de la Base de donnée
+		$form->setDbOptions('fonction',new Default_Model_Fonction());
+		$form->setDbOptions('pole', new Default_Model_Pole());
+
+		// condition sur le champ modalité pour ne pas affiché aucune modalité (propore au csm)
+		$where = array('libelle <> ?' => 'Aucune modalite');
+		$form->setDbOptions('modalite', new Default_Model_Modalite(),'getId','getLibelle',$where);
+
+		// condition sur le champ cs pour n'affiché que les entité non cs .
+		$where = array('cs = ?' => 0);
+		$form->setDbOptions('entite', new Default_Model_Entite(),'getId','getLibelle',$where);
+
+		$personne = new Default_Model_Personne();
+
+		if ($this->getRequest()->isPost()) 
+		{
+			$data = $request->getPost();
+		
+
+			///////////////// récupération de l'url///////////////
+			$requete = $this->getRequest();
+			if ($requete instanceof Zend_Controller_Request_Http)
+			{
+				$baseurl = $requete->getBaseUrl();
+			}
+
+			if ($form->isValid($request->getPost()))  // formulaire valide 
+			{
+				echo "</br> Form Valide";
+			    $personne = new Default_Model_Personne();
+		
+				$IsExist = $personne->IsExist($data['Nom'], $data['Prenom']);
+				
+				if($IsExist>0)  // personne existante 
+				{
+					$this->view->warning = "Désolé la ressource : ". $data['Nom']." ".$data['Prenom']." existe déjà !";
+							
+					// vider les champs ci dessous 
+					$form->getElement('Nom')->setValue('');
+					$form->getElement('Prenom')->setValue('');
+					$form->getElement('entite')->setValue('');
+					$form->getElement('modalite')->setValue('');
+					$form->getElement('pole')->setValue('');
+					$form->getElement('date_entree')->setValue('');
+					$form->getElement('date_debut')->setValue('');
+					$form->getElement('date_fin')->setValue('');
+					$form->getElement('pourcent')->setValue('100');
+					$form->getElement('Stage')->setValue('');
+				}
+				else            // personne inexistante         
+				{
+
+				    if($data['date_entree'] > $data['date_debut'])  // si on a pas saisi une date_fin
+					{
+						 $this->view->error = "La date d'entree doit étre inf&eacute;rieure ou &eacute;gale à la date de debut";
+				    	 $form->getElement('date_entree')->setView()->addError("");
+				     	 $form->getElement('date_debut')->setView()->addError("");
+					 }
+				     elseif($data['date_fin'] <> '')
+				    { 
+				     	if ($data['date_debut'] > $data['date_fin']) // si date debut > date fin 
+						{
+							$this->view->error = "La date de d&eacute;but doit étre inf&eacute;rieure ou &eacute;gale à la date de fin";
+				    	 	$form->getElement('date_debut')->setView()->addError("");
+			        		$form->getElement('date_fin')->setView()->addError("");
+						}
+						else
+						{
+						
+							// remplir l'objet personne avec les informations necessaires 
+						    $personne->setNom($data['Nom']);
+						    $personne->setPrenom($data['Prenom']);
+							//centre de service,modalité et entité figés pour le csm
+					        $personne->setEntite($data['entite']);
+							$personne->setModalite($data['modalite']);
+							$personne->setFonction($data['fonction']);  
+		                    $personne->setPole($data['pole']);
+		                    $personne->setDate_entree($data['date_entree']);
+		                    $personne->setDate_debut($data['date_debut']);
+		                    $personne->setDate_fin($data['date_fin']);
+		                    $personne->setPourcent($data['pourcent']);
+		                    $personne->setStage($data['Stage']);
+	
+							try 
+						 	{
+								$personne->save();
+							    // affichage du message de succès 
+								if($personne->getStage() == '1')
+								{$this->view->success = "Création du stagiaire : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}
+							    else 
+							    {$this->view->success = "Création de la ressource : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}  
+							    
+							    // vider les champs ci dessous 
+								$form->getElement('Nom')->setValue('');
+								$form->getElement('Prenom')->setValue('');
+								$form->getElement('entite')->setValue('');
+								$form->getElement('modalite')->setValue('');
+								$form->getElement('pole')->setValue('');
+								$form->getElement('date_entree')->setValue('');
+								$form->getElement('date_debut')->setValue('');
+								$form->getElement('date_fin')->setValue('');
+								$form->getElement('pourcent')->setValue('100');
+								$form->getElement('Stage')->setValue('');
+							    
+							}
+							catch (Zend_Db_Exception $e)
+							{
+									$this->view->error = "Création de la ressource a échoué !";
+									$form->populate($data);
+							}
+				
+
+						    // affichage du message de succès 
+						    if($personne->getStage() == '1')
+							{$this->view->success = "Création du stagiaire : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}
+						    else 
+							{$this->view->success = "Création de la ressource : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}  				
+					    }		
+				    }				   
 					else 
 					{
-						//$solde ->setTotal_q1($form->getValue('id_modalite_pr'));
-						$solde ->setTotal_q2(1);
-					}
-					$solde ->setTotal_q1($form->getValue('id_modalite_pr'));
-					$solde ->setAnnee_reference();
-					$solde->save();
-	
-					//redirection
-					$this->_helper->redirector('index');
+					    // remplir l'objet personne avec les informations necessaires 
+					    $personne->setNom($data['Nom']);
+					    $personne->setPrenom($data['Prenom']);
+						//centre de service,modalité et entité figés pour le csm
+				        $personne->setEntite($data['entite']);
+						$personne->setModalite($data['modalite']);
+						$personne->setFonction($data['fonction']);  
+	                    $personne->setPole($data['pole']);
+	                    $personne->setDate_entree($data['date_entree']);
+	                    $personne->setDate_debut($data['date_debut']);
+	                    $personne->setDate_fin($data['date_fin']);
+	                    $personne->setPourcent($data['pourcent']);
+	                    $personne->setStage($data['Stage']);
+
+						try 
+						{
+							$personne->save();
+						    // affichage du message de succès 
+							if($personne->getStage() == '1')
+							{$this->view->success = "Création du stagiaire : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}
+						    else 
+						    {$this->view->success = "Création de la ressource : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}  
+						    
+						    // vider les champs ci dessous 
+							$form->getElement('Nom')->setValue('');
+							$form->getElement('Prenom')->setValue('');
+							$form->getElement('entite')->setValue('');
+							$form->getElement('modalite')->setValue('');
+							$form->getElement('pole')->setValue('');
+							$form->getElement('date_entree')->setValue('');
+							$form->getElement('date_debut')->setValue('');
+							$form->getElement('date_fin')->setValue('');
+							$form->getElement('pourcent')->setValue('100');
+							$form->getElement('Stage')->setValue('');
+						    
+						}
+						catch (Zend_Db_Exception $e)
+						{
+								$this->view->error = "Création de la ressource a échoué !";
+								$form->populate($data);
+						}
+				
+					  }
+
 				}
 			}
-			else
-			{
+			else   // formulaire invalide
+			{   echo "</br> Form Invalide !!";
+                $IsExist = $personne->IsExist($data['Nom'], $data['Prenom']);
 				
-				$form->populate($data);
-			}
-		}
-	}
+                if($IsExist>0)    // personne existe 
+				{
+					$this->view->warning = "Désolé la ressource : ". $data['Nom']." ".$data['Prenom']." existe déjà !";
+							
+					// vider les champs ci dessous 
+					$form->getElement('Nom')->setValue('');
+					$form->getElement('Prenom')->setValue('');
+					$form->getElement('entite')->setValue('');
+					$form->getElement('modalite')->setValue('');
+					$form->getElement('pole')->setValue('');
+					$form->getElement('date_entree')->setValue('');
+					$form->getElement('date_debut')->setValue('');
+					$form->getElement('date_fin')->setValue('');
+					$form->getElement('pourcent')->setValue('100');
+					$form->getElement('Stage')->setValue('');
+				}
+				else              // personne inexistante 
+				{
+				
+				    if($data['Nom'] === '')  // si on a pas saisi un Nom
+					{$this->view->error = "Veuillez saisir un nom !";}
+					elseif($data['Prenom'] == '') // si on a pas saisi un Prenom
+					{$this->view->error = "Veuillez saisir un prenom !";}
+				    elseif($data['entite'] === 'x')  // si on a pas selectionné une entite  id = 'x'
+					{$this->view->error = "Veuillez selectionner une entit&eacute; !";}
+				    elseif($data['modalite'] === 'x')  // si on a pas selectionné une modalité  id = 'x'
+					{$this->view->error = "Veuillez selectionner une modalit&eacute; !";}
+					elseif($data['fonction'] === 'x')  // si on a pas selectionné une fonction  id = 'x'
+					{$this->view->error = "Veuillez selectionner une fonction !";}
+					elseif($data['pole'] === 'x')  // si on a pas selectionné un pole  id = 'x'
+					{$this->view->error = "Veuillez selectionner un pole !";}
+					elseif($data['date_entree'] === '')  // si on a pas saisi une date_d'entree
+					{$this->view->error = "Veuillez saisir une date d'entree !";}
+					elseif($data['date_debut'] === '')  // si on a pas saisi une date_debut
+					{$this->view->error = "Veuillez saisir une date debut !";}
+				    elseif($data['date_entree'] > $data['date_debut'])  // si on a pas saisi une date_fin
+					{$this->view->error = "La date d'entree doit étre inf&eacute;rieure ou &eacute;gale à la date de debut";
+				     $form->getElement('date_entree')->setView()->addError("");
+				     $form->getElement('date_debut')->setView()->addError("");}
+				    elseif($form->getElement('pourcent')->hasErrors())                    
+			        {$this->view->error = "Le pourcentage doit etre compris entre 0 et 100";}
+				     elseif($data['date_fin'] <> '')
+				    { 
+				    	 if ($data['date_debut'] > $data['date_fin']) // si date debut > date fin 
+					 	{	
+					 		$this->view->error = "La date de d&eacute;but doit étre inf&eacute;rieure ou &eacute;gale à la date de fin";
+				     		$form->getElement('date_debut')->setView()->addError("");
+			         		$form->getElement('date_fin')->setView()->addError("");
+					 	}
+					 	else
+					 	{
+						 	// remplir l'objet personne avec les informations necessaires 
+						    $personne->setNom($data['Nom']);
+						    $personne->setPrenom($data['Prenom']);
+							//centre de service,modalité et entité figés pour le csm
+					        $personne->setEntite($data['entite']);
+							$personne->setModalite($data['modalite']);
+							$personne->setFonction($data['fonction']);  
+		                    $personne->setPole($data['pole']);
+		                    $personne->setDate_entree($data['date_entree']);
+		                    $personne->setDate_debut($data['date_debut']);
+		                    $personne->setDate_fin($data['date_fin']);
+		                    $personne->setPourcent($data['pourcent']);
+		                    $personne->setStage($data['Stage']);
+	
+					 	    try
+					 	    {
+								$personne->save();
+							    // affichage du message de succès 
+								if($personne->getStage() == '1')
+								{$this->view->success = "Création du stagiaire : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}
+							    else 
+							    {$this->view->success = "Création de la ressource : ".$data['Nom']." ".$data['Prenom']. " avec succès !";}  
+							    
+							    // vider les champs ci dessous 
+								$form->getElement('Nom')->setValue('');
+								$form->getElement('Prenom')->setValue('');
+								$form->getElement('entite')->setValue('');
+								$form->getElement('modalite')->setValue('');
+								$form->getElement('pole')->setValue('');
+								$form->getElement('date_entree')->setValue('');
+								$form->getElement('date_debut')->setValue('');
+								$form->getElement('date_fin')->setValue('');
+								$form->getElement('pourcent')->setValue('100');
+								$form->getElement('Stage')->setValue('');
+							    
+							}
+							catch (Zend_Db_Exception $e)
+							{
+									$this->view->error = "Création de la ressource a échoué !";
+									$form->populate($data);
+							}
+					 	
+					 	}
+				    }	
+			        else
+					{$this->view->error = "Formulaire invalide !";}	
+					$form->populate($data);	
+				    
+			     }// fin else	     
+	       }// fin else
+     }// fin if requete post
+	$this->_helper->viewRenderer('createp');
+	$this->view->form = $form;
+
+}// fin action createpf
+
+
+
+	// editAction()  :  modifier une personne de l'equipe FRONT ou CSM 
+	// MTA : modifié le 23/07/2013 
 
 	public function editAction()
-	{
-		//cr�ation du fomulaire
-		$form = new Default_Form_Personne();
-		//indique l'action qui va traiter le formulaire
-		$form->setAction($this->view->url(array('controller' => 'personne', 'action' => 'edit'), 'default', true));
-		$form->submit->setLabel('Modifier');
+	{   
+		$id = $this->_getParam('id');
+		$personne = new Default_Model_Personne();
+		$personne = $personne->find($id);
 
-		//assigne le formulaire � la vue
-		$this->view->form = $form;
-		$this->view->title = "Modifier les donnees d'Une Ressource";
-		//si la page est POST�e = formulaire envoy�
-		if($this->getRequest()->isPost())
-		{
-			//r�cup�ration des donn�es envoy�es par le formulaire
-			$data = $this->getRequest()->getPost();
+	    /* Génération de formulaire ressource Marocaine */
+        
+		//******// ENTITE MAROCAINE //******//
+		if( $personne->getEntite()->getCs() == "1")    //*******************************************************************************************
+		{   
+			$form    = new Default_Form_PersonneMa();
+			//MBA : Peuplé les listes déroulantes é partir de la Base de donnée
+			$form->setDbOptions('fonction',new Default_Model_Fonction());
+			$form->setDbOptions('pole', new Default_Model_Pole());
+			$this->view->title ='Modification ressource Marocaine';			
 
-			//v�rifie que les donn�es r�pondent aux conditions des validateurs
-			if($form->isValid($data))
-			{
-				//cr�ation et initialisation d'un objet Default_Model_Personne
-				//qui sera enregistr� dans la base de donn�es
-				$personne = new Default_Model_Personne();
-				$personne->setId($form->getValue('id'));
-				$personne->setNom($form->getValue('nom_pr'));
-				$personne->setPrenom($form->getValue('prenom_pr'));
-				$personne->setDate_debut('0000-00-00');
-				$personne->setDate_fin('0000-00-00');
-				$personne->setId_pole($form->getValue('id_pole_pr'));
-				$personne->setId_entite($form->getValue('id_entite_pr'));
-				$personne->setId_fonction($form->getValue('id_fonction_pr'));
-				$personne->setCentre_service($form->getValue('centre_service_pr'));
-				$personne->setPourcent($form->getValue('pourcent_pr'));
-				$personne->setStage($form->getValue('stage_pr'));
-				$personne_vant_modif = new default_model_Personne();
-				$personne_vant_modif  = $personne_vant_modif ->find($form->getValue('id'));
-				$date_entree1 = $personne_vant_modif ->getDate_entree();
-				$modalite_base =  $personne_vant_modif ->getId_modalite();
-				$date_entree_base=$form->getValue('date_entree_pr');
-				$modalite = $form->getValue('id_modalite_pr');
-				if ($date_entree1 !=$date_entree_base || $modalite_base != $modalite )
-				{
-					$solde= new Default_Model_Solde();
-					$solde->delete($form->getValue('id'));
-					$solde->setId_personne($form->getValue('id'));
-					$solde ->setTotal_cp($date_entree_base);
-					$solde ->setTotal_q1($modalite);
-					$solde ->setTotal_q2(2);
-					$solde ->setAnnee_reference();
-					$solde->save();
-				}
-				$personne->setDate_entree($date_entree_base);
-				$personne->setId_modalite($modalite);
-				$personne->save();
+            // sauvegarder les données a modifiées 
+			$PreData['Nom'] = $personne->getNom();
+			$PreData['Prenom'] = $personne->getPrenom();
+			$PreData['fonction']=  intval($personne->getFonction()->getId());
+			$PreData['pole'] = intval($personne->getPole()->getId());
+			$PreData['date_debut'] = date('Y-m-d',strtotime($personne->getDate_debut()));
+			$PreData['date_entree'] = date('Y-m-d',strtotime($personne->getDate_entree()));
+			$PreData['date_fin'] = date('Y-m-d',strtotime($personne->getDate_fin()));
+			$PreData['pourcent'] = intval($personne->getPourcent());
+			$PreData['Stage'] = $personne->getStage();
 
+			// si la date retourné est 1970-01-01 on vide le champs 
+			if($PreData['date_fin'] == '1970-01-01')
+			$PreData['date_fin'] = '';
+						
+			// remplir le formulaire avec ces données PreData
+			$form->populate($PreData);
+
+			$this->_helper->viewRenderer('createp');
+			$this->view->form = $form;
 			
-				//redirection
-				$this->_helper->redirector('index');
-			}
-			else
-			{
-				//si erreur rencontr�e, le formulaire est rempli avec les donn�es
-				//envoy�es pr�c�demment
-				$form->populate($data);
-			}
-		}
-		else
+			// renommer le boutton valider => Modifier
+		    $form->getElement('creer')->setLabel('Modifier');  
+			
+			if($this->getRequest()->isPost())
+			{  
+				//récupération des données envoyées par le formulaire
+				$data = $this->getRequest()->getPost();
+            
+				///////////////// récupération de l'url///////////////
+			    $requete = $this->getRequest();
+			    if ($requete instanceof Zend_Controller_Request_Http)
+			    {$baseurl = $requete->getBaseUrl();}
+                //////////////////////////////////////////////////////
+			  
+				//vérifie que les données répondent aux conditions des validateurs
+				if($form->isValid($data))
+				{   
+				     if($data['Nom'] === '')  // si on a pas saisi un Nom
+					 {$this->view->error = "Veuillez saisir un nom !";}
+					 elseif($data['Prenom'] == '') // si on a pas saisi un Prenom
+					 {$this->view->error = "Veuillez saisir un prenom !";}
+					 elseif($data['fonction'] === 'x')  // si on a pas selectionné une fonction  id = 'x'
+					 {$this->view->error = "Veuillez selectionner une fonction !";}
+					 elseif($data['pole'] === 'x')  // si on a pas selectionné un pole  id = 'x'
+					 {$this->view->error = "Veuillez selectionner un pole !";}
+					 elseif($data['date_entree'] === '')  // si on a pas saisi une date_d'entree
+					 {$this->view->error = "Veuillez saisir une date d'entree !";}
+					 elseif($data['date_debut'] === '')  // si on a pas saisi une date_debut
+					 {$this->view->error = "Veuillez saisir une date debut !";}
+				     elseif($data['date_entree'] > $data['date_debut'])  // si on a pas saisi une date_fin
+					 {$this->view->error = "La date d'entree doit étre inf&eacute;rieure ou &eacute;gale à la date de debut";
+				     $form->getElement('date_entree')->setView()->addError("");
+				     $form->getElement('date_debut')->setView()->addError("");}
+				     elseif($form->getElement('pourcent')->hasErrors())                    
+			        {$this->view->error = "Le pourcentage doit etre compris entre 0 et 100";}
+				     elseif($data['date_fin'] <> '')
+				     { 
+				        if ($data['date_debut'] > $data['date_fin']) // si date debut > date fin 
+					    {
+					    	$this->view->error = "La date de d&eacute;but doit étre inf&eacute;rieure ou &eacute;gale à la date de fin";
+				        	$form->getElement('date_debut')->setView()->addError("");
+			            	$form->getElement('date_fin')->setView()->addError("");
+					    }
+					    else
+					    {
+						      $isArrayEquals = true;
+								// vérifie si les données ont subit une modification
+								foreach($PreData as $k=>$v)
+								{
+									if((string)$PreData[$k] != (string)$data[$k])
+									{
+										$isArrayEquals = false ;
+									}
+								}
+			
+								if($isArrayEquals == true)
+								{
+									$this->view->warning = "Aucun champ n'a &eacute;t&eacute; modifi&eacute; !";
+								}
+								else
+								{		
+										$data['id'] = $personne->getId();
+										$data['date_entree'] = date('Y-m-d',strtotime($data['date_entree']));
+										$data['date_debut'] = date('Y-m-d',strtotime($data['date_debut']));
+										$data['date_fin'] = date('Y-m-d',strtotime($data['date_fin']));
+										$data['entite'] = $personne->getEntite();
+										$data['modalite'] = $personne->getModalite();
+				              
+										$personne = new Default_Model_Personne($data);
+				           
+										try 
+										{	
+											$personne->save();
+										}
+										catch (Zend_Db_Exception $e)
+										{
+											if($form->getElement('fonction')->getValue() == 'x')
+											$form->getElement('fonction')->addError("erreur");
+				
+											if($form->getElement('pole')->getValue() == 'x')
+											$form->getElement('pole')->addError("erreur");
+											$this->view->error = "Erreur d'insertion : ".$e->getMessage();
+											$form->populate($data);
+										}
+				
+										$this->view->success = "Les informations de la ressource : ".$data['Nom']." ".$data['Prenom']. " ont été modifiées avec succès !";
+										header("Refresh:1.5;URL=".$baseurl."/personne/index");              // URL dynamique	
+				
+							    } // fin else
+						   } // fin else
+				      }// fin elseif
+					  else 
+				     {   	
+									$isArrayEquals = true;
+									// vérifie si les données ont subit une modification
+									foreach($PreData as $k=>$v)
+									{
+										if((string)$PreData[$k] != (string)$data[$k])
+										{
+											$isArrayEquals = false ;
+										}
+									}
+				
+									if($isArrayEquals == true)
+									{
+										$this->view->warning = "Aucun champ n'a &eacute;t&eacute; modifi&eacute; !";
+									}
+									else
+									{		
+											$data['id'] = $personne->getId();
+											$data['date_entree'] = date('Y-m-d',strtotime($data['date_entree']));
+											$data['date_debut'] = date('Y-m-d',strtotime($data['date_debut']));
+											$data['date_fin'] = date('Y-m-d',strtotime($data['date_fin']));
+											$data['entite'] = $personne->getEntite();
+											$data['modalite'] = $personne->getModalite();
+					
+											$personne = new Default_Model_Personne($data);
+					                      
+											try 
+											{	
+												$personne->save();
+											}
+											catch (Zend_Db_Exception $e)
+											{
+												if($form->getElement('fonction')->getValue() == 'x')
+												$form->getElement('fonction')->addError("erreur");
+					
+												if($form->getElement('pole')->getValue() == 'x')
+												$form->getElement('pole')->addError("erreur");
+												$this->view->error = "Erreur d'insertion : ".$e->getMessage();
+												$form->populate($data);
+					
+											}
+					
+											$this->view->success = "Les informations de la ressource : ".$data['Nom']." ".$data['Prenom']. " ont été modifiées avec succès !";
+											header("Refresh:1.5;URL=".$baseurl."/personne/index");              // URL dynamique	
+					
+								     } // fin else
+						} // fin else 
+				} // fin forme valide 
+				else     // Formulaire invalide                                          
+				{     		    
+
+				    if($data['Nom'] === '')  // si on a pas saisi un Nom
+					{$this->view->error = "Veuillez saisir un nom !";}
+					elseif($data['Prenom'] == '') // si on a pas saisi un Prenom
+					{$this->view->error = "Veuillez saisir un prenom !";}
+					elseif($data['fonction'] === 'x')  // si on a pas selectionné une fonction  id = 'x'
+					{$this->view->error = "Veuillez selectionner une fonction !";}
+					elseif($data['pole'] === 'x')  // si on a pas selectionné un pole  id = 'x'
+					{$this->view->error = "Veuillez selectionner un pole !";}
+					elseif($data['date_entree'] === '')  // si on a pas saisi une date_d'entree
+					{$this->view->error = "Veuillez saisir une date d'entree !";}
+					elseif($data['date_debut'] === '')  // si on a pas saisi une date_debut
+					{$this->view->error = "Veuillez saisir une date debut !";}
+				    elseif($data['date_entree'] > $data['date_debut'])  // si on a pas saisi une date_fin
+					{$this->view->error = "La date d'entree doit étre inf&eacute;rieure ou &eacute;gale à la date de debut";
+				     $form->getElement('date_entree')->setView()->addError("");
+				     $form->getElement('date_debut')->setView()->addError("");}
+		    		elseif($form->getElement('pourcent')->hasErrors())                    
+			        {$this->view->error = "Le pourcentage doit etre compris entre 0 et 100";}
+				     elseif($data['date_fin'] <> '')
+				    { 
+					      if ($data['date_debut'] > $data['date_fin']) // si date debut > date fin 
+						  {
+						  	$this->view->error = "La date de d&eacute;but doit étre inf&eacute;rieure ou &eacute;gale à la date de fin";
+					        $form->getElement('date_debut')->setView()->addError("");
+				            $form->getElement('date_fin')->setView()->addError("");
+						  }
+				   	      else
+					      {
+						      $isArrayEquals = true;
+								// vérifie si les données ont subit une modification
+								foreach($PreData as $k=>$v)
+								{
+									if((string)$PreData[$k] != (string)$data[$k])
+									{
+										$isArrayEquals = false ;
+									}
+								}
+			
+								if($isArrayEquals == true)
+								{
+									$this->view->warning = "Aucun champ n'a &eacute;t&eacute; modifi&eacute; !";
+								}
+								else
+								{		
+										$data['id'] = $personne->getId();
+										$data['date_entree'] = date('Y-m-d',strtotime($data['date_entree']));
+										$data['date_debut'] = date('Y-m-d',strtotime($data['date_debut']));
+										$data['date_fin'] = date('Y-m-d',strtotime($data['date_fin']));
+										$data['entite'] = $personne->getEntite();
+										$data['modalite'] = $personne->getModalite();
+				
+										$personne = new Default_Model_Personne($data);
+				           
+										try 
+										{	
+											$personne->save();
+										}
+										catch (Zend_Db_Exception $e)
+										{
+											if($form->getElement('fonction')->getValue() == 'x')
+											$form->getElement('fonction')->addError("erreur");
+				
+											if($form->getElement('pole')->getValue() == 'x')
+											$form->getElement('pole')->addError("erreur");
+											$this->view->error = "Erreur d'insertion : ".$e->getMessage();
+											$form->populate($data);
+				
+										}
+				
+										$this->view->success = "Les informations de la ressource : ".$data['Nom']." ".$data['Prenom']. " ont été modifiées avec succès !";
+										header("Refresh:1.5;URL=".$baseurl."/personne/index");              // URL dynamique	
+				
+								} // fin else
+						  } // fin else
+					  }	// fin elseif 		    		
+					else // sinon 
+					{     	
+					 $this->view->error = "Formulaire invalide !";}
+					 $form->populate($data);
+			     	}
+			     	
+				$this->_helper->viewRenderer('createp');
+				$this->view->form = $form;
+
+			}// fin formulaire envoyé
+		} // fin if entité marocaine
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		 //******************//  ENTITE FRANCAISE  //******************//
+		elseif( $personne->getEntite()->getCs() == "0")    
 		{
-			//r�cup�ration de l'id pass� en param�tre
-			$id = $this->_getParam('id', 0);
+			$form    = new Default_Form_PersonneFr();
 
-			if($id > 0)
+			//MBA : Peuplé les listes déroulantes é partir de la Base de donnée
+			$form->setDbOptions('fonction',new Default_Model_Fonction());
+			$form->setDbOptions('pole', new Default_Model_Pole());
+
+			// condition sur le champ modalité pour ne pas affiché aucune modalité (propore au csm)
+			$where = array('libelle <> ?' => 'Aucune modalite');
+			$form->setDbOptions('modalite', new Default_Model_Modalite(),'getId','getLibelle',$where);
+
+			// condition sur le champ cs pour n'affiché que les entité non cs .
+			$where = array('cs = ?' => 0);
+			$form->setDbOptions('entite', new Default_Model_Entite(),'getId','getLibelle',$where);
+
+			$this->view->title ='Modification ressource Française';
+
+			$PreData['Nom'] = $personne->getNom();
+			$PreData['Prenom'] = $personne->getPrenom();
+			$PreData['entite'] = intval($personne->getEntite()->getId());
+			$PreData['modalite'] = intval($personne->getModalite()->getId());
+			$PreData['fonction']= intval($personne->getFonction()->getId());
+			$PreData['pole'] = intval($personne->getPole()->getId());
+			$PreData['date_entree'] = date('Y-m-d',strtotime($personne->getDate_entree()));
+			$PreData['date_debut'] = date('Y-m-d',strtotime($personne->getDate_debut()));
+			$PreData['date_fin'] = date('Y-m-d',strtotime($personne->getDate_fin()));
+			$PreData['pourcent'] = intval($personne->getPourcent());
+			$PreData['Stage'] = $personne->getStage();
+     
+			// si la date retourné est 1970-01-01 on vide le champs 
+			if($PreData['date_fin'] == '1970-01-01')
+			$PreData['date_fin'] = '';
+			
+		    // remplir le formulaire avec ces données PreData
+			$form->populate($PreData);
+			
+			$this->_helper->viewRenderer('createp');
+			$this->view->form = $form;
+			
+			// renommer le boutton valider => Modifier
+		    $form->getElement('creer')->setLabel('Modifier');  
+			
+		    if($this->getRequest()->isPost())
 			{
-				//r�cup�ration de l'entr�e
-				$personne = new Default_Model_Personne();
-				$personne = $personne->find($id);
+				//récupération des données envoyées par le formulaire
+				$data = $this->getRequest()->getPost();
 
-				//assignation des valeurs de l'entr�e dans un tableau
-				//tableau utilis� pour la m�thode populate() qui va remplir le champs du formulaire
-				//avec les valeurs du tableau
-				$data[] = array();
-				$data['id'] = $personne->getId();
-				$data['nom'] = $personne->getNom();
-				$data['prenom'] = $personne->getPrenom();
-				$data['date_entree'] = $personne->getDate_entree();
-				$data['pole'] = $personne->getId_pole();
-				$data['entite'] = $personne->getId_entite();
-				$data['modalite'] = $personne->getId_modalite();
-				$data['fonction'] = $personne->getId_fonction();
-				$data['centre_service'] = $personne->getCentre_service();
-				$data['pourcent'] = $personne->getPourcent();
-				$data['stage'] = $personne->getStage();
-				$form->populate($data);
+				// récupération de l'url
+			    $requete = $this->getRequest();
+			    if ($requete instanceof Zend_Controller_Request_Http)
+			    {$baseurl = $requete->getBaseUrl();}
+               
+                
+			    //vérifie que les données répondent aux conditions des validateurs
+				if($form->isValid($data))   // formulaire valide 
+				{   
+			   
+				      if($data['Nom'] === '')  // si on a pas saisi un Nom
+					 {$this->view->error = "Veuillez saisir un nom !";}
+					 elseif($data['Prenom'] == '') // si on a pas saisi un Prenom
+					 {$this->view->error = "Veuillez saisir un prenom !";}
+					 elseif($data['entite'] === 'x')  // si on a pas selectionné une entite  id = 'x'
+					 {$this->view->error = "Veuillez selectionner une entit&eacute; !";}
+				     elseif($data['modalite'] === 'x')  // si on a pas selectionné une modalité  id = 'x'
+					 {$this->view->error = "Veuillez selectionner une modalit&eacute; !";}
+					 elseif($data['fonction'] === 'x')  // si on a pas selectionné une fonction  id = 'x'
+					 {$this->view->error = "Veuillez selectionner une fonction !";}
+					 elseif($data['pole'] === 'x')  // si on a pas selectionné un pole  id = 'x'
+					 {$this->view->error = "Veuillez selectionner un pole !";}
+					 elseif($data['date_entree'] === '')  // si on a pas saisi une date_d'entree
+					 {$this->view->error = "Veuillez saisir une date d'entree !";}
+					 elseif($data['date_debut'] === '')  // si on a pas saisi une date_debut
+					 {$this->view->error = "Veuillez saisir une date debut !";}
+					 elseif($data['date_entree'] > $data['date_debut'])  // si on a pas saisi une date_fin
+					 {$this->view->error = "La date d'entree doit étre inf&eacute;rieure ou &eacute;gale à la date de debut";
+				     $form->getElement('date_entree')->setView()->addError("");
+				     $form->getElement('date_debut')->setView()->addError("");}
+				     elseif($form->getElement('pourcent')->hasErrors())                    
+			         {$this->view->error = "Le pourcentage doit etre compris entre 0 et 100";}
+			         elseif($data['date_fin'] <> '')
+				     {
+				     	if ($data['date_debut'] > $data['date_fin']) // si date debut > date fin 
+					    {
+					    	$this->view->error = "La date de d&eacute;but doit étre inf&eacute;rieure ou &eacute;gale à la date de fin";
+				        	$form->getElement('date_debut')->setView()->addError("");
+			            	$form->getElement('date_fin')->setView()->addError("");
+					    }
+					    else
+					    {
+					    	$isArrayEquals = true;
+								// vérifie si les données ont subit une modification
+								foreach($PreData as $k=>$v)
+								{
+									if((string)$PreData[$k] != (string)$data[$k])
+									{
+										$isArrayEquals = false ;
+									}
+								}
+			
+								if($isArrayEquals == true)
+								{
+									$this->view->warning = "Aucun champ n'a &eacute;t&eacute; modifi&eacute; !";
+								}
+								else
+								{	 
+									    $data['id'] = $personne->getId();
+										$data['date_entree'] = date('Y-m-d',strtotime($data['date_entree']));
+										$data['date_debut'] = date('Y-m-d',strtotime($data['date_debut']));
+										$data['date_fin'] = date('Y-m-d',strtotime($data['date_fin']));
+										$data['entite'] = $personne->getEntite();
+										$data['modalite'] = $personne->getModalite();
+				             
+										$personne = new Default_Model_Personne($data);
+				           
+										try 
+										{	
+											$personne->save();
+										}
+										catch (Zend_Db_Exception $e)
+										{
+											if($form->getElement('fonction')->getValue() == 'x')
+											$form->getElement('fonction')->addError("erreur");
+				
+											if($form->getElement('pole')->getValue() == 'x')
+											$form->getElement('pole')->addError("erreur");
+											$this->view->error = "Erreur d'insertion : ".$e->getMessage();
+											$form->populate($data);
+										}
+				
+										$this->view->success = "Les informations de la ressource : ".$data['Nom']." ".$data['Prenom']. " ont été modifiées avec succès !";
+										header("Refresh:1.5;URL=".$baseurl."/personne/index");   
+					              
+								}// Fin else 
+					      }// Fin else 	
+				     }// Fin elseif 
+				     else 
+				     {
+				     	        $isArrayEquals = true;
+								// vérifie si les données ont subit une modification
+								foreach($PreData as $k=>$v)
+								{
+									if((string)$PreData[$k] != (string)$data[$k])
+									{
+										$isArrayEquals = false ;
+									}
+								}
+			
+								if($isArrayEquals == true)
+								{
+									$this->view->warning = "Aucun champ n'a &eacute;t&eacute; modifi&eacute; !";
+								}
+								else
+								{	 
+									    $data['id'] = $personne->getId();
+										$data['date_entree'] = date('Y-m-d',strtotime($data['date_entree']));
+										$data['date_debut'] = date('Y-m-d',strtotime($data['date_debut']));
+										$data['date_fin'] = date('Y-m-d',strtotime($data['date_fin']));
+										$data['entite'] = $personne->getEntite();
+										$data['modalite'] = $personne->getModalite();
+				                          echo "</br> data 2: ";
+										var_dump($data);
+										$personne = new Default_Model_Personne($data);
+				           
+										try 
+										{	
+											$personne->save();
+										}
+										catch (Zend_Db_Exception $e)
+										{
+											if($form->getElement('fonction')->getValue() == 'x')
+											$form->getElement('fonction')->addError("erreur");
+				
+											if($form->getElement('pole')->getValue() == 'x')
+											$form->getElement('pole')->addError("erreur");
+											$this->view->error = "Erreur d'insertion : ".$e->getMessage();
+											$form->populate($data);
+										}
+				
+										$this->view->success = "Les informations de la ressource : ".$data['Nom']." ".$data['Prenom']. " ont été modifiées avec succès !";
+										header("Refresh:1.5;URL=".$baseurl."/personne/index");   
+															              
+								}// Fin else 		     
+				     }// Fin else     
+				}
+				else                        // formulaire invalide 
+				{
+				    echo "je suis la";
+				      if($data['Nom'] === '')  // si on a pas saisi un Nom
+					 {$this->view->error = "Veuillez saisir un nom !";}
+					 elseif($data['Prenom'] == '') // si on a pas saisi un Prenom
+					 {$this->view->error = "Veuillez saisir un prenom !";}
+					 elseif($data['entite'] === 'x')  // si on a pas selectionné une entite  id = 'x'
+					 {$this->view->error = "Veuillez selectionner une entit&eacute; !";}
+				     elseif($data['modalite'] === 'x')  // si on a pas selectionné une modalité  id = 'x'
+					 {$this->view->error = "Veuillez selectionner une modalit&eacute; !";}
+					 elseif($data['fonction'] === 'x')  // si on a pas selectionné une fonction  id = 'x'
+					 {$this->view->error = "Veuillez selectionner une fonction !";}
+					 elseif($data['pole'] === 'x')  // si on a pas selectionné un pole  id = 'x'
+					 {$this->view->error = "Veuillez selectionner un pole !";}
+					 elseif($data['date_entree'] === '')  // si on a pas saisi une date_d'entree
+					 {$this->view->error = "Veuillez saisir une date d'entree !";}
+					 elseif($data['date_debut'] === '')  // si on a pas saisi une date_debut
+					 {$this->view->error = "Veuillez saisir une date debut !";}
+					 elseif($data['date_entree'] > $data['date_debut'])  // si on a pas saisi une date_fin
+					 {$this->view->error = "La date d'entree doit étre inf&eacute;rieure ou &eacute;gale à la date de debut";
+				     $form->getElement('date_entree')->setView()->addError("");
+				     $form->getElement('date_debut')->setView()->addError("");}
+				     elseif($form->getElement('pourcent')->hasErrors())                    
+			         {$this->view->error = "Le pourcentage doit etre compris entre 0 et 100";}
+			         elseif($data['date_fin'] <> '')
+				     {
+				     	if ($data['date_debut'] > $data['date_fin']) // si date debut > date fin 
+					    {
+					    	$this->view->error = "La date de d&eacute;but doit étre inf&eacute;rieure ou &eacute;gale à la date de fin";
+				        	$form->getElement('date_debut')->setView()->addError("");
+			            	$form->getElement('date_fin')->setView()->addError("");
+					    }
+					    else
+					    {
+					    	$isArrayEquals = true;
+								// vérifie si les données ont subit une modification
+								foreach($PreData as $k=>$v)
+								{
+									if((string)$PreData[$k] != (string)$data[$k])
+									{
+										$isArrayEquals = false ;
+									}
+								}
+			
+								if($isArrayEquals == true)
+								{
+									$this->view->warning = "Aucun champ n'a &eacute;t&eacute; modifi&eacute; !";
+								}
+								else
+								{	 
+									    $data['id'] = $personne->getId();
+										$data['date_entree'] = date('Y-m-d',strtotime($data['date_entree']));
+										$data['date_debut'] = date('Y-m-d',strtotime($data['date_debut']));
+										$data['date_fin'] = date('Y-m-d',strtotime($data['date_fin']));
+										$data['entite'] = $personne->getEntite();
+										$data['modalite'] = $personne->getModalite();
+				             
+										$personne = new Default_Model_Personne($data);
+				           
+										try 
+										{	
+											$personne->save();
+										}
+										catch (Zend_Db_Exception $e)
+										{
+											if($form->getElement('fonction')->getValue() == 'x')
+											$form->getElement('fonction')->addError("erreur");
+				
+											if($form->getElement('pole')->getValue() == 'x')
+											$form->getElement('pole')->addError("erreur");
+											$this->view->error = "Erreur d'insertion : ".$e->getMessage();
+											$form->populate($data);
+										}
+				
+										$this->view->success = "Les informations de la ressource : ".$data['Nom']." ".$data['Prenom']. " ont été modifiées avec succès !";
+										header("Refresh:1.5;URL=".$baseurl."/personne/index");   
+					              
+								}// Fin else 	     
+					      }// Fin else 
+				     }// Fin elseif 
+
+				     else    // autre cas que les if et else 
+				     {
+				     	        $isArrayEquals = true;
+								// vérifie si les données ont subit une modification
+								foreach($PreData as $k=>$v)
+								{
+									if((string)$PreData[$k] != (string)$data[$k])
+									{
+										$isArrayEquals = false ;
+									}
+								}
+			
+								if($isArrayEquals == true)
+								{
+									$this->view->warning = "Aucun champ n'a &eacute;t&eacute; modifi&eacute; !";
+								}
+								else
+								{	 
+									    $data['id'] = $personne->getId();
+										$data['date_entree'] = date('Y-m-d',strtotime($data['date_entree']));
+										$data['date_debut'] = date('Y-m-d',strtotime($data['date_debut']));
+										$data['date_fin'] = date('Y-m-d',strtotime($data['date_fin']));
+										$data['entite'] = $personne->getEntite();
+										$data['modalite'] = $personne->getModalite();
+				                         // echo "</br> data 2: ";
+										//var_dump($data);
+										$personne = new Default_Model_Personne($data);
+				           
+										try 
+										{	
+											$personne->save();
+										}
+										catch (Zend_Db_Exception $e)
+										{
+											if($form->getElement('fonction')->getValue() == 'x')
+											$form->getElement('fonction')->addError("erreur");
+				
+											if($form->getElement('pole')->getValue() == 'x')
+											$form->getElement('pole')->addError("erreur");
+											$this->view->error = "Erreur d'insertion : ".$e->getMessage();
+											$form->populate($data);
+										}
+				
+										$this->view->success = "Les informations de la ressource : ".$data['Nom']." ".$data['Prenom']. " ont été modifiées avec succès !";
+										header("Refresh:1.5;URL=".$baseurl."/personne/index");   
+					              
+								}// Fin else 
+				     }// Fin else 
+				     
+				}
+			   			    
 			}
-		}
-	}
-
+			
+		}// Fin Modifier Front 
+		
+}// Fin Action modifier 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public function deleteAction()
 	{
-		//r�cup�re les param�tres de la requ�te
-		$params = $this->getRequest()->getParams();
 
-		//v�rifie que le param�tre id existe
-		if(isset($params['id']))
+		//é la reception d'une requete ajax
+
+		if($this->getRequest()->isXmlHttpRequest())
 		{
-			$id = $params['id'];
+			//récupération des données envoyé par ajax
+			$data = $this->getRequest()->getPost();
+			$id = $data['id'];
 
-			//cr�ation du mod�le pour la suppression
 			$personne = new Default_Model_Personne();
 			//appel de la fcontion de suppression avec en argument,
-			//la clause where qui sera appliqu�e
-			$result = $personne->delete("id=$id");
+			//la clause where qui sera appliquée
+			try {
+				$result = $personne->delete("id=$id");
 
-			//redirection
-			$this->_helper->redirector('index');
+			}
+			catch (Zend_Db_Exception $e)
+			{
+				// en cas d'erreur envoi de reponse avec code erreur [500]
+				$content = array("status"=>"500","result"=> $result);
+				$this->view->error= "Erreur";
+				$this->_helper->json($content);
+
+				echo $content;
+			}
+			//en cas de succés envoie de reponse avec code succés [200]
+		 	$this->view->success = "Suppression a été effectué";
+			$content = array("status"=>"200","result"=> "1");
+
+			// envoi de reponse en format Json
+			$this->_helper->json($content);
+
+
 		}
-		else
-		{
-			$this->view->form = 'Impossible delete: id missing !';
-		}
+
+
 	}
 
+
 }
+#endregion MBA
